@@ -4,4 +4,19 @@
 ######## 31/05/21 ##########
 ############################
 
-This repository contains (or will contain) a simple analysis module for our DEMP events after they have passed through the ECCE fun4all simulation
+This repository contains (or will contain) a simple analysis module for our DEMP events after they have passed through the ECCE fun4all simulation.
+
+Within the virtual machine (VM) -
+cd ~/
+source setup.sh
+mkdir work
+cd work
+git clone https://github.com/ECCE-EIC/macros
+git clone https://github.com/ECCE-EIC/tutorials
+mkdir ECCE_DEMP
+cd ECCE_DEMP
+CreateSubsysRecoModule.pl ECCE_DEMP
+cp ~/work/tutorials/CaloAna/src/*.[sa]* .
+sed -i "s/CaloAna/ECCE_DEMP/" Makefile.am
+sed -i "s/libcaloana/libeccedemp/" Makefile.am
+sed -i "s/caloana/eccedemp/" configure.ac
