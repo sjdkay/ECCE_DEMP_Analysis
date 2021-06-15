@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 lib_LTLIBRARIES = \
-    libeccedempana.la
+    libeccedemp.la
 
 AM_LDFLAGS = \
   -L$(libdir) \
@@ -10,28 +10,35 @@ AM_LDFLAGS = \
 AM_CPPFLAGS = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
-  -I$(ROOTSYS)/include
+  -I$(ROOTSYS)/include \
+  -isystem ${G4_MAIN}/include
+
+#  -I/cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/gsl-2.6/include 
 
 pkginclude_HEADERS = \
-  ECCE_DEMP_Ana.h
+  ECCE_DEMP.h
 
 if ! MAKEROOT6
   ROOT5_DICTS = \
-    ECCE_DEMP_Ana_Dict.cc
+  ECCE_DEMP_Dict.h
 endif
 
-libeccedempana_la_SOURCES = \
+libeccedemp_la_SOURCES = \
   $(ROOT5_DICTS) \
-  ECCE_DEMP_Ana.cc 
+  ECCE_DEMP.cc
 
-libeccedempana_la_LDFLAGS = \
+libeccedemp_la_LDFLAGS  = \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
   -lcalo_io \
   -lfun4all \
   -lg4detectors_io \
-  -lphg4hit
+  -lphg4hit\
+  -lgsl \
+  -lgslcblas 
 
+#   -L/cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/gsl-2.6/lib \ 
+#   \ -lm
 
 ################################################
 # linking tests
@@ -41,6 +48,7 @@ noinst_PROGRAMS = \
 
 testexternals_SOURCES = testexternals.C
 testexternals_LDADD = libeccedemp.la
+
 
 testexternals.C:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@

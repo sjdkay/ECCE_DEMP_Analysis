@@ -8,8 +8,8 @@
 
 R__LOAD_LIBRARY(libfun4all.so)
 
-#include <difftaggana/diff_tagg_ana.h>
-R__LOAD_LIBRARY(libdifftaggana.so)
+#include <eccedemp/ECCE_DEMP.h>
+R__LOAD_LIBRARY(libeccedemp.so)
 
 class PHG4Reco;
 
@@ -40,9 +40,6 @@ void UserInit()
   //BlackHoleGeometry::max_radius = std::max(BlackHoleGeometry::max_radius, XXX);
   //BlackHoleGeometry::max_z = std::max(BlackHoleGeometry::max_z, YYY);
   //BlackHoleGeometry::min_z = std::min(BlackHoleGeometry::min_z, ZZZ);
-
-
-
 }
 
 // If you have a detector - here goes the setup
@@ -55,7 +52,7 @@ void UserDetector(PHG4Reco *g4Reco)
 void UserAnalysisInit()
 {
   Fun4AllServer* se = Fun4AllServer::instance();
-  diff_tagg_ana *myAnalysisModule = new diff_tagg_ana("diff_tagg_ana","out.root");
+  ECCE_DEMP *myAnalysisModule = new ECCE_DEMP("ECCE_DEMP","out.root");
   se->registerSubsystem(myAnalysisModule);
   
   // AnalysisModule *myAnalysisModule = new AnalysisModule();

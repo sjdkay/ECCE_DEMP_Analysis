@@ -1,4 +1,4 @@
-AC_INIT(eccedempana,[1.00])
+AC_INIT(eccedemp,[1.00])
 AC_CONFIG_SRCDIR([configure.ac])
 
 AM_INIT_AUTOMAKE
