@@ -25,8 +25,7 @@ class ECCE_DEMP : public SubsysReco
 {
  public:
 
-//  ECCE_DEMP(const std::string &name = "diff_tagg_ana");
-  ECCE_DEMP(const std::string &name = "Diff_Tagg_ana", const std::string &fname = "MyNtuple.root");
+  ECCE_DEMP(const std::string &name = "ECCE_DEMP", const std::string &fname = "MyNtuple.root");
 
   virtual ~ECCE_DEMP();
 
@@ -66,10 +65,8 @@ class ECCE_DEMP : public SubsysReco
   int process_g4hits_ZDC(PHCompositeNode *);
   int process_g4hits_RomanPots(PHCompositeNode *);
 
-
   int process_g4hits(PHCompositeNode *, const std::string&);
   int process_g4clusters(PHCompositeNode *, const std::string&);
-
 
 // private:
 
@@ -81,8 +78,10 @@ class ECCE_DEMP : public SubsysReco
 
   TFile *outfile;
   TNtuple *g4hitntuple;
-  TNtuple *clusterntuple;
-
+  TNtuple *ZDChitntuple;
+  TNtuple *EMCalclusterntuple;
+  TNtuple *HCalInclusterntuple;
+  TNtuple *HCalOutclusterntuple;
   unsigned long long int event_itt;
   gsl_rng* m_RandomGenerator;
 
@@ -107,6 +106,10 @@ class ECCE_DEMP : public SubsysReco
   double have_true_dis_info = false;
   
   bool  HIT_IN_ZDC; 
+  bool  HIT_IN_EMCAL;
+  bool  HIT_IN_HCAL;
+  bool  CLUS_IN_EMCAL;
+  bool  CLUS_IN_HCAL;
   bool  HIT_IN_HEC;	
 
   double e_beam_energy;
@@ -115,7 +118,6 @@ class ECCE_DEMP : public SubsysReco
   double crossing_angle;
 
   TLorentzVector r_lelectron;
-//  TLorentzVector r_lproton;
 //  TLorentzVector r_lproton;
 
   TLorentzVector r_lscatelec;
@@ -126,10 +128,19 @@ class ECCE_DEMP : public SubsysReco
   Int_t ZDC_hit;
 
   TH2F* h2_ZDC_XY; 
-  TH2F* h2_ZDC_XY_double; 
+  TH2F* h2_ZDC_XY_nEnergy;
 
-  TH1F* h1_E_dep_smeared;
-  TH1F* h1_E_dep;
+  TH1F* h1_ZDC_E_dep;
+  TH1F* h1_ZDC_E_dep_smeared;
+
+  TH1F* h1_EMCal_E_dep;
+  TH1F* h1_EMCal_E_dep_smeared;
+
+  TH1F* h1_HCalIn_E_dep;
+  TH1F* h1_HCalIn_E_dep_smeared;
+
+  TH1F* h1_HCalOut_E_dep;
+  TH1F* h1_HCalOut_E_dep_smeared;
 
 };
 

@@ -101,30 +101,17 @@
 
 using namespace std;
 
-
-//____________________________________________________________________________..
-//ECCE_DEMP::ECCE_DEMP(const std::string &name):
-// SubsysReco(name)
-//{
-//  std::cout << "ECCE_DEMP::ECCE_DEMP(const std::string &name) Calling ctor" << std::endl;
-//}
-
-
 ECCE_DEMP::ECCE_DEMP(const std::string &name, const std::string& filename):
  SubsysReco(name)
  , outfilename(filename)
 {
   std::cout << "ECCE_DEMP_example::Diff_Tagg_example(const std::string &name) Calling ctor" << std::endl;
 
-
   unsigned int seed = PHRandomSeed();  // fixed seed is handled in this funtcion
   m_RandomGenerator = gsl_rng_alloc(gsl_rng_mt19937);
   gsl_rng_set(m_RandomGenerator, seed);
 
 }
-
-
-
 
 //____________________________________________________________________________..
 ECCE_DEMP::~ECCE_DEMP()
@@ -144,22 +131,21 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   // TH1 *h1 = new TH1F("h1",....)
   // hm->registerHisto(h1);
   outfile = new TFile(outfilename.c_str(), "RECREATE");
-  g4hitntuple = new TNtuple("hitntup", "G4Hits", "x0:y0:z0:x1:y1:z1:edep");
+  g4hitntuple = new TNtuple("hitntup", "G4Hits", "x0:y0:z0:x1:y1:z1:edep"); 
+  ZDChitntuple = new TNtuple("ZDChitntup", "G4Hits", "x0:y0:z0:x1:y1:z1:edep");
+  EMCalclusterntuple = new TNtuple ("EMCalclusterntup", "G4Clusters", "phi:z:edep:nTowers");
+  HCalInclusterntuple = new TNtuple ("HCalInclusterntup", "G4Clusters", "phi:z:edep:nTowers");
+  HCalOutclusterntuple = new TNtuple ("HCalOutclusterntup", "G4Clusters", "phi:z:edep:nTowers");
 
   std::cout << "ECCE_DEMP::Init(PHCompositeNode *topNode) Initializing" << std::endl;
 
   event_itt = 0;
 
-
   h2_ZDC_XY = new TH2F("ZDC_XY", "ZDC XY", 200, -50, 50, 200, -50, 50);
+  h2_ZDC_XY_nEnergy = new TH2F("ZDC_XY_nEnergy", "ZDC XY - EDep > 70 GeV", 200, -50, 50, 200, -50, 50);
 
-  h2_ZDC_XY_double = new TH2F("ZDC_XY_double", "ZDC XY Double gamma", 200, -50, 50, 200, -50, 50);
-
-  h1_E_dep = new TH1F("E_dep", "E Dependence", 120, 0.0, 60.0);
-
-  h1_E_dep_smeared = new TH1F("E_dep_smeared", "E Dependence Smeared", 120, 0.0, 60.0);
-
-
+  h1_ZDC_E_dep = new TH1F("ZDC_E_dep", "ZDC E Deposit", 120, 0.0, 60.0);
+  h1_ZDC_E_dep_smeared = new TH1F("ZDC_E_dep_smeared", "ZDC E Deposit", 120, 0.0, 60.0);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -174,8 +160,6 @@ int ECCE_DEMP::InitRun(PHCompositeNode *topNode)
 //____________________________________________________________________________..
 int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 {
-//  std::cout << "ECCE_DEMP::process_event(PHCompositeNode *topNode) Processing Event" << std::endl;
-
   
   ZDC_hit = 0;
 
@@ -188,22 +172,12 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 
   process_g4hits_RomanPots(topNode);
 
-
-  ////-------------------------
-  ////Example for Getting the Hadron end cap hits and clusters
-  //// uncommenting the following line:
-  ///// for inner Hadron end cap  
-  // process_g4hits(topNode, "HCALIN");
-  // process_g4clusters(topNode, "HCALIN");
-  //
-  ///// for outer Hadron end cap  
-  // process_g4hits(topNode, "HCALOUT");
-  // process_g4clusters(topNode, "HCALOUT");
-  //
-  //// for Electron end cap  
-  // process_g4hits(topNode, "EEMC");
-  // process_g4clusters(topNode, "EEMC");
-  //
+  //process_g4hits(topNode, "HCALIN");
+  process_g4clusters(topNode, "HCALIN");
+  //process_g4hits(topNode, "HCALOUT");
+  process_g4clusters(topNode, "HCALOUT");
+  //process_g4hits(topNode, "EEMC");
+  process_g4clusters(topNode, "EEMC");
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -227,13 +201,6 @@ int ECCE_DEMP::EndRun(const int runnumber)
 int ECCE_DEMP::End(PHCompositeNode *topNode)
 {
   std::cout << "ECCE_DEMP::End(PHCompositeNode *topNode) This is the End..." << std::endl;
-
-
-//  h2_ZDC_XY->Write();
-//  h2_ZDC_XY_double->Write();
-//  
-//  h1_E_dep->Write();
-//  h1_E_dep_smeared->Write();
 
   outfile->cd();
   g4hitntuple->Write();
@@ -262,44 +229,30 @@ void ECCE_DEMP::Print(const std::string &what) const
 //***************************************************
 //
 
-
 int ECCE_DEMP::process_g4hits_ZDC(PHCompositeNode* topNode)
 {
   ostringstream nodename;
 
   // loop over the G4Hits
   nodename.str("");
-//  nodename << "G4HIT_" << detector;
-//  nodename << "G4HIT_" << "ZDC";
   nodename << "G4HIT_" << "ZDC";
-//  nodename << "G4HIT_" << "EEMC";
 
   PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, nodename.str().c_str());
 
-//  cout << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " << endl;
-
-
   float smeared_E;
-
 
   if (hits) {
 //    // this returns an iterator to the beginning and the end of our G4Hits
     PHG4HitContainer::ConstRange hit_range = hits->getHits();
     for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++)
-
     {
-//	HIT_IN_ZDC=true;
 	ZDC_hit++;
     }
 
     for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++) {
 
-
-//	ZDC_hit++;
-
-//      cout << "AAA" << endl;
       // the pointer to the G4Hit is hit_iter->second
-      g4hitntuple->Fill(hit_iter->second->get_x(0),
+      ZDChitntuple->Fill(hit_iter->second->get_x(0),
                         hit_iter->second->get_y(0),
                         hit_iter->second->get_z(0),
                         hit_iter->second->get_x(1),
@@ -307,39 +260,21 @@ int ECCE_DEMP::process_g4hits_ZDC(PHCompositeNode* topNode)
                         hit_iter->second->get_z(1),
                         hit_iter->second->get_edep());
 
-
-
-//      cout << hit_iter->second->get_x(0)-90 << "   " << hit_iter->second->get_y(0) << endl;
-
-
       h2_ZDC_XY->Fill(hit_iter->second->get_x(0)-90, hit_iter->second->get_y(0)); 
 //
       smeared_E = EMCAL_Smear(hit_iter->second->get_edep());
-//
-      if (ZDC_hit == 2 ) {
+      h1_ZDC_E_dep->Fill(hit_iter->second->get_edep());
+      h1_ZDC_E_dep_smeared->Fill(smeared_E);
 
-//      cout << hit_iter->second->get_x(0)-90 << "   " << hit_iter->second->get_y(0) << endl;
-
-        h2_ZDC_XY_double->Fill(hit_iter->second->get_x(0)-90, hit_iter->second->get_y(0)); 
-//      h1_E_dep->Fill(hit_iter->second->get_edep()); 
-//
-        h1_E_dep->Fill(hit_iter->second->get_edep()); 
-        h1_E_dep_smeared->Fill(smeared_E); 
-//
+      // Event has roughly the correct energy for a "real" neutron event
+      if(smeared_E > 70){
+	h2_ZDC_XY_nEnergy->Fill(hit_iter->second->get_x(0)-90, hit_iter->second->get_y(0));
       }
-//
-//
-//
-////	hit_iter->get_avg_t();
-
     }
   }
 
-//  cout << "BB" << endl;
-
   return Fun4AllReturnCodes::EVENT_OK;
 }
-
 
 //***************************************************
 // Getting the RomanPots hits
@@ -348,18 +283,10 @@ int ECCE_DEMP::process_g4hits_RomanPots(PHCompositeNode* topNode)
 {
   ostringstream nodename;
 
-
-  cout << "Entering Romanpot?" << endl;
-
-  // loop over the G4Hits
   nodename.str("");
-//  nodename << "G4HIT_" << detector;
-//  nodename << "G4HIT_" << "ZDC";
   nodename << "G4HIT_" << "RomanPots_0";
-//  nodename << "G4HIT_" << "EEMC";
 
   PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, nodename.str().c_str());
-
 
   if (hits) {
 //    // this returns an iterator to the beginning and the end of our G4Hits
@@ -367,16 +294,14 @@ int ECCE_DEMP::process_g4hits_RomanPots(PHCompositeNode* topNode)
 
     for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++) {
 
-
-	cout << "Roman pot hits? " << endl;
-	cout << "This is where you can fill your loop " << endl;
+      //cout << "Roman pot hits? " << endl;
+      //cout << "This is where you can fill your loop " << endl;
 
       }
     }
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
-
 
 //*****************************************************
 
@@ -389,7 +314,6 @@ float ECCE_DEMP::EMCAL_Smear(float E) {
 
   return E_reco;
 }
-
 
 //*****************************************************
 
@@ -429,9 +353,6 @@ float ECCE_DEMP::Position_Smear(float P) {
 
 }
 
-
-
-
 int ECCE_DEMP::process_g4hits(PHCompositeNode* topNode, const std::string& detector)
 {
   ostringstream nodename;
@@ -460,10 +381,6 @@ int ECCE_DEMP::process_g4hits(PHCompositeNode* topNode, const std::string& detec
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-
-
-
-
 int ECCE_DEMP::process_g4clusters(PHCompositeNode* topNode, const string& detector)
 {
   ostringstream nodename;
@@ -476,13 +393,26 @@ int ECCE_DEMP::process_g4clusters(PHCompositeNode* topNode, const string& detect
   {
     RawClusterContainer::ConstRange cluster_range = clusters->getClusters();
     for (RawClusterContainer::ConstIterator cluster_iter = cluster_range.first; cluster_iter != cluster_range.second; cluster_iter++)
-    {
-      clusterntuple->Fill(cluster_iter->second->get_phi(),
-                          cluster_iter->second->get_z(),
-                          cluster_iter->second->get_energy(),
-                          cluster_iter->second->getNTowers());
+      {// Fill ntuple depending on where clusters are coming from
+      if (detector == "EEMC"){
+	EMCalclusterntuple->Fill(cluster_iter->second->get_phi(),
+			    cluster_iter->second->get_z(),
+			    cluster_iter->second->get_energy(),
+			    cluster_iter->second->getNTowers());
+      }
+      else if (detector == "HCALIN"){
+        HCalInclusterntuple->Fill(cluster_iter->second->get_phi(),
+				 cluster_iter->second->get_z(),
+				 cluster_iter->second->get_energy(),
+				 cluster_iter->second->getNTowers());
+      }
+      if (detector == "HCALOUT"){
+        HCalOutclusterntuple->Fill(cluster_iter->second->get_phi(),
+				 cluster_iter->second->get_z(),
+				 cluster_iter->second->get_energy(),
+				 cluster_iter->second->getNTowers());
+      }
     }
   }
   return Fun4AllReturnCodes::EVENT_OK;
 }
-
