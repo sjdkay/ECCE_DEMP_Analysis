@@ -63,9 +63,13 @@ class ECCE_DEMP : public SubsysReco
   void Print(const std::string &what = "ALL") const override;
 
   int process_g4hits_ZDC(PHCompositeNode *);
-  int process_g4hits_RomanPots(PHCompositeNode *);
+  int process_g4hits_EEMC(PHCompositeNode *);
+  int process_g4hits_CEMC(PHCompositeNode *);
+  int process_g4hits_FEMC(PHCompositeNode *);
+  int process_g4hits_HCALIN(PHCompositeNode *);
+  int process_g4hits_HCALOUT(PHCompositeNode *);
+  int process_g4hits_FHCAL(PHCompositeNode *);
 
-  int process_g4hits(PHCompositeNode *, const std::string&);
   int process_g4clusters(PHCompositeNode *, const std::string&);
 
 // private:
@@ -79,9 +83,18 @@ class ECCE_DEMP : public SubsysReco
   TFile *outfile;
   TNtuple *g4hitntuple;
   TNtuple *ZDChitntuple;
-  TNtuple *EMCalclusterntuple;
+  TNtuple *EEMChitntuple;
+  TNtuple *CEMChitntuple;
+  TNtuple *FEMChitntuple;
+  TNtuple *HCALINhitntuple;
+  TNtuple *HCALOUThitntuple;
+  TNtuple *FHCALhitntuple;
+  TNtuple *EEMCalclusterntuple;
+  TNtuple *CEMCalclusterntuple;
+  TNtuple *FEMCalclusterntuple;
   TNtuple *HCalInclusterntuple;
   TNtuple *HCalOutclusterntuple;
+  TNtuple *FHCalclusterntuple;
   unsigned long long int event_itt;
   gsl_rng* m_RandomGenerator;
 
@@ -100,7 +113,7 @@ class ECCE_DEMP : public SubsysReco
   double true_x;
   double true_s_e;
   double true_xpi;
-  double true_ypi;
+x  double true_ypi;
   double true_tpi;
 
   double have_true_dis_info = false;
@@ -126,9 +139,16 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector lproton;
 
   Int_t ZDC_hit;
+  Int_t EEMC_hit;
+  Int_t CEMC_hit;
+  Int_t FEMC_hit;
+  Int_t HCALIN_hit;
+  Int_t HCALOUT_hit;
+  Int_t FHCAL_hit;
 
   TH2F* h2_ZDC_XY; 
   TH2F* h2_ZDC_XY_nEnergy;
+  TH2F* h2_ZDC_XY_nEnergy_Smeared;
 
   TH1F* h1_ZDC_E_dep;
   TH1F* h1_ZDC_E_dep_smeared;
