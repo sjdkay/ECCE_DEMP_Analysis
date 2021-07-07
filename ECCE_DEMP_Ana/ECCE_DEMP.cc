@@ -148,6 +148,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   // hm->registerHisto(h1);
   outfile = new TFile(outfilename.c_str(), "RECREATE");
   g4hitntuple = new TNtuple("hitntup", "G4Hits", "x0:y0:z0:edep");
+  g4trackntuple = new TNtuple("trackntup", "G4Tracks", "px:py:pz:p:theta:phi");
   ZDChitntuple = new TNtuple("ZDChitntup", "G4Hits", "x0:y0:z0:edep");
   EEMChitntuple = new TNtuple("EEMChitntup", "G4Hits", "x0:y0:z0:edep:ESmear");
   CEMChitntuple = new TNtuple("CEMChitntup", "G4Hits", "x0:y0:z0:edep:ESmear");
@@ -172,6 +173,26 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 
   h1_ZDC_E_dep = new TH1F("ZDC_E_dep", "ZDC E Deposit", 200, 0.0, 100.0);
   h1_ZDC_E_dep_smeared = new TH1F("ZDC_E_dep_smeared", "ZDC E Deposit", 240, 0.0, 120.0);
+
+  h1_eTrack_px = new TH1F("eTrack_px", "e' Track P_{x}", 200, -10, 10);
+  h1_eTrack_py = new TH1F("eTrack_py", "e' Track P_{y}", 200, -10, 10);
+  h1_eTrack_pz = new TH1F("eTrack_pz", "e' Track P_{z}", 100, -10, 0);
+  h1_eTrack_p = new TH1F("eTrack_p", "e' Track P", 100, 0, 10);
+  h1_eTrack_theta = new TH1F("eTrack_theta", "e' Track #theta", 160, 0, 1.6);
+  h1_eTrack_phi = new TH1F("eTrack_phi", "e' Track #phi", 640, -3.2, 3.2);
+
+  h1_piTrack_px = new TH1F("piTrack_px", "#pi Track P_{x}", 200, -10, 10);
+  h1_piTrack_py = new TH1F("piTrack_py", "#pi Track P_{y}", 200, -10, 10);
+  h1_piTrack_pz = new TH1F("piTrack_pz", "#pi Track P_{z}", 500, 0, 50);
+  h1_piTrack_p = new TH1F("piTrack_p", "#pi Track P", 500, 0, 50);
+  h1_piTrack_theta = new TH1F("piTrack_theta", "#pi Track #theta", 160, 1.6, 3.2);
+  h1_piTrack_phi = new TH1F("piTrack_phi", "#pi Track #phi", 640, -3.2, 3.2);
+
+  h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [rad]; #phi [rad]", 160, 1.6, 3.2, 640, -3.2, 3.2);
+  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [rad]; P [GeV/c]", 160, 1.6, 3.2, 100, 0, 10);
+
+  h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [rad]; #phi [rad]", 160, 0, 1.6, 640, -3.2, 3.2);
+  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [rad]; P [GeV/c]", 160, 0, 1.6, 500, 0, 50);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -720,6 +741,18 @@ int ECCE_DEMP::process_g4clusters(PHCompositeNode* topNode, const string& detect
 
 int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
 {
+  // Loop to check node actually exists, need to tweak this and include it
+  // PHNode *findNode = dynamic_cast<PHNode*>(nodeIter.findFirst("TrackMap"));
+  // if (findNode)
+  //   {
+  //     dst_trackmap = findNode::getClass<SvtxTrackMap>(topNode, "TrackMap");
+  //     if (Verbosity() >= VERBOSITY_A_LOT) std::cout << __FILE__ << "::" << __func__ << "::" << __LINE__ << ": Number of tracks: " << dst_trackmap->size() << std::endl; 
+  //   }
+  // else
+  //   {
+  //     std::cout << __FILE__ << "::" << __func__ << "::" << __LINE__<< ": TrackMap does not exist" << std::endl;
+  //   }
+
   SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
   if (!trackmap)
     {
@@ -736,7 +769,48 @@ int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
        ++iter)
     {
       SvtxTrack* track = iter->second;
-      cout << track->get_px() << endl;
+
+      if ( track->get_pz() > 0 ){ // +ve z direction -> pions, crappy way of selecting them for now w/o truth info
+	TVector3 piVect(track->get_px(), track->get_py(), track->get_pz());
+	g4trackntuple->Fill(track->get_px(),
+			    track->get_py(),
+			    track->get_pz(),
+			    piVect.Mag(),
+			    piVect.Theta(),
+			    piVect.Phi());
+
+	h1_piTrack_px->Fill(track->get_px());
+	h1_piTrack_py->Fill(track->get_py());
+	h1_piTrack_pz->Fill(track->get_pz());
+	h1_piTrack_p->Fill(piVect.Mag());
+	h1_piTrack_theta->Fill(piVect.Theta());
+	h1_piTrack_phi->Fill(piVect.Phi());
+
+	h2_piTrack_ThetaPhi->Fill(piVect.Theta(),piVect.Phi());
+	h2_piTrack_pTheta->Fill(piVect.Theta(), piVect.Mag());
+
+      }
+
+      else if (track->get_pz() < 0 ){ // -ve z direction -> electrons, crappy way of selecting them for now w/o truth info
+	TVector3 eVect(track->get_px(), track->get_py(), track->get_pz());
+	g4trackntuple->Fill(track->get_px(),
+			    track->get_py(),
+			    track->get_pz(),
+			    eVect.Mag(),
+			    eVect.Theta(),
+			    eVect.Phi());
+	
+	h1_eTrack_px->Fill(track->get_px());
+	h1_eTrack_py->Fill(track->get_py());
+	h1_eTrack_pz->Fill(track->get_pz());
+	h1_eTrack_p->Fill(eVect.Mag());
+	h1_eTrack_theta->Fill(eVect.Theta());
+	h1_eTrack_phi->Fill(eVect.Phi());
+	
+	h2_eTrack_ThetaPhi->Fill(eVect.Theta(),eVect.Phi());
+	h2_eTrack_pTheta->Fill(eVect.Theta(), eVect.Mag());
+
+      }
     }
   
   return Fun4AllReturnCodes::EVENT_OK;

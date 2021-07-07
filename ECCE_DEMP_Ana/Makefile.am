@@ -35,9 +35,10 @@ libeccedemp_la_LDFLAGS  = \
   -lg4detectors_io \
   -lphg4hit\
   -lgsl \
-  -lgslcblas 
+  -lgslcblas \
+  -lg4eval
 
-#   -L/cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/gsl-2.6/lib \ 
+#   -L/cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/gsl-2.6/lib \
 #   \ -lm
 
 ################################################
@@ -48,7 +49,6 @@ noinst_PROGRAMS = \
 
 testexternals_SOURCES = testexternals.C
 testexternals_LDADD = libeccedemp.la
-
 
 testexternals.C:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@

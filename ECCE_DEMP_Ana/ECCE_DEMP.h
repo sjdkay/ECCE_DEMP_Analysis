@@ -92,6 +92,7 @@ class ECCE_DEMP : public SubsysReco
 
   TFile *outfile;
   TNtuple *g4hitntuple;
+  TNtuple *g4trackntuple;
   TNtuple *ZDChitntuple;
   TNtuple *EEMChitntuple;
   TNtuple *CEMChitntuple;
@@ -171,6 +172,27 @@ class ECCE_DEMP : public SubsysReco
 
   TH1F* h1_HCalOut_E_dep;
   TH1F* h1_HCalOut_E_dep_smeared;
+
+  TH1F* h1_eTrack_px;
+  TH1F* h1_eTrack_py;
+  TH1F* h1_eTrack_pz;
+  TH1F* h1_eTrack_p;
+  TH1F* h1_eTrack_theta;
+  TH1F* h1_eTrack_phi;
+
+  TH1F* h1_piTrack_px;
+  TH1F* h1_piTrack_py;
+  TH1F* h1_piTrack_pz;
+  TH1F* h1_piTrack_p;
+  TH1F* h1_piTrack_theta;
+  TH1F* h1_piTrack_phi;
+
+  TH2F* h2_eTrack_ThetaPhi;
+  TH2F* h2_eTrack_pTheta;
+
+  TH2F* h2_piTrack_ThetaPhi;
+  TH2F* h2_piTrack_pTheta;
+
 
 };
 
