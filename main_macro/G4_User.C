@@ -52,7 +52,7 @@ void UserDetector(PHG4Reco *g4Reco)
 void UserAnalysisInit()
 {
   Fun4AllServer* se = Fun4AllServer::instance();
-  ECCE_DEMP *myAnalysisModule = new ECCE_DEMP("ECCE_DEMP","out.root");
+  ECCE_DEMP *myAnalysisModule = new ECCE_DEMP("ECCE_DEMP","ECCE_DEMP_5on100_25000.root");
   se->registerSubsystem(myAnalysisModule);
   
   // AnalysisModule *myAnalysisModule = new AnalysisModule();

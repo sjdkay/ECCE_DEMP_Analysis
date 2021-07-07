@@ -24,12 +24,19 @@
 R__LOAD_LIBRARY(libfun4all.so)
 
 int Fun4All_G4_EICDetector(
-    const int nEvents = 1,
-    const string &inputFile = "/data/DEMP/EIC_Smear/UnitWeight/eic_DEMPGen_5on100_1B_1_100.root",
-    const string &outputFile = "/data/DEMP/EIC_Smear/UnitWeight/eic_DEMPGen_5on100_1B_1_100_fun4all.root",
+			   //const int nEvents = -1,
+			   //const int nEvents = 100,
+    const int nEvents = 2500,
+    const string &inputFile = "/data/DEMP/EIC_Smear/KLambda_Testing/Q2_5/eic_DEMPGen_KLambda_5on41_1B_1_10.root",
+    //const string &inputFile = "/data/DEMP/EIC_Smear/UnitWeight/5on100_1B/eic_DEMPGen_5on100_1000000000_1.root",    
+    const string &outputFile = "eic_DEMPGen_KLambda_5on41_1B_1_10_fun4all_2500_Events.root",
+    //const string &outputFile = "eic_DEMPGen_5on100_1B_1_100_fun4all_AllEvents.root",
+    //const string &outputFile = "eic_DEMPGen_5on100_1B_1_fun4all.root",
     const string &embed_input_file = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/sPHENIX_G4Hits_sHijing_9-11fm_00000_00010.root",
     const int skip = 0,
-    const string &outdir = ".")
+    //const string &outdir = ".") 
+    const string &outdir = "/data/DEMP/EIC_Smear/UnitWeight/Fun4All_Output/")
+    
 {
   //---------------
   // Fun4All server
@@ -86,7 +93,7 @@ int Fun4All_G4_EICDetector(
   // Input::SIMPLE_VERBOSITY = 1;
 
   // Particle gun (same particles in always the same direction)
-  // Input::GUN = true;
+  //Input::GUN = true;
   // Input::GUN_NUMBER = 3; // if you need 3 of them
   // Input::GUN_VERBOSITY = 0;
 
@@ -230,7 +237,7 @@ int Fun4All_G4_EICDetector(
 
   // turn the display on (default off)
   //Enable::DISPLAY = true;
-
+  
   //======================
   // What to run
   //======================

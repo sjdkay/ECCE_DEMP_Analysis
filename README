@@ -35,3 +35,15 @@ make install
 cd /home/fun4all/work/macros/detectors/EICDetector
 cp ~/work/ECCE_DEMP_Analysis/main_macro/G4_User.C .
 cp ~/work/ECCE_DEMP_Analysis/main_macro/Fun4all_reana.C .
+
+
+##################################
+##### EIC Smear Instructions #####
+##################################
+
+To process files through EIC smear and retain the weight, execute -
+
+export EIC_LEVEL=dev
+source /cvmfs/eic.opensciencegrid.org/x8664_sl7/MCEG/releases/etc/eic_bash.sh
+
+before processing EIC smear.

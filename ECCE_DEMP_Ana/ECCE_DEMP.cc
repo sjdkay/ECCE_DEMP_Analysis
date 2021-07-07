@@ -64,6 +64,8 @@
 #include "ECCE_DEMP.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
+#include <fun4all/Fun4AllServer.h>
+#include <fun4all/PHTFileServer.h>
 
 #include <phool/PHCompositeNode.h>
 
@@ -84,17 +86,31 @@
 #include <g4main/PHG4Hit.h>
 #include <g4main/PHG4HitContainer.h>
 
+// Track includes
+#include <trackbase_historic/SvtxTrackMap.h>
+
+// Jet includes
+
+#include <g4eval/JetEvalStack.h>
+#include <g4jets/JetMap.h>
+
 // Cluster includes
 #include <calobase/RawCluster.h>
 #include <calobase/RawClusterContainer.h>
 
 #include <TFile.h>
 #include <TNtuple.h>
+#include <TH2F.h>
+#include <TString.h>
+#include <TTree.h>
+#include <TVector3.h>
 
+#include <algorithm>
 #include <cassert>
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <stdexcept>
 
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
@@ -183,19 +199,28 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
      std::cout << "Event Processing Counter: " << event_itt << endl;
 
   process_g4hits_ZDC(topNode);
-  process_g4hits_EEMC(topNode);
-  process_g4hits_CEMC(topNode);
-  process_g4hits_FEMC(topNode);
-  process_g4hits_HCALIN(topNode);
-  process_g4hits_HCALOUT(topNode);
-  process_g4hits_FHCAL(topNode);
+  // process_g4hits_EEMC(topNode);
+  // process_g4hits_CEMC(topNode);
+  // process_g4hits_FEMC(topNode);
+  // process_g4hits_HCALIN(topNode);
+  // process_g4hits_HCALOUT(topNode);
+  // process_g4hits_FHCAL(topNode);
 
+  process_g4hits(topNode, "EEMC");
+  process_g4hits(topNode, "CEMC");
+  process_g4hits(topNode, "FEMC");
+  process_g4hits(topNode, "HCALIN");
+  process_g4hits(topNode, "HCALOUT");
+  process_g4hits(topNode, "FHCAL");
   process_g4clusters(topNode, "EEMC");
   process_g4clusters(topNode, "CEMC");
   process_g4clusters(topNode, "FEMC");
   process_g4clusters(topNode, "HCALIN");
   process_g4clusters(topNode, "HCALOUT");
   process_g4clusters(topNode, "FHCAL");
+
+  process_g4tracks(topNode);
+
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -244,7 +269,6 @@ void ECCE_DEMP::Print(const std::string &what) const
 
 
 //***************************************************
-//
 
 int ECCE_DEMP::process_g4hits_ZDC(PHCompositeNode* topNode)
 {
@@ -292,6 +316,8 @@ int ECCE_DEMP::process_g4hits_ZDC(PHCompositeNode* topNode)
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
+
+//***************************************************
 
 // Get the EEMC hits
 int ECCE_DEMP::process_g4hits_EEMC(PHCompositeNode* topNode)
@@ -538,6 +564,103 @@ float ECCE_DEMP::Position_Smear(float P) {
   return P_reco;
 
 }
+int ECCE_DEMP::process_g4hits(PHCompositeNode* topNode, const string& detector)
+{
+  ostringstream nodename;
+
+  // loop over the G4Hits
+  nodename.str("");
+  nodename << "G4HIT_" << detector;
+  PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, nodename.str().c_str());
+  float smeared_E_EEMC;
+  float smeared_E_CEMC;
+  float smeared_E_FEMC;
+  float smeared_E_HCALIN;
+  float smeared_E_HCALOUT;
+  float smeared_E_FHCAL;
+
+  if (hits) {
+    // this returns an iterator to the beginning and the end of our G4Hits
+    PHG4HitContainer::ConstRange hit_range = hits->getHits();
+    for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++){
+      if(detector == "EEMC"){
+	  EEMC_hit++;
+	}
+	else if(detector == "CEMC"){
+	  CEMC_hit++;
+	}
+	else if(detector == "FEMC"){
+	  FEMC_hit++;
+	}
+	else if(detector == "HCALIN"){
+	  HCALIN_hit++;
+	}
+	else if(detector == "HCALOUT"){
+	  HCALOUT_hit++;
+	}
+	else if(detector == "FHCAL"){
+	  FHCAL_hit++;
+	}
+      }
+    for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++) {
+      if (detector == "EEMC"){
+	smeared_E_EEMC = EMCAL_Smear(hit_iter->second->get_edep());
+	// the pointer to the G4Hit is hit_iter->second
+	EEMChitntuple->Fill(hit_iter->second->get_x(0),
+			    hit_iter->second->get_y(0),
+			    hit_iter->second->get_z(0),
+			    hit_iter->second->get_edep(),
+			    smeared_E_EEMC);
+      }
+      else if (detector == "CEMC"){
+	smeared_E_CEMC = EMCAL_Smear(hit_iter->second->get_edep());
+	// the pointer to the G4Hit is hit_iter->second
+	CEMChitntuple->Fill(hit_iter->second->get_x(0),
+			    hit_iter->second->get_y(0),
+			    hit_iter->second->get_z(0),
+			    hit_iter->second->get_edep(),
+			    smeared_E_CEMC);    
+      }
+      else if (detector == "FEMC"){
+	smeared_E_FEMC = EMCAL_Smear(hit_iter->second->get_edep());
+	// the pointer to the G4Hit is hit_iter->second
+	FEMChitntuple->Fill(hit_iter->second->get_x(0),
+			    hit_iter->second->get_y(0),
+			    hit_iter->second->get_z(0),
+			    hit_iter->second->get_edep(),
+			    smeared_E_FEMC);
+      }
+      else if (detector == "HCALIN"){
+	smeared_E_HCALIN = HCAL_Smear(hit_iter->second->get_edep());
+	// the pointer to the G4Hit is hit_iter->second
+	HCALINhitntuple->Fill(hit_iter->second->get_x(0),
+			      hit_iter->second->get_y(0),
+			      hit_iter->second->get_z(0),
+			      hit_iter->second->get_edep(),
+			      smeared_E_HCALIN);
+      }
+      else if (detector == "HCALOUT"){
+	smeared_E_HCALOUT = HCAL_Smear(hit_iter->second->get_edep());
+	// the pointer to the G4Hit is hit_iter->second
+	HCALOUThitntuple->Fill(hit_iter->second->get_x(0),
+			      hit_iter->second->get_y(0),
+			      hit_iter->second->get_z(0),
+			      hit_iter->second->get_edep(),
+			      smeared_E_HCALOUT);      
+      }
+      else if (detector == "FHCAL"){
+	smeared_E_FHCAL = HCAL_Smear(hit_iter->second->get_edep());
+	// the pointer to the G4Hit is hit_iter->second
+	FHCALhitntuple->Fill(hit_iter->second->get_x(0),
+			      hit_iter->second->get_y(0),
+			      hit_iter->second->get_z(0),
+			      hit_iter->second->get_edep(),
+			      smeared_E_FHCAL);
+      }
+    }
+  }
+  return Fun4AllReturnCodes::EVENT_OK;
+}
 
 int ECCE_DEMP::process_g4clusters(PHCompositeNode* topNode, const string& detector)
 {
@@ -590,5 +713,31 @@ int ECCE_DEMP::process_g4clusters(PHCompositeNode* topNode, const string& detect
       }
     }
   }
+  return Fun4AllReturnCodes::EVENT_OK;
+}
+
+//***************************************************
+
+int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
+{
+  SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
+  if (!trackmap)
+    {
+      trackmap = findNode::getClass<SvtxTrackMap>(topNode, "TrackMap");
+      if (!trackmap)
+    	{
+    	  cout
+    	    << "ECCE_DEMP::process_event - Error can not find DST trackmap node SvtxTrackMap" << endl;
+    	  exit(-1);
+    	}
+    }
+  for (SvtxTrackMap::Iter iter = trackmap->begin();
+       iter != trackmap->end();
+       ++iter)
+    {
+      SvtxTrack* track = iter->second;
+      cout << track->get_px() << endl;
+    }
+  
   return Fun4AllReturnCodes::EVENT_OK;
 }

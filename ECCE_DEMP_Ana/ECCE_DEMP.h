@@ -6,7 +6,9 @@
 #include <fun4all/SubsysReco.h>
 
 #include <string>
-
+#include <memory>
+#include <string>
+#include <utility>  // std::pair, std::make_pair                                                                                                                                                            
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
 
@@ -19,7 +21,7 @@ class Fun4AllHistoManager;
 class PHCompositeNode;
 class TFile;
 class TNtuple;
-
+class JetEvalStack;
 
 class ECCE_DEMP : public SubsysReco
 {
@@ -70,11 +72,19 @@ class ECCE_DEMP : public SubsysReco
   int process_g4hits_HCALOUT(PHCompositeNode *);
   int process_g4hits_FHCAL(PHCompositeNode *);
 
+  int process_g4hits(PHCompositeNode *, const std::string&);
   int process_g4clusters(PHCompositeNode *, const std::string&);
 
-// private:
+  int process_g4tracks(PHCompositeNode *);
+
+  void use_initial_vertex(const bool b = true) {initial_vertex = b;}
+
+  //private:
 
  protected:
+
+  //! flag to use initial vertex in track evaluator 
+  bool initial_vertex = false;
 
   std::string detector;
   std::string outfilename;
@@ -113,12 +123,12 @@ class ECCE_DEMP : public SubsysReco
   double true_x;
   double true_s_e;
   double true_xpi;
-x  double true_ypi;
+  double true_ypi;
   double true_tpi;
 
   double have_true_dis_info = false;
   
-  bool  HIT_IN_ZDC; 
+  bool  HIT_IN_ZDC;
   bool  HIT_IN_EMCAL;
   bool  HIT_IN_HCAL;
   bool  CLUS_IN_EMCAL;
