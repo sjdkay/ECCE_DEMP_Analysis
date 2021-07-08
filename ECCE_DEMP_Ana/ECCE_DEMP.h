@@ -187,12 +187,15 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_piTrack_theta;
   TH1F* h1_piTrack_phi;
 
+  TH1F* h1_nTracksDist;
+
+  TH2F* h2_ePiTrackDist;
+
   TH2F* h2_eTrack_ThetaPhi;
   TH2F* h2_eTrack_pTheta;
 
   TH2F* h2_piTrack_ThetaPhi;
   TH2F* h2_piTrack_pTheta;
-
 
 };
 

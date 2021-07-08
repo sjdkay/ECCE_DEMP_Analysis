@@ -141,7 +141,6 @@ ECCE_DEMP::~ECCE_DEMP()
 //____________________________________________________________________________..
 int ECCE_DEMP::Init(PHCompositeNode *topNode)
 {
-
   hm = new Fun4AllHistoManager(Name());
   // create and register your histos (all types) here
   // TH1 *h1 = new TH1F("h1",....)
@@ -178,21 +177,25 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_eTrack_py = new TH1F("eTrack_py", "e' Track P_{y}", 200, -10, 10);
   h1_eTrack_pz = new TH1F("eTrack_pz", "e' Track P_{z}", 100, -10, 0);
   h1_eTrack_p = new TH1F("eTrack_p", "e' Track P", 100, 0, 10);
-  h1_eTrack_theta = new TH1F("eTrack_theta", "e' Track #theta", 160, 0, 1.6);
-  h1_eTrack_phi = new TH1F("eTrack_phi", "e' Track #phi", 640, -3.2, 3.2);
+  h1_eTrack_theta = new TH1F("eTrack_theta", "e' Track #theta", 140, 110, 180);
+  h1_eTrack_phi = new TH1F("eTrack_phi", "e' Track #phi", 720, -180, 180);
 
   h1_piTrack_px = new TH1F("piTrack_px", "#pi Track P_{x}", 200, -10, 10);
   h1_piTrack_py = new TH1F("piTrack_py", "#pi Track P_{y}", 200, -10, 10);
   h1_piTrack_pz = new TH1F("piTrack_pz", "#pi Track P_{z}", 500, 0, 50);
   h1_piTrack_p = new TH1F("piTrack_p", "#pi Track P", 500, 0, 50);
-  h1_piTrack_theta = new TH1F("piTrack_theta", "#pi Track #theta", 160, 1.6, 3.2);
-  h1_piTrack_phi = new TH1F("piTrack_phi", "#pi Track #phi", 640, -3.2, 3.2);
+  h1_piTrack_theta = new TH1F("piTrack_theta", "#pi Track #theta", 120, 0, 60);
+  h1_piTrack_phi = new TH1F("piTrack_phi", "#pi Track #phi", 720, -180, 180);
 
-  h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [rad]; #phi [rad]", 160, 1.6, 3.2, 640, -3.2, 3.2);
-  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [rad]; P [GeV/c]", 160, 1.6, 3.2, 100, 0, 10);
+  h1_nTracksDist = new TH1F("nTracksDist", "Number of Tracks Per Event", 5, 0, 5);
 
-  h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [rad]; #phi [rad]", 160, 0, 1.6, 640, -3.2, 3.2);
-  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [rad]; P [GeV/c]", 160, 0, 1.6, 500, 0, 50);
+  h2_ePiTrackDist = new TH2F("ePiTrackDist", " Number of pion tracks vs number of electron tracks; nTracks_{#pi}; nTracks_{e'}", 2, 0, 2, 2, 0, 2);
+
+  h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
+  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
+
+  h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
+  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -741,7 +744,7 @@ int ECCE_DEMP::process_g4clusters(PHCompositeNode* topNode, const string& detect
 
 int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
 {
-  // Loop to check node actually exists, need to tweak this and include it
+  // Statement to check node actually exists, need to tweak this and include it
   // PHNode *findNode = dynamic_cast<PHNode*>(nodeIter.findFirst("TrackMap"));
   // if (findNode)
   //   {
@@ -764,13 +767,18 @@ int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
     	  exit(-1);
     	}
     }
+  int nTracks = 0;
+  Bool_t ElecTrack = kFALSE;
+  Bool_t PionTrack = kFALSE;
+  // Iterate over tracks
   for (SvtxTrackMap::Iter iter = trackmap->begin();
        iter != trackmap->end();
        ++iter)
     {
       SvtxTrack* track = iter->second;
-
-      if ( track->get_pz() > 0 ){ // +ve z direction -> pions, crappy way of selecting them for now w/o truth info
+      nTracks++;
+      if ( track->get_pz() > 0 && track->get_charge() == 1){ // +ve z direction -> pions, crappy way of selecting them for now w/o truth info
+	PionTrack = kTRUE;
 	TVector3 piVect(track->get_px(), track->get_py(), track->get_pz());
 	g4trackntuple->Fill(track->get_px(),
 			    track->get_py(),
@@ -783,15 +791,15 @@ int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
 	h1_piTrack_py->Fill(track->get_py());
 	h1_piTrack_pz->Fill(track->get_pz());
 	h1_piTrack_p->Fill(piVect.Mag());
-	h1_piTrack_theta->Fill(piVect.Theta());
-	h1_piTrack_phi->Fill(piVect.Phi());
+	h1_piTrack_theta->Fill(piVect.Theta()*TMath::RadToDeg());
+	h1_piTrack_phi->Fill(piVect.Phi()*TMath::RadToDeg());
 
-	h2_piTrack_ThetaPhi->Fill(piVect.Theta(),piVect.Phi());
-	h2_piTrack_pTheta->Fill(piVect.Theta(), piVect.Mag());
-
+	h2_piTrack_ThetaPhi->Fill(piVect.Theta()*TMath::RadToDeg(), (piVect.Phi()*TMath::RadToDeg()));
+	h2_piTrack_pTheta->Fill((piVect.Theta()*TMath::RadToDeg()), piVect.Mag());
       }
 
-      else if (track->get_pz() < 0 ){ // -ve z direction -> electrons, crappy way of selecting them for now w/o truth info
+      else if (track->get_pz() < 0  && track->get_charge() == -1 ){ // -ve z direction -> electrons, crappy way of selecting them for now w/o truth info
+	ElecTrack = kTRUE;
 	TVector3 eVect(track->get_px(), track->get_py(), track->get_pz());
 	g4trackntuple->Fill(track->get_px(),
 			    track->get_py(),
@@ -799,19 +807,32 @@ int ECCE_DEMP::process_g4tracks(PHCompositeNode* topNode)
 			    eVect.Mag(),
 			    eVect.Theta(),
 			    eVect.Phi());
-	
+
 	h1_eTrack_px->Fill(track->get_px());
 	h1_eTrack_py->Fill(track->get_py());
 	h1_eTrack_pz->Fill(track->get_pz());
 	h1_eTrack_p->Fill(eVect.Mag());
-	h1_eTrack_theta->Fill(eVect.Theta());
-	h1_eTrack_phi->Fill(eVect.Phi());
+	h1_eTrack_theta->Fill(eVect.Theta()*TMath::RadToDeg());
+	h1_eTrack_phi->Fill(eVect.Phi()*TMath::RadToDeg());
 	
-	h2_eTrack_ThetaPhi->Fill(eVect.Theta(),eVect.Phi());
-	h2_eTrack_pTheta->Fill(eVect.Theta(), eVect.Mag());
-
+	h2_eTrack_ThetaPhi->Fill((eVect.Theta()*TMath::RadToDeg()), (eVect.Phi()*TMath::RadToDeg()));
+	h2_eTrack_pTheta->Fill((eVect.Theta()*TMath::RadToDeg()), eVect.Mag());
       }
     }
-  
+
+  h1_nTracksDist->Fill(nTracks);
+  if( PionTrack == kFALSE && ElecTrack == kFALSE ){ // No pion or electron track
+    h2_ePiTrackDist->Fill(0.,0.);
+  }
+  else if( PionTrack == kTRUE && ElecTrack == kFALSE ){ // Pion track but no electron track
+    h2_ePiTrackDist->Fill(1.,0.);
+  }
+  else if( PionTrack == kFALSE && ElecTrack == kTRUE ){ // No pion track but an electron track
+    h2_ePiTrackDist->Fill(0.,1.);
+  }
+  else if( PionTrack == kTRUE && ElecTrack == kTRUE ){ // Both a pion and an electron track
+    h2_ePiTrackDist->Fill(1.,1.);
+  }
+
   return Fun4AllReturnCodes::EVENT_OK;
 }
