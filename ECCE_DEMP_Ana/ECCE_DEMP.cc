@@ -90,13 +90,22 @@
 #include <trackbase_historic/SvtxTrackMap.h>
 
 // Jet includes
-
 #include <g4eval/JetEvalStack.h>
 #include <g4jets/JetMap.h>
 
 // Cluster includes
 #include <calobase/RawCluster.h>
 #include <calobase/RawClusterContainer.h>
+
+/// HEPMC truth includes
+#include <HepMC/GenEvent.h>
+#include <HepMC/GenVertex.h>
+#include <phhepmc/PHHepMCGenEvent.h>
+#include <phhepmc/PHHepMCGenEventMap.h>
+
+/// Fun4All includes
+#include <g4main/PHG4Particle.h>
+#include <g4main/PHG4TruthInfoContainer.h>
 
 #include <TFile.h>
 #include <TNtuple.h>
@@ -187,6 +196,19 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
   h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
 
+
+  h1_piTruth_p = new TH1F("piTruth_p", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 200, -100, 100);
+  h1_piTruth_px = new TH1F("piTruth_px", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 200, -100, 100);
+  h1_piTruth_py = new TH1F("piTruth_py", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 200, -100, 100);
+  h1_piTruth_pz = new TH1F("piTruth_pz", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 200, -100, 100);
+  h1_piTruth_E = new TH1F("piTruth_E", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 200, -100, 100);
+  h1_eTruth_p = new TH1F("eTruth_p", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 200, -100, 100);
+  h1_eTruth_px = new TH1F("eTruth_px", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 200, -100, 100);
+  h1_eTruth_py = new TH1F("eTruth_py", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 200, -100, 100);
+  h1_eTruth_pz = new TH1F("eTruth_pz", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 200, -100, 100);
+  h1_eTruth_E = new TH1F("eTruth_E", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 200, -100, 100);
+
+
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -221,10 +243,10 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
     // Get ZDC hits for neutron info
     PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_ZDC");
-    // Quantities we want to determine
-    TVector3 eVect;
-    TVector3 piVect;
-    Double_t nEDep;
+    // Get MC truth info
+    PHG4TruthInfoContainer *truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode, "G4TruthInfo");
+    /// Get the primary particle range
+    PHG4TruthInfoContainer::Range range = truthinfo->GetPrimaryParticleRange();
 
     if (!trackmap)
       {
@@ -245,10 +267,12 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	SvtxTrack* track = iter->second;
 	if ( track->get_pz() > 0 && track->get_charge() == 1){ // +ve z direction -> pions, crappy way of selecting them for now w/o truth info
 	  piVect.SetXYZ(track->get_px(), track->get_py(), track->get_pz());
+	  pi4Vect.SetPxPyPzE(track->get_px(), track->get_py(), track->get_pz(), sqrt(pow(piVect.Mag(), 2)+pow(mPi,2)));
 	}
 
 	else if (track->get_pz() < 0  && track->get_charge() == -1 ){ // -ve z direction -> electrons, crappy way of selecting them for now w/o truth info
 	  eVect.SetXYZ(track->get_px(), track->get_py(), track->get_pz());
+	  e4Vect.SetPxPyPzE(track->get_px(), track->get_py(), track->get_pz(), sqrt(pow(eVect.Mag(), 2)+pow(mElec,2)));
 	}
       }
     
@@ -258,10 +282,49 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
       PHG4HitContainer::ConstRange hit_range = hits->getHits();
       for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++)
 	{
+	  nZDCPos.SetXYZ(hit_iter->second->get_x(0), hit_iter->second->get_y(0), hit_iter->second->get_z(0));
 	  nEDep = hit_iter->second->get_edep();
 	}
     }
-    cout << piVect.Mag() << "  " << eVect.Mag() << "  " << nEDep << endl;
+
+    if (!truthinfo)
+      {
+	cout << PHWHERE
+	     << "PHG4TruthInfoContainer node is missing, can't collect G4 truth particles"
+	     << endl;
+	return Fun4AllReturnCodes::EVENT_OK;
+      }
+
+    /// Loop over the G4 truth (stable) particles
+    for (PHG4TruthInfoContainer::ConstIterator iter = range.first;
+	 iter != range.second;
+	 ++iter)
+      {
+	/// Get this truth particle
+	const PHG4Particle *truth = iter->second;
+	if ( truth->get_pid() == 11){ // PDG 11 -> Scattered electron
+	  e4VectTruth.SetPxPyPzE(truth->get_px(), truth->get_py(), truth->get_pz(), truth->get_e());
+	}
+	else if (truth->get_pid() == 211){ // PDG 211 -> Pion 
+	  pi4VectTruth.SetPxPyPzE(truth->get_px(), truth->get_py(), truth->get_pz(), truth->get_e());
+	}
+	else if (truth->get_pid() == 2112){ // PDG 2112 -> Neutron
+	  n4VectTruth.SetPxPyPzE(truth->get_px(), truth->get_py(), truth->get_pz(), truth->get_e());
+	}
+      }
+    
+    // Now have relevant information from this event, fill some histograms and calculate some stuff
+    h1_piTruth_p->Fill((piVect.Mag()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
+    h1_piTruth_px->Fill((piVect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100);
+    h1_piTruth_py->Fill((piVect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100);
+    h1_piTruth_pz->Fill((piVect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100);
+    h1_piTruth_E->Fill((pi4Vect.E()-pi4VectTruth.E())/(pi4VectTruth.E())*100);
+    h1_eTruth_p->Fill((eVect.Mag()-e4VectTruth.P())/(e4VectTruth.P())*100);
+    h1_eTruth_px->Fill((eVect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100);
+    h1_eTruth_py->Fill((eVect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100);
+    h1_eTruth_pz->Fill((eVect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100);
+    h1_eTruth_E->Fill((e4Vect.E()-e4VectTruth.E())/(e4VectTruth.E())*100);
+    
   }
 
   return Fun4AllReturnCodes::EVENT_OK;

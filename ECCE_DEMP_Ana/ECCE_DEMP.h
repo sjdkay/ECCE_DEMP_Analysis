@@ -136,6 +136,23 @@ class ECCE_DEMP : public SubsysReco
 
   TLorentzVector lproton;
 
+  // Particle Masses
+  Double_t mPi = 0.139570;
+  Double_t mElec = 0.000510998950;
+  Double_t mNeut = 0.93965420;
+
+  // Quantities we want to determine
+  TVector3 eVect;
+  TVector3 piVect;
+  TVector3 nZDCPos;
+  TLorentzVector e4Vect;
+  TLorentzVector pi4Vect;
+  TLorentzVector n4Vect;
+  TLorentzVector e4VectTruth;
+  TLorentzVector pi4VectTruth;
+  TLorentzVector n4VectTruth;
+  Double_t nEDep;
+
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
@@ -178,6 +195,24 @@ class ECCE_DEMP : public SubsysReco
 
   TH2F* h2_piTrack_ThetaPhi;
   TH2F* h2_piTrack_pTheta;
+
+  // Histogram for coincidence analysis routine
+
+  TH1F* h1_piTruth_p;
+  TH1F* h1_piTruth_px;
+  TH1F* h1_piTruth_py;
+  TH1F* h1_piTruth_pz;
+  TH1F* h1_piTruth_E;
+  TH1F* h1_eTruth_p;
+  TH1F* h1_eTruth_px;
+  TH1F* h1_eTruth_py;
+  TH1F* h1_eTruth_pz;
+  TH1F* h1_eTruth_E;
+  TH1F* h1_nTruth_p;
+  TH1F* h1_nTruth_px;
+  TH1F* h1_nTruth_py;
+  TH1F* h1_nTruth_pz;
+  TH1F* h1_nTruth_E;
 
 };
 
