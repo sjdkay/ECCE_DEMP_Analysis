@@ -152,6 +152,9 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector pi4VectTruth;
   TLorentzVector n4VectTruth;
   Double_t nEDep;
+  Double_t nTheta;
+  Double_t nPhi;
+  Double_t nPMag;
 
   Int_t ZDC_hit;
   Int_t EEMC_hit;

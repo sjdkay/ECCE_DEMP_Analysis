@@ -196,18 +196,21 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
   h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
 
-
-  h1_piTruth_p = new TH1F("piTruth_p", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 200, -100, 100);
-  h1_piTruth_px = new TH1F("piTruth_px", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 200, -100, 100);
-  h1_piTruth_py = new TH1F("piTruth_py", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 200, -100, 100);
-  h1_piTruth_pz = new TH1F("piTruth_pz", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 200, -100, 100);
-  h1_piTruth_E = new TH1F("piTruth_E", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 200, -100, 100);
-  h1_eTruth_p = new TH1F("eTruth_p", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 200, -100, 100);
-  h1_eTruth_px = new TH1F("eTruth_px", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 200, -100, 100);
-  h1_eTruth_py = new TH1F("eTruth_py", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 200, -100, 100);
-  h1_eTruth_pz = new TH1F("eTruth_pz", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 200, -100, 100);
-  h1_eTruth_E = new TH1F("eTruth_E", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 200, -100, 100);
-
+  h1_piTruth_p = new TH1F("piTruth_p", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_px = new TH1F("piTruth_px", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_py = new TH1F("piTruth_py", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_pz = new TH1F("piTruth_pz", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_E = new TH1F("piTruth_E", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_p = new TH1F("eTruth_p", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
+  h1_eTruth_px = new TH1F("eTruth_px", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_py = new TH1F("eTruth_py", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_pz = new TH1F("eTruth_pz", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_E = new TH1F("eTruth_E", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  h1_nTruth_p = new TH1F("nTruth_p", "n #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
+  h1_nTruth_px = new TH1F("nTruth_px", "#n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_py = new TH1F("nTruth_py", "#n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_pz = new TH1F("nTruth_pz", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_E = new TH1F("nTruth_E", "n #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -245,7 +248,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_ZDC");
     // Get MC truth info
     PHG4TruthInfoContainer *truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode, "G4TruthInfo");
-    /// Get the primary particle range
+    // Get the primary particle range
     PHG4TruthInfoContainer::Range range = truthinfo->GetPrimaryParticleRange();
 
     if (!trackmap)
@@ -284,6 +287,10 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	{
 	  nZDCPos.SetXYZ(hit_iter->second->get_x(0), hit_iter->second->get_y(0), hit_iter->second->get_z(0));
 	  nEDep = hit_iter->second->get_edep();
+	  nTheta = nZDCPos.Theta();
+	  nPhi = nZDCPos.Phi();
+	  nPMag = sqrt((pow(nEDep,2)) - (pow(mNeut,2)));
+	  n4Vect.SetPxPyPzE(nPMag*sin(nTheta)*cos(nPhi), nPMag*sin(nTheta)*sin(nPhi), nPMag*cos(nTheta), nEDep);
 	}
     }
 
@@ -324,6 +331,11 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_eTruth_py->Fill((eVect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100);
     h1_eTruth_pz->Fill((eVect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100);
     h1_eTruth_E->Fill((e4Vect.E()-e4VectTruth.E())/(e4VectTruth.E())*100);
+    h1_nTruth_p->Fill((n4Vect.P()-n4VectTruth.P())/(n4VectTruth.P())*100);
+    h1_nTruth_px->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100);
+    h1_nTruth_py->Fill((n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100);
+    h1_nTruth_pz->Fill((n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100);
+    h1_nTruth_E->Fill((n4Vect.E()-n4VectTruth.E())/(n4VectTruth.E())*100);
     
   }
 
