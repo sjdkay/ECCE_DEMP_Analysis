@@ -16,7 +16,6 @@
 #include "TH1.h"
 #include "TH2.h"
 
-
 class Fun4AllHistoManager;
 class PHCompositeNode;
 class TFile;
@@ -64,13 +63,6 @@ class ECCE_DEMP : public SubsysReco
 
   void Print(const std::string &what = "ALL") const override;
 
-  int process_g4hits_ZDC(PHCompositeNode *);
-
-  int process_g4hits(PHCompositeNode *, const std::string&);
-  int process_g4clusters(PHCompositeNode *, const std::string&);
-
-  int process_g4tracks(PHCompositeNode *);
-
   bool Check_ePi(PHCompositeNode *);
   bool Check_n(PHCompositeNode *);
 
@@ -88,11 +80,6 @@ class ECCE_DEMP : public SubsysReco
   Fun4AllHistoManager *hm;
 
   TFile *outfile;
-  TNtuple *g4hitntuple;
-  TNtuple *g4trackntuple;
-  TNtuple *ZDChitntuple;
-  TNtuple *EEMChitntuple;
-  TNtuple *EEMCalclusterntuple;
   unsigned long long int event_itt;
   gsl_rng* m_RandomGenerator;
 
@@ -143,64 +130,35 @@ class ECCE_DEMP : public SubsysReco
 
   // Quantities we want to determine
   TVector3 eVect;
+  TVector3 eVectSmeared;
   TVector3 piVect;
+  TVector3 piVectSmeared;
   TVector3 nZDCPos;
+  TVector3 nZDCPosSmeared;
   TLorentzVector e4Vect;
+  TLorentzVector e4VectSmeared;
   TLorentzVector pi4Vect;
+  TLorentzVector pi4VectSmeared;
   TLorentzVector n4Vect;
+  TLorentzVector n4VectSmeared;
   TLorentzVector e4VectTruth;
   TLorentzVector pi4VectTruth;
   TLorentzVector n4VectTruth;
   Double_t nEDep;
+  Double_t nEDepSmeared;
   Double_t nTheta;
+  Double_t nThetaSmeared;
   Double_t nPhi;
+  Double_t nPhiSmeared;
   Double_t nPMag;
+  Double_t nPMagSmeared;
 
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
-  TH2F* h2_ZDC_XY; 
-  TH2F* h2_ZDC_XY_nEnergy;
-  TH2F* h2_ZDC_XY_nEnergy_Smeared;
-
-  TH1F* h1_ZDC_E_dep;
-  TH1F* h1_ZDC_E_dep_smeared;
-
-  TH1F* h1_EMCal_E_dep;
-  TH1F* h1_EMCal_E_dep_smeared;
-
-  TH1F* h1_HCalIn_E_dep;
-  TH1F* h1_HCalIn_E_dep_smeared;
-
-  TH1F* h1_HCalOut_E_dep;
-  TH1F* h1_HCalOut_E_dep_smeared;
-
-  TH1F* h1_eTrack_px;
-  TH1F* h1_eTrack_py;
-  TH1F* h1_eTrack_pz;
-  TH1F* h1_eTrack_p;
-  TH1F* h1_eTrack_theta;
-  TH1F* h1_eTrack_phi;
-
-  TH1F* h1_piTrack_px;
-  TH1F* h1_piTrack_py;
-  TH1F* h1_piTrack_pz;
-  TH1F* h1_piTrack_p;
-  TH1F* h1_piTrack_theta;
-  TH1F* h1_piTrack_phi;
-
-  TH1F* h1_nTracksDist;
-
-  TH2F* h2_ePiTrackDist;
-
-  TH2F* h2_eTrack_ThetaPhi;
-  TH2F* h2_eTrack_pTheta;
-
-  TH2F* h2_piTrack_ThetaPhi;
-  TH2F* h2_piTrack_pTheta;
-
   // Histogram for coincidence analysis routine
 
+  // Resolution test plots for unsmeared vectors
   TH1F* h1_piTruth_p;
   TH1F* h1_piTruth_px;
   TH1F* h1_piTruth_py;
@@ -216,7 +174,47 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTruth_py;
   TH1F* h1_nTruth_pz;
   TH1F* h1_nTruth_E;
+  // Resolution test plots with smeared vectors
+  TH1F* h1_piTruth_p_Smeared;
+  TH1F* h1_piTruth_px_Smeared;
+  TH1F* h1_piTruth_py_Smeared;
+  TH1F* h1_piTruth_pz_Smeared;
+  TH1F* h1_piTruth_E_Smeared;
+  TH1F* h1_eTruth_p_Smeared;
+  TH1F* h1_eTruth_px_Smeared;
+  TH1F* h1_eTruth_py_Smeared;
+  TH1F* h1_eTruth_pz_Smeared;
+  TH1F* h1_eTruth_E_Smeared;
+  TH1F* h1_nTruth_p_Smeared;
+  TH1F* h1_nTruth_px_Smeared;
+  TH1F* h1_nTruth_py_Smeared;
+  TH1F* h1_nTruth_pz_Smeared;
+  TH1F* h1_nTruth_E_Smeared;
 
+  // 2D distributions 
+  TH2F* h2_ZDC_XY;
+  TH2F* h2_ZDC_XY_Smeared;
+  // Particle Theta/Phi and Theta/p distributions
+  TH2F* h2_eTrack_ThetaPhi;
+  TH2F* h2_eTrack_pTheta;
+  TH2F* h2_piTrack_ThetaPhi;
+  TH2F* h2_piTrack_pTheta;
+  TH2F* h2_nTrack_ThetaPhi;
+  TH2F* h2_nTrack_pTheta;
+  TH2F* h2_eTrack_ThetaPhi_Smeared;
+  TH2F* h2_eTrack_pTheta_Smeared;
+  TH2F* h2_piTrack_ThetaPhi_Smeared;
+  TH2F* h2_piTrack_pTheta_Smeared;
+  TH2F* h2_nTrack_ThetaPhi_Smeared;
+  TH2F* h2_nTrack_pTheta_Smeared;
+  // 2D resolution test plots
+  TH2F* h2_eTruth_pxpy;
+  TH2F* h2_piTruth_pxpy;
+  TH2F* h2_nTruth_pxpy;
+  TH2F* h2_eTruth_pxpy_Smeared;
+  TH2F* h2_piTruth_pxpy_Smeared;
+  TH2F* h2_nTruth_pxpy_Smeared;
+ 
 };
 
 #endif // ECCE_DEMP_ANA_H
