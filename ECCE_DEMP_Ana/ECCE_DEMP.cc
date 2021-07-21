@@ -160,6 +160,48 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 
   event_itt = 0;
 
+  h1_pi_px = new TH1F("pi_px", "#pi p_{x} Distribution", 200, -20, 20);
+  h1_pi_py = new TH1F("pi_py", "#pi p_{y} Distribution", 200, -20, 20);
+  h1_pi_pz = new TH1F("pi_pz", "#pi p_{z} Distribution", 200, -50, 50); 
+  h1_pi_p = new TH1F("pi_p", "#pi p Distribution", 200, 0, 50);
+  h1_pi_E = new TH1F("pi_E", "#pi E Distribution", 200, 0, 50);
+  h1_pi_Theta = new TH1F("pi_Theta", "#pi #theta Distribution; #theta [deg]", 200, 0, 50);
+  h1_pi_Phi = new TH1F("pi_Phi", "#pi #phi Distribution; #phi [deg]", 360, -180, 180);
+  h1_e_px = new TH1F("e_px", "e' p_{x} Distribution", 200, -10, 10);
+  h1_e_py = new TH1F("e_py", "e' p_{y} Distribution", 200, -10, 10);
+  h1_e_pz = new TH1F("e_pz", "e' p_{z} Distribution", 200, -10, 0); 
+  h1_e_p = new TH1F("e_p", "e' p Distribution", 200, 0, 10);
+  h1_e_E = new TH1F("e_E", "e' E Distribution", 200, 0, 10);
+  h1_e_Theta = new TH1F("e_Theta", "e' #theta Distribution; #theta [deg]", 200, 110, 160);
+  h1_e_Phi = new TH1F("e_Phi", "e' #phi Distribution; #phi [deg]", 360, -180, 180);
+  h1_n_px = new TH1F("n_px", "n p_{x} Distribution", 320, -4, 4);
+  h1_n_py = new TH1F("n_py", "n p_{y} Distribution", 200, -2.5, 2.5);
+  h1_n_pz = new TH1F("n_pz", "n p_{z} Distribution", 240, 0, 120); 
+  h1_n_p = new TH1F("n_p", "n p Distribution", 240, 0, 120);
+  h1_n_E = new TH1F("n_E", "n E Distribution", 240, 0, 120);
+  h1_n_Theta = new TH1F("n_Theta", "n #theta Distribution; #theta [deg]", 300, 0, 3);
+  h1_n_Phi = new TH1F("n_Phi", "n #phi Distribution; #phi [deg]", 400, -20, 20);
+  h1_pmiss_px = new TH1F("pmiss_px", "p_{miss} p_{x} Distribution", 800, -10, 10);
+  h1_pmiss_py = new TH1F("pmiss_py", "p_{miss} p_{y} Distribution", 200, -2.5, 2.5);
+  h1_pmiss_pz = new TH1F("pmiss_pz", "p_{miss} p_{z} Distribution", 240, 0, 120); 
+  h1_pmiss_p = new TH1F("pmiss_p", "p_{miss} p Distribution", 240, 0, 120);
+  h1_pmiss_E = new TH1F("pmiss_E", "p_{miss} E Distribution", 240, 0, 120);
+  h1_pmiss_Theta = new TH1F("pmiss_Theta", "p_{miss} #theta Distribution; #theta [deg]", 1000, 0, 10);
+  h1_pmiss_Phi = new TH1F("pmiss_Phi", "p_{miss} #phi Distribution; #phi [deg]", 720, -180, 180);
+  h1_gamma_px = new TH1F("gamma_px", "#gamma p_{x} Distribution", 200, -10, 10);
+  h1_gamma_py = new TH1F("gamma_py", "#gamma p_{y} Distribution", 200, -10, 10);
+  h1_gamma_pz = new TH1F("gamma_pz", "#gamma p_{z} Distribution", 200, -10, 0); 
+  h1_gamma_p = new TH1F("gamma_p", "#gamma p Distribution", 200, 0, 10);
+  h1_gamma_E = new TH1F("gamma_E", "#gamma E Distribution", 200, 0, 10);
+  h1_gamma_Theta = new TH1F("gamma_Theta", "#gamma #theta Distribution; #theta [deg]", 360, -180, 180);
+  h1_gamma_Phi = new TH1F("gamma_Phi", "#gamma #phi Distribution; #phi [deg]", 360, -180, 180);
+
+  h1_Q2_Dist = new TH1F("Q2_Dist", "Q^{2} Distribution", 200, 0, 50);
+  h1_W_Dist = new TH1F("W_Dist", "W Distribution", 500, 0, 50);
+  h1_t_Dist = new TH1F("t_Dist", "t Distribution", 100, 0, 10);
+  h1_xb_Dist = new TH1F("xb_Dist", "x_{b} Distribution", 100, 0, 1);
+  h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
+
   h1_piTruth_p = new TH1F("piTruth_p", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
   h1_piTruth_px = new TH1F("piTruth_px", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
   h1_piTruth_py = new TH1F("piTruth_py", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
@@ -233,6 +275,9 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
   
   ZDC_hit = 0;
   EEMC_hit = 0;
+  Double_t Pi = TMath::ACos(-1);
+  eBeam4Vect.SetPxPyPzE(0,0,-5,5);
+  pBeam4Vect.SetPxPyPzE(-100*TMath::Sin(0.05),100*TMath::Sin(0.05)*TMath::Sin(Pi),100*TMath::Cos(0.05),100);
 
   event_itt++; 
  
@@ -329,14 +374,79 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	  n4VectTruth.SetPxPyPzE(truth->get_px(), truth->get_py(), truth->get_pz(), truth->get_e());
 	}
       }
+
     
     // Now have relevant information from this event, fill some histograms and calculate some stuff
-    h1_piTruth_p->Fill((pi4Vect.Mag()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
+
+    // Calculate kinematic quantities
+    virtphoton4Vect = eBeam4Vect - e4Vect;
+    t4Vect = virtphoton4Vect - pi4Vect;
+    pmiss4Vect = (eBeam4Vect + pBeam4Vect) - (e4Vect+pi4Vect);
+    Q2 = -1*(virtphoton4Vect.Mag2());
+    W = (virtphoton4Vect+pBeam4Vect).Mag();
+    t = -(t4Vect.Mag2());
+    xb =  Q2/(2*(pBeam4Vect.Dot(virtphoton4Vect)));
+    xi = xb/(2-xb);
+
+    // Truth versions of kinematic quantities
+    virtphoton4VectTruth = eBeam4Vect - e4VectTruth;
+    t4VectTruth = virtphoton4VectTruth - pi4VectTruth;
+    pmiss4VectTruth = (eBeam4Vect + pBeam4Vect) - (e4VectTruth+pi4VectTruth);
+    Q2_truth = -1*(virtphoton4VectTruth.Mag2());
+    W_truth = (virtphoton4VectTruth+pBeam4Vect).Mag();
+    t_truth = -(t4VectTruth.Mag2());
+    xb_truth =  Q2_truth/(2*(pBeam4Vect.Dot(virtphoton4VectTruth)));
+    xi_truth = xb_truth/(2-xb_truth);
+      
+    // Fill histograms
+    h1_pi_px->Fill(pi4Vect.Px());
+    h1_pi_py->Fill(pi4Vect.Py());
+    h1_pi_pz->Fill(pi4Vect.Pz());
+    h1_pi_p->Fill(pi4Vect.P());
+    h1_pi_E->Fill(pi4Vect.E());
+    h1_pi_Theta->Fill(pi4Vect.Theta()*TMath::RadToDeg());
+    h1_pi_Phi->Fill(pi4Vect.Phi()*TMath::RadToDeg());
+    h1_e_px->Fill(e4Vect.Px());
+    h1_e_py->Fill(e4Vect.Py());
+    h1_e_pz->Fill(e4Vect.Pz());
+    h1_e_p->Fill(e4Vect.P());
+    h1_e_E->Fill(e4Vect.E());
+    h1_e_Theta->Fill(e4Vect.Theta()*TMath::RadToDeg());
+    h1_e_Phi->Fill(e4Vect.Phi()*TMath::RadToDeg());
+    h1_n_px->Fill(n4Vect.Px());
+    h1_n_py->Fill(n4Vect.Py());
+    h1_n_pz->Fill(n4Vect.Pz());
+    h1_n_p->Fill(n4Vect.P());
+    h1_n_E->Fill(n4Vect.E());
+    h1_n_Theta->Fill(n4Vect.Theta()*TMath::RadToDeg());
+    h1_n_Phi->Fill(n4Vect.Phi()*TMath::RadToDeg());
+    h1_pmiss_px->Fill(pmiss4Vect.Px());
+    h1_pmiss_py->Fill(pmiss4Vect.Py());
+    h1_pmiss_pz->Fill(pmiss4Vect.Pz());
+    h1_pmiss_p->Fill(pmiss4Vect.P());
+    h1_pmiss_E->Fill(pmiss4Vect.E());
+    h1_pmiss_Theta->Fill(pmiss4Vect.Theta()*TMath::RadToDeg());
+    h1_pmiss_Phi->Fill(pmiss4Vect.Phi()*TMath::RadToDeg());
+    h1_gamma_px->Fill(virtphoton4Vect.Px());
+    h1_gamma_py->Fill(virtphoton4Vect.Py());
+    h1_gamma_pz->Fill(virtphoton4Vect.Pz());
+    h1_gamma_p->Fill(virtphoton4Vect.P());
+    h1_gamma_E->Fill(virtphoton4Vect.E());
+    h1_gamma_Theta->Fill(virtphoton4Vect.Theta()*TMath::RadToDeg());
+    h1_gamma_Phi->Fill(virtphoton4Vect.Phi()*TMath::RadToDeg());
+
+    h1_Q2_Dist->Fill(Q2);
+    h1_W_Dist->Fill(W);
+    h1_t_Dist->Fill(t);
+    h1_xb_Dist->Fill(xb);
+    h1_xi_Dist->Fill(xi);
+
+    h1_piTruth_p->Fill((pi4Vect.P()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
     h1_piTruth_px->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100);
     h1_piTruth_py->Fill((pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100);
     h1_piTruth_pz->Fill((pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100);
     h1_piTruth_E->Fill((pi4Vect.E()-pi4VectTruth.E())/(pi4VectTruth.E())*100);
-    h1_eTruth_p->Fill((e4Vect.Mag()-e4VectTruth.P())/(e4VectTruth.P())*100);
+    h1_eTruth_p->Fill((e4Vect.P()-e4VectTruth.P())/(e4VectTruth.P())*100);
     h1_eTruth_px->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100);
     h1_eTruth_py->Fill((e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100);
     h1_eTruth_pz->Fill((e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100);
@@ -347,12 +457,12 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_nTruth_pz->Fill((n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100);
     h1_nTruth_E->Fill((n4Vect.E()-n4VectTruth.E())/(n4VectTruth.E())*100);
 
-    h1_piTruth_p_Smeared->Fill((pi4VectSmeared.Mag()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
+    h1_piTruth_p_Smeared->Fill((pi4VectSmeared.P()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
     h1_piTruth_px_Smeared->Fill((pi4VectSmeared.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100);
     h1_piTruth_py_Smeared->Fill((pi4VectSmeared.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100);
     h1_piTruth_pz_Smeared->Fill((pi4VectSmeared.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100);
     h1_piTruth_E_Smeared->Fill((pi4VectSmeared.E()-pi4VectTruth.E())/(pi4VectTruth.E())*100);
-    h1_eTruth_p_Smeared->Fill((e4VectSmeared.Mag()-e4VectTruth.P())/(e4VectTruth.P())*100);
+    h1_eTruth_p_Smeared->Fill((e4VectSmeared.P()-e4VectTruth.P())/(e4VectTruth.P())*100);
     h1_eTruth_px_Smeared->Fill((e4VectSmeared.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100);
     h1_eTruth_py_Smeared->Fill((e4VectSmeared.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100);
     h1_eTruth_pz_Smeared->Fill((e4VectSmeared.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100);

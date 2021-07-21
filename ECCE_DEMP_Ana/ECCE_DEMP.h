@@ -144,6 +144,15 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector e4VectTruth;
   TLorentzVector pi4VectTruth;
   TLorentzVector n4VectTruth;
+  TLorentzVector eBeam4Vect;
+  TLorentzVector pBeam4Vect;
+  TLorentzVector virtphoton4Vect;
+  TLorentzVector t4Vect;
+  TLorentzVector pmiss4Vect;
+  TLorentzVector virtphoton4VectTruth;
+  TLorentzVector t4VectTruth;
+  TLorentzVector pmiss4VectTruth;
+
   Double_t nEDep;
   Double_t nEDepSmeared;
   Double_t nTheta;
@@ -153,10 +162,64 @@ class ECCE_DEMP : public SubsysReco
   Double_t nPMag;
   Double_t nPMagSmeared;
 
+  Double_t Q2;
+  Double_t W;
+  Double_t t;
+  Double_t xb;
+  Double_t xi;
+  Double_t Q2_truth;
+  Double_t W_truth;
+  Double_t t_truth;
+  Double_t xb_truth;
+  Double_t xi_truth;
+
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
   // Histogram for coincidence analysis routine
+
+  // 1D distributions for each particle
+  TH1F* h1_pi_px;
+  TH1F* h1_pi_py;
+  TH1F* h1_pi_pz;
+  TH1F* h1_pi_p;
+  TH1F* h1_pi_E;
+  TH1F* h1_pi_Theta;
+  TH1F* h1_pi_Phi;
+  TH1F* h1_e_px;
+  TH1F* h1_e_py;
+  TH1F* h1_e_pz;
+  TH1F* h1_e_p;
+  TH1F* h1_e_E;
+  TH1F* h1_e_Theta;
+  TH1F* h1_e_Phi;
+  TH1F* h1_n_px;
+  TH1F* h1_n_py;
+  TH1F* h1_n_pz;
+  TH1F* h1_n_p;
+  TH1F* h1_n_E;
+  TH1F* h1_n_Theta;
+  TH1F* h1_n_Phi;
+  TH1F* h1_pmiss_px;
+  TH1F* h1_pmiss_py;
+  TH1F* h1_pmiss_pz;
+  TH1F* h1_pmiss_p;
+  TH1F* h1_pmiss_E;
+  TH1F* h1_pmiss_Theta;
+  TH1F* h1_pmiss_Phi;
+  TH1F* h1_gamma_px;
+  TH1F* h1_gamma_py;
+  TH1F* h1_gamma_pz;
+  TH1F* h1_gamma_p;
+  TH1F* h1_gamma_E;
+  TH1F* h1_gamma_Theta;
+  TH1F* h1_gamma_Phi;
+  
+  TH1F* h1_Q2_Dist;
+  TH1F* h1_W_Dist;
+  TH1F* h1_t_Dist;
+  TH1F* h1_xb_Dist;
+  TH1F* h1_xi_Dist;
 
   // Resolution test plots for unsmeared vectors
   TH1F* h1_piTruth_p;
