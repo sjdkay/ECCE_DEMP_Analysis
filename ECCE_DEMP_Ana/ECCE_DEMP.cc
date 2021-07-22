@@ -160,6 +160,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 
   event_itt = 0;
 
+  gDirectory->mkdir("Pion_Info");
+  gDirectory->cd("Pion_Info");
   h1_pi_px = new TH1F("pi_px", "#pi p_{x} Distribution", 200, -20, 20);
   h1_pi_py = new TH1F("pi_py", "#pi p_{y} Distribution", 200, -20, 20);
   h1_pi_pz = new TH1F("pi_pz", "#pi p_{z} Distribution", 200, -50, 50); 
@@ -167,6 +169,30 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_pi_E = new TH1F("pi_E", "#pi E Distribution", 200, 0, 50);
   h1_pi_Theta = new TH1F("pi_Theta", "#pi #theta Distribution; #theta [deg]", 200, 0, 50);
   h1_pi_Phi = new TH1F("pi_Phi", "#pi #phi Distribution; #phi [deg]", 360, -180, 180);
+  h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
+  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
+  h2_piTrack_ThetaPhi_Smeared = new TH2F("piTrack_ThetaPhi_Smeared", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
+  h2_piTrack_pTheta_Smeared = new TH2F("piTrack_pTheta_Smeared", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
+  gDirectory->cd("../");
+
+  gDirectory->mkdir("Pion_Truth_Info");
+  gDirectory->cd("Pion_Truth_Info");
+  h1_piTruth_p = new TH1F("piTruth_p", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_px = new TH1F("piTruth_px", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_py = new TH1F("piTruth_py", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_pz = new TH1F("piTruth_pz", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_E = new TH1F("piTruth_E", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_p_Smeared = new TH1F("piTruth_p_Smeared", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_px_Smeared = new TH1F("piTruth_px_Smeared", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_py_Smeared = new TH1F("piTruth_py_Smeared", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_pz_Smeared = new TH1F("piTruth_pz_Smeared", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_piTruth_E_Smeared = new TH1F("piTruth_E_Smeared", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 100, -50, 50);
+  h2_piTruth_pxpy = new TH2F("piTruth_pxpy", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  h2_piTruth_pxpy_Smeared = new TH2F("piTruth_pxpy_Smeared", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  gDirectory->cd("../");
+  
+  gDirectory->mkdir("Scattered_Electron_Info");
+  gDirectory->cd("Scattered_Electron_Info");
   h1_e_px = new TH1F("e_px", "e' p_{x} Distribution", 200, -10, 10);
   h1_e_py = new TH1F("e_py", "e' p_{y} Distribution", 200, -10, 10);
   h1_e_pz = new TH1F("e_pz", "e' p_{z} Distribution", 200, -10, 0); 
@@ -174,6 +200,30 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_e_E = new TH1F("e_E", "e' E Distribution", 200, 0, 10);
   h1_e_Theta = new TH1F("e_Theta", "e' #theta Distribution; #theta [deg]", 200, 110, 160);
   h1_e_Phi = new TH1F("e_Phi", "e' #phi Distribution; #phi [deg]", 360, -180, 180);
+  h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
+  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
+  h2_eTrack_ThetaPhi_Smeared = new TH2F("eTrack_ThetaPhi_Smeared", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
+  h2_eTrack_pTheta_Smeared = new TH2F("eTrack_pTheta_Smeared", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
+  gDirectory->cd("../");
+
+  gDirectory->mkdir("Scattered_Electron_Truth_Info");
+  gDirectory->cd("Scattered_Electron_Truth_Info");
+  h1_eTruth_p = new TH1F("eTruth_p", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
+  h1_eTruth_px = new TH1F("eTruth_px", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_py = new TH1F("eTruth_py", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_pz = new TH1F("eTruth_pz", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_E = new TH1F("eTruth_E", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  h1_eTruth_p_Smeared = new TH1F("eTruth_p_Smeared", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
+  h1_eTruth_px_Smeared = new TH1F("eTruth_px_Smeared", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_py_Smeared = new TH1F("eTruth_py_Smeared", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_pz_Smeared = new TH1F("eTruth_pz_Smeared", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_eTruth_E_Smeared = new TH1F("eTruth_E_Smeared", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  h2_eTruth_pxpy = new TH2F("eTruth_pxpy", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);  
+  h2_eTruth_pxpy_Smeared = new TH2F("eTruth_pxpy_Smeared", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  gDirectory->cd("../");
+
+  gDirectory->mkdir("Neutron_Info");
+  gDirectory->cd("Neutron_Info");
   h1_n_px = new TH1F("n_px", "n p_{x} Distribution", 320, -4, 4);
   h1_n_py = new TH1F("n_py", "n p_{y} Distribution", 200, -2.5, 2.5);
   h1_n_pz = new TH1F("n_pz", "n p_{z} Distribution", 240, 0, 120); 
@@ -181,6 +231,30 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_n_E = new TH1F("n_E", "n E Distribution", 240, 0, 120);
   h1_n_Theta = new TH1F("n_Theta", "n #theta Distribution; #theta [deg]", 300, 0, 3);
   h1_n_Phi = new TH1F("n_Phi", "n #phi Distribution; #phi [deg]", 400, -20, 20);
+  h2_nTrack_ThetaPhi = new TH2F("nTrack_ThetaPhi", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 5, 100, -50, 50);
+  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 5, 1000, 0, 100);
+  h2_nTrack_ThetaPhi_Smeared = new TH2F("nTrack_ThetaPhi_Smeared", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 5, 100, -50, 50);
+  h2_nTrack_pTheta_Smeared = new TH2F("nTrack_pTheta_Smeared", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 5, 1000, 0, 100);
+  gDirectory->cd("../");
+
+  gDirectory->mkdir("Neutron_Truth_Info");
+  gDirectory->cd("Neutron_Truth_Info");
+  h1_nTruth_p = new TH1F("nTruth_p", "n #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
+  h1_nTruth_px = new TH1F("nTruth_px", "#n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_py = new TH1F("nTruth_py", "#n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_pz = new TH1F("nTruth_pz", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_E = new TH1F("nTruth_E", "n #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  h1_nTruth_p_Smeared = new TH1F("nTruth_p_Smeared", "n #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
+  h1_nTruth_px_Smeared = new TH1F("nTruth_px_Smeared", "#n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_py_Smeared = new TH1F("nTruth_py_Smeared", "#n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_pz_Smeared = new TH1F("nTruth_pz_Smeared", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
+  h1_nTruth_E_Smeared = new TH1F("nTruth_E_Smeared", "n #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  h2_nTruth_pxpy = new TH2F("nTruth_pxpy", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  h2_nTruth_pxpy_Smeared = new TH2F("nTruth_pxpy_Smeared", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  gDirectory->cd("../");
+
+  gDirectory->mkdir("PMiss_Info");
+  gDirectory->cd("PMiss_Info");
   h1_pmiss_px = new TH1F("pmiss_px", "p_{miss} p_{x} Distribution", 800, -10, 10);
   h1_pmiss_py = new TH1F("pmiss_py", "p_{miss} p_{y} Distribution", 200, -2.5, 2.5);
   h1_pmiss_pz = new TH1F("pmiss_pz", "p_{miss} p_{z} Distribution", 240, 0, 120); 
@@ -188,6 +262,10 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_pmiss_E = new TH1F("pmiss_E", "p_{miss} E Distribution", 240, 0, 120);
   h1_pmiss_Theta = new TH1F("pmiss_Theta", "p_{miss} #theta Distribution; #theta [deg]", 1000, 0, 10);
   h1_pmiss_Phi = new TH1F("pmiss_Phi", "p_{miss} #phi Distribution; #phi [deg]", 720, -180, 180);
+  gDirectory->cd("../");
+  
+  gDirectory->mkdir("Virtual_Photon_Info");
+  gDirectory->cd("Virtual_Photon_Info");
   h1_gamma_px = new TH1F("gamma_px", "#gamma p_{x} Distribution", 200, -10, 10);
   h1_gamma_py = new TH1F("gamma_py", "#gamma p_{y} Distribution", 200, -10, 10);
   h1_gamma_pz = new TH1F("gamma_pz", "#gamma p_{z} Distribution", 200, -10, 0); 
@@ -195,69 +273,19 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_gamma_E = new TH1F("gamma_E", "#gamma E Distribution", 200, 0, 10);
   h1_gamma_Theta = new TH1F("gamma_Theta", "#gamma #theta Distribution; #theta [deg]", 360, -180, 180);
   h1_gamma_Phi = new TH1F("gamma_Phi", "#gamma #phi Distribution; #phi [deg]", 360, -180, 180);
-
+  gDirectory->cd("../");
+ 
+  gDirectory->mkdir("Kinematics_Info");
+  gDirectory->cd("Kinematics_Info");
   h1_Q2_Dist = new TH1F("Q2_Dist", "Q^{2} Distribution", 200, 0, 50);
   h1_W_Dist = new TH1F("W_Dist", "W Distribution", 500, 0, 50);
   h1_t_Dist = new TH1F("t_Dist", "t Distribution", 100, 0, 10);
   h1_xb_Dist = new TH1F("xb_Dist", "x_{b} Distribution", 100, 0, 1);
   h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
-
-  h1_piTruth_p = new TH1F("piTruth_p", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_px = new TH1F("piTruth_px", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_py = new TH1F("piTruth_py", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_pz = new TH1F("piTruth_pz", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_E = new TH1F("piTruth_E", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_p = new TH1F("eTruth_p", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
-  h1_eTruth_px = new TH1F("eTruth_px", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_py = new TH1F("eTruth_py", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_pz = new TH1F("eTruth_pz", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_E = new TH1F("eTruth_E", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
-  h1_nTruth_p = new TH1F("nTruth_p", "n #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
-  h1_nTruth_px = new TH1F("nTruth_px", "#n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
-  h1_nTruth_py = new TH1F("nTruth_py", "#n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
-  h1_nTruth_pz = new TH1F("nTruth_pz", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_nTruth_E = new TH1F("nTruth_E", "n #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
-
-  h1_piTruth_p_Smeared = new TH1F("piTruth_p_Smeared", "#pi #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_px_Smeared = new TH1F("piTruth_px_Smeared", "#pi #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_py_Smeared = new TH1F("piTruth_py_Smeared", "#pi #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_pz_Smeared = new TH1F("piTruth_pz_Smeared", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_piTruth_E_Smeared = new TH1F("piTruth_E_Smeared", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_p_Smeared = new TH1F("eTruth_p_Smeared", "e' #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
-  h1_eTruth_px_Smeared = new TH1F("eTruth_px_Smeared", "#e' #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_py_Smeared = new TH1F("eTruth_py_Smeared", "#e' #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_pz_Smeared = new TH1F("eTruth_pz_Smeared", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_eTruth_E_Smeared = new TH1F("eTruth_E_Smeared", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
-  h1_nTruth_p_Smeared = new TH1F("nTruth_p_Smeared", "n #frac{#Delta p}{Truth p} Distribution (%) ; %", 100, -50, 50);
-  h1_nTruth_px_Smeared = new TH1F("nTruth_px_Smeared", "#n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
-  h1_nTruth_py_Smeared = new TH1F("nTruth_py_Smeared", "#n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
-  h1_nTruth_pz_Smeared = new TH1F("nTruth_pz_Smeared", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_nTruth_E_Smeared = new TH1F("nTruth_E_Smeared", "n #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  gDirectory->cd("../");
 
   h2_ZDC_XY = new TH2F("ZDC_XY", "ZDC XY", 200, -50, 50, 200, -50, 50);
   h2_ZDC_XY_Smeared = new TH2F("ZDC_XY_Smeared", "ZDC XY", 200, -50, 50, 200, -50, 50);
-
-  h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
-  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
-  h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
-  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
-  h2_nTrack_ThetaPhi = new TH2F("nTrack_ThetaPhi", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 5, 100, -50, 50);
-  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 5, 1000, 0, 100);
-
-  h2_eTrack_ThetaPhi_Smeared = new TH2F("eTrack_ThetaPhi_Smeared", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
-  h2_eTrack_pTheta_Smeared = new TH2F("eTrack_pTheta_Smeared", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
-  h2_piTrack_ThetaPhi_Smeared = new TH2F("piTrack_ThetaPhi_Smeared", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
-  h2_piTrack_pTheta_Smeared = new TH2F("piTrack_pTheta_Smeared", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
-  h2_nTrack_ThetaPhi_Smeared = new TH2F("nTrack_ThetaPhi_Smeared", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 5, 100, -50, 50);
-  h2_nTrack_pTheta_Smeared = new TH2F("nTrack_pTheta_Smeared", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 5, 1000, 0, 100);
-
-  h2_eTruth_pxpy = new TH2F("eTruth_pxpy", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-  h2_piTruth_pxpy = new TH2F("piTruth_pxpy", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-  h2_nTruth_pxpy = new TH2F("nTruth_pxpy", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-
-  h2_eTruth_pxpy_Smeared = new TH2F("eTruth_pxpy_Smeared", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-  h2_piTruth_pxpy_Smeared = new TH2F("piTruth_pxpy_Smeared", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-  h2_nTruth_pxpy_Smeared = new TH2F("nTruth_pxpy_Smeared", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
