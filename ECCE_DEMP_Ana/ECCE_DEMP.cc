@@ -188,6 +188,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_piTruth_pz_Smeared = new TH1F("piTruth_pz_Smeared", "#pi #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
   h1_piTruth_E_Smeared = new TH1F("piTruth_E_Smeared", "#pi #frac{#Delta E}{Truth E} Distribution (%); %", 100, -50, 50);
   h2_piTruth_pxpy = new TH2F("piTruth_pxpy", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  h2_piTruth_pxpz = new TH2F("piTruth_pxpz", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_piTruth_pypz = new TH2F("piTruth_pypz", "#pi #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   h2_piTruth_pxpy_Smeared = new TH2F("piTruth_pxpy_Smeared", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
   gDirectory->cd("../");
   
@@ -219,6 +221,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_eTruth_pz_Smeared = new TH1F("eTruth_pz_Smeared", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
   h1_eTruth_E_Smeared = new TH1F("eTruth_E_Smeared", "e' #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
   h2_eTruth_pxpy = new TH2F("eTruth_pxpy", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);  
+  h2_eTruth_pxpz = new TH2F("eTruth_pxpz", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
+  h2_eTruth_pypz = new TH2F("eTruth_pypz", "e' #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
   h2_eTruth_pxpy_Smeared = new TH2F("eTruth_pxpy_Smeared", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
   gDirectory->cd("../");
 
@@ -229,12 +233,12 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_n_pz = new TH1F("n_pz", "n p_{z} Distribution", 240, 0, 120); 
   h1_n_p = new TH1F("n_p", "n p Distribution", 240, 0, 120);
   h1_n_E = new TH1F("n_E", "n E Distribution", 240, 0, 120);
-  h1_n_Theta = new TH1F("n_Theta", "n #theta Distribution; #theta [deg]", 300, 0, 3);
+  h1_n_Theta = new TH1F("n_Theta", "n #theta Distribution; #theta [deg]", 100, 0, 1);
   h1_n_Phi = new TH1F("n_Phi", "n #phi Distribution; #phi [deg]", 400, -20, 20);
-  h2_nTrack_ThetaPhi = new TH2F("nTrack_ThetaPhi", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 5, 100, -50, 50);
-  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 5, 1000, 0, 100);
-  h2_nTrack_ThetaPhi_Smeared = new TH2F("nTrack_ThetaPhi_Smeared", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 5, 100, -50, 50);
-  h2_nTrack_pTheta_Smeared = new TH2F("nTrack_pTheta_Smeared", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 5, 1000, 0, 100);
+  h2_nTrack_ThetaPhi = new TH2F("nTrack_ThetaPhi", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 1, 100, -50, 50);
+  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 1, 1000, 0, 100);
+  h2_nTrack_ThetaPhi_Smeared = new TH2F("nTrack_ThetaPhi_Smeared", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 100, 0, 1, 100, -50, 50);
+  h2_nTrack_pTheta_Smeared = new TH2F("nTrack_pTheta_Smeared", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 100, 0, 1, 1000, 0, 100);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Neutron_Truth_Info");
@@ -249,7 +253,10 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_nTruth_py_Smeared = new TH1F("nTruth_py_Smeared", "#n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
   h1_nTruth_pz_Smeared = new TH1F("nTruth_pz_Smeared", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
   h1_nTruth_E_Smeared = new TH1F("nTruth_E_Smeared", "n #frac{#Delta E}{Truth E} Distribution (%) ; %", 100, -50, 50);
+  // SJDK 04/08/21 - Neutron Px distributions currently don't work, a correction is applied for the ZDC x position which is used to determine the neutron 4 vector (from angles/E). This is NOT applied to the truth track. Need to figure out how to correctly adjust the truth track too
   h2_nTruth_pxpy = new TH2F("nTruth_pxpy", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  h2_nTruth_pxpz = new TH2F("nTruth_pxpz", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_nTruth_pypz = new TH2F("nTruth_pypz", "n #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   h2_nTruth_pxpy_Smeared = new TH2F("nTruth_pxpy_Smeared", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
   gDirectory->cd("../");
 
@@ -284,8 +291,27 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
+  gDirectory->mkdir("Kinematics_Truth_Info");
+  gDirectory->cd("Kinematics_Truth_Info");
+  h1_Q2Truth_Dist = new TH1F("Q2Truth_Dist", "Q^{2} Truth Distribution", 200, 0, 50);
+  h1_WTruth_Dist = new TH1F("WTruth_Dist", "W Truth Distribution", 500, 0, 50);
+  h1_tTruth_Dist = new TH1F("tTruth_Dist", "t Truth Distribution", 100, 0, 10);
+  h1_xbTruth_Dist = new TH1F("xbTruth_Dist", "x_{b} Truth Distribution", 100, 0, 1);
+  h1_xiTruth_Dist = new TH1F("xiTruth_Dist", "#xi Truth Distribution", 100, 0, 1);
+  gDirectory->cd("../");
+
   h2_ZDC_XY = new TH2F("ZDC_XY", "ZDC XY", 200, -50, 50, 200, -50, 50);
   h2_ZDC_XY_Smeared = new TH2F("ZDC_XY_Smeared", "ZDC XY", 200, -50, 50, 200, -50, 50);
+
+  // Define beam 4 vectors
+  e_beam_energy = 5;
+  e_beam_pmag = sqrt(pow(e_beam_energy,2)-pow(mElec,2));
+  ion_beam_energy = 100;
+  ion_beam_pmag = sqrt((pow(ion_beam_energy,2)-pow(mProt,2)));
+  crossing_angle = 0.05; 
+  Double_t Pi = TMath::ACos(-1);
+  eBeam4Vect.SetPxPyPzE(0,0,-1*e_beam_pmag,e_beam_energy);
+  pBeam4Vect.SetPxPyPzE(-ion_beam_pmag*TMath::Sin(crossing_angle),ion_beam_pmag*TMath::Sin(crossing_angle)*TMath::Sin(Pi),ion_beam_pmag*TMath::Cos(crossing_angle),ion_beam_energy);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -300,20 +326,13 @@ int ECCE_DEMP::InitRun(PHCompositeNode *topNode)
 //____________________________________________________________________________..
 int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 {
-  
   ZDC_hit = 0;
   EEMC_hit = 0;
-  Double_t Pi = TMath::ACos(-1);
-  eBeam4Vect.SetPxPyPzE(0,0,-5,5);
-  pBeam4Vect.SetPxPyPzE(-100*TMath::Sin(0.05),100*TMath::Sin(0.05)*TMath::Sin(Pi),100*TMath::Cos(0.05),100);
-
   event_itt++; 
  
   if(event_itt%100 == 0)
      std::cout << "Event Processing Counter: " << event_itt << endl;
-
-  //process_g4hits_ZDC(topNode);
-
+  
   if (Check_n(topNode) == true && Check_ePi(topNode) == true){ // For event, check if it look like we have an e/pi/n in the event
     // Get track map for e'/pi info
     SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
@@ -362,8 +381,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
       PHG4HitContainer::ConstRange hit_range = hits->getHits();
       for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++)
 	{
-	  nZDCPos.SetXYZ(hit_iter->second->get_x(0), hit_iter->second->get_y(0), hit_iter->second->get_z(0));
-	  nZDCPosSmeared.SetXYZ(Position_Smear(hit_iter->second->get_x(0)), Position_Smear(hit_iter->second->get_y(0)), Position_Smear(hit_iter->second->get_z(0)));
+	  nZDCPos.SetXYZ(hit_iter->second->get_x(0)-90, hit_iter->second->get_y(0), hit_iter->second->get_z(0));
+	  nZDCPosSmeared.SetXYZ(Position_Smear(hit_iter->second->get_x(0)-90), Position_Smear(hit_iter->second->get_y(0)), Position_Smear(hit_iter->second->get_z(0)));
 	  nEDep = hit_iter->second->get_edep();
 	  nEDepSmeared = EMCAL_Smear(hit_iter->second->get_edep());
 	  nTheta = nZDCPos.Theta();
@@ -385,12 +404,12 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	return Fun4AllReturnCodes::EVENT_OK;
       }
 
-    /// Loop over the G4 truth (stable) particles
+    // Loop over the G4 truth (stable) particles
     for (PHG4TruthInfoContainer::ConstIterator iter = range.first;
 	 iter != range.second;
 	 ++iter)
       {
-	/// Get this truth particle
+	// Get this truth particle
 	const PHG4Particle *truth = iter->second;
 	if ( truth->get_pid() == 11){ // PDG 11 -> Scattered electron
 	  e4VectTruth.SetPxPyPzE(truth->get_px(), truth->get_py(), truth->get_pz(), truth->get_e());
@@ -403,9 +422,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	}
       }
 
-    
     // Now have relevant information from this event, fill some histograms and calculate some stuff
-
     // Calculate kinematic quantities
     virtphoton4Vect = eBeam4Vect - e4Vect;
     t4Vect = virtphoton4Vect - pi4Vect;
@@ -469,6 +486,12 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_xb_Dist->Fill(xb);
     h1_xi_Dist->Fill(xi);
 
+    h1_Q2Truth_Dist->Fill(Q2_truth);
+    h1_WTruth_Dist->Fill(W_truth);
+    h1_tTruth_Dist->Fill(t_truth);
+    h1_xbTruth_Dist->Fill(xb_truth);
+    h1_xiTruth_Dist->Fill(xi_truth);
+
     h1_piTruth_p->Fill((pi4Vect.P()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
     h1_piTruth_px->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100);
     h1_piTruth_py->Fill((pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100);
@@ -501,8 +524,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_nTruth_pz_Smeared->Fill((n4VectSmeared.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100);
     h1_nTruth_E_Smeared->Fill((n4VectSmeared.E()-n4VectTruth.E())/(n4VectTruth.E())*100);
     
-    h2_ZDC_XY->Fill(nZDCPos.x()-90, nZDCPos.y());
-    h2_ZDC_XY_Smeared->Fill(nZDCPosSmeared.x()-90, nZDCPosSmeared.y());
+    h2_ZDC_XY->Fill(nZDCPos.x(), nZDCPos.y());
+    h2_ZDC_XY_Smeared->Fill(nZDCPosSmeared.x(), nZDCPosSmeared.y());
 
     h2_piTrack_ThetaPhi->Fill((pi4Vect.Theta()*TMath::RadToDeg()), (pi4Vect.Phi()*TMath::RadToDeg()));
     h2_piTrack_pTheta->Fill((pi4Vect.Theta()*TMath::RadToDeg()), pi4Vect.P());
@@ -520,6 +543,15 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h2_piTruth_pxpy->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100);
     h2_eTruth_pxpy->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100);
     h2_nTruth_pxpy->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100);
+
+    h2_piTruth_pxpz->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100);
+    h2_eTruth_pxpz->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100);
+    h2_nTruth_pxpz->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100);
+
+    h2_piTruth_pypz->Fill((pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100);
+    h2_eTruth_pypz->Fill((e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100);
+    h2_nTruth_pypz->Fill((n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100);
+
     h2_piTruth_pxpy_Smeared->Fill((pi4VectSmeared.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4VectSmeared.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100);
     h2_eTruth_pxpy_Smeared->Fill((e4VectSmeared.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4VectSmeared.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100);
     h2_nTruth_pxpy_Smeared->Fill((n4VectSmeared.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4VectSmeared.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100);

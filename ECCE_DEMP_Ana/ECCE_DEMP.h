@@ -111,7 +111,9 @@ class ECCE_DEMP : public SubsysReco
   bool  HIT_IN_HEC;	
 
   double e_beam_energy;
+  double e_beam_pmag;
   double ion_beam_energy;
+  double ion_beam_pmag;
 
   double crossing_angle;
 
@@ -127,6 +129,7 @@ class ECCE_DEMP : public SubsysReco
   Double_t mPi = 0.139570;
   Double_t mElec = 0.000510998950;
   Double_t mNeut = 0.93965420;
+  Double_t mProt = 0.93827208816;
 
   // Quantities we want to determine
   TVector3 eVect;
@@ -221,6 +224,12 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_xb_Dist;
   TH1F* h1_xi_Dist;
 
+  TH1F* h1_Q2Truth_Dist;
+  TH1F* h1_WTruth_Dist;
+  TH1F* h1_tTruth_Dist;
+  TH1F* h1_xbTruth_Dist;
+  TH1F* h1_xiTruth_Dist;
+
   // Resolution test plots for unsmeared vectors
   TH1F* h1_piTruth_p;
   TH1F* h1_piTruth_px;
@@ -274,6 +283,12 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_eTruth_pxpy;
   TH2F* h2_piTruth_pxpy;
   TH2F* h2_nTruth_pxpy;
+  TH2F* h2_eTruth_pxpz;
+  TH2F* h2_piTruth_pxpz;
+  TH2F* h2_nTruth_pxpz;
+  TH2F* h2_eTruth_pypz;
+  TH2F* h2_piTruth_pypz;
+  TH2F* h2_nTruth_pypz;
   TH2F* h2_eTruth_pxpy_Smeared;
   TH2F* h2_piTruth_pxpy_Smeared;
   TH2F* h2_nTruth_pxpy_Smeared;
