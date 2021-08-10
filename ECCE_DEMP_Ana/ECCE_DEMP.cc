@@ -237,6 +237,15 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_xiTruth_Dist = new TH1F("xiTruth_Dist", "#xi Truth Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
+  gDirectory->mkdir("Kinematics_Analysis");
+  gDirectory->cd("Kinematics_Analysis");
+  h2_delta_t_t = new TH2F("delta_t_t", "#Delta t vs t; #Delta t (%); t", 200, -100, 100, 100, 0, 1);
+ 
+  for(Int_t A = 0; A < 7; A++){
+    h2_delta_t_t_Q2[A] = new TH2F(Form("delta_t_t_Q2_%i", (A+1)), Form("#Delta t vs t, %i < Q^{2} < %i; #Delta t (Percent); t", (5 + (A*5)), 10+(A*5)), 200, -100, 100, 100, 0, 1);
+  }
+  gDirectory->cd("../");
+
   h2_ZDC_XY = new TH2F("ZDC_XY", "ZDC XY", 200, -50, 50, 200, -50, 50);
   h2_ZDC_XY_Smeared = new TH2F("ZDC_XY_Smeared", "ZDC XY", 200, -50, 50, 200, -50, 50);
 
@@ -428,6 +437,16 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_tTruth_Dist->Fill(t_truth);
     h1_xbTruth_Dist->Fill(xb_truth);
     h1_xiTruth_Dist->Fill(xi_truth);
+
+    h2_delta_t_t->Fill(((t - t_truth)/t_truth)*100, t);
+    
+    for(Int_t B = 0; B < 7; B++){
+      Double_t Q2_low = 5+(B*5);
+      Double_t Q2_high = 10+(B*5);
+      if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
+	h2_delta_t_t_Q2[B]->Fill(((t - t_truth)/t_truth)*100, t);
+      }
+    }
 
     h1_piTruth_p->Fill((pi4Vect.P()-pi4VectTruth.P())/(pi4VectTruth.P())*100);
     h1_piTruth_px->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100);

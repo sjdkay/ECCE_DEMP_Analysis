@@ -292,6 +292,10 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_eTruth_pxpy_Smeared;
   TH2F* h2_piTruth_pxpy_Smeared;
   TH2F* h2_nTruth_pxpy_Smeared;
+
+  // 2D Kinematic plots
+  TH2F* h2_delta_t_t;
+  TH2F* h2_delta_t_t_Q2[7];
  
 };
 
