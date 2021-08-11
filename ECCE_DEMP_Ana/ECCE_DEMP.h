@@ -151,6 +151,7 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector pBeam4Vect;
   TLorentzVector virtphoton4Vect;
   TLorentzVector t4Vect;
+  TLorentzVector t_alt4Vect;
   TLorentzVector pmiss4Vect;
   TLorentzVector virtphoton4VectTruth;
   TLorentzVector t4VectTruth;
@@ -168,6 +169,7 @@ class ECCE_DEMP : public SubsysReco
   Double_t Q2;
   Double_t W;
   Double_t t;
+  Double_t t_alt;
   Double_t xb;
   Double_t xi;
   Double_t Q2_truth;
@@ -221,6 +223,8 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_Q2_Dist;
   TH1F* h1_W_Dist;
   TH1F* h1_t_Dist;
+  TH1F* h1_t_alt_Dist;
+  TH1F* h1_t_comp;
   TH1F* h1_xb_Dist;
   TH1F* h1_xi_Dist;
 
@@ -292,8 +296,14 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_eTruth_pxpy_Smeared;
   TH2F* h2_piTruth_pxpy_Smeared;
   TH2F* h2_nTruth_pxpy_Smeared;
+  
+  // 1D Kinematic analysis plots
+  TH1F* h1_t_Q2[7];
+  TH1F* h1_t_alt_Q2[7];
 
-  // 2D Kinematic plots
+  // 2D Kinematic analysis plots
+  TH2F* h2_t_ep;
+  TH2F* h2_t_Q2;
   TH2F* h2_delta_t_t;
   TH2F* h2_delta_t_t_Q2[7];
  

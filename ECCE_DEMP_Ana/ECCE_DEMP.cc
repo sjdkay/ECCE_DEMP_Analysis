@@ -224,6 +224,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_Q2_Dist = new TH1F("Q2_Dist", "Q^{2} Distribution", 200, 0, 50);
   h1_W_Dist = new TH1F("W_Dist", "W Distribution", 500, 0, 50);
   h1_t_Dist = new TH1F("t_Dist", "t Distribution", 100, 0, 10);
+  h1_t_alt_Dist = new TH1F("t_alt_Dist", "t (Alternative calculation) Distribution", 100, 0, 10);
+  h1_t_comp = new TH1F("t_comp_Dist", "#frac{#Delta t}{t} Distribution; #frac{t_{alt}-t}{t} (%)", 200, -100, 100);
   h1_xb_Dist = new TH1F("xb_Dist", "x_{b} Distribution", 100, 0, 1);
   h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
   gDirectory->cd("../");
@@ -239,9 +241,13 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 
   gDirectory->mkdir("Kinematics_Analysis");
   gDirectory->cd("Kinematics_Analysis");
+  h2_t_ep = new TH2F("t_ep", "t vs ScatElec P; t; P_{e'}", 100, 0, 10, 200, 0, 10);
+  h2_t_Q2 = new TH2F("t_Q2", "t vs Q^{2}; t; Q^{2}", 100, 0, 10, 200, 0, 50);
   h2_delta_t_t = new TH2F("delta_t_t", "#Delta t vs t; #Delta t (%); t", 200, -100, 100, 100, 0, 1);
- 
+  
   for(Int_t A = 0; A < 7; A++){
+    h1_t_Q2[A] = new TH1F(Form("t_Q2_%i", (A+1)), Form("t dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
+    h1_t_alt_Q2[A] = new TH1F(Form("t_alt_Q2_%i", (A+1)), Form("t (Alternative calculation) dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
     h2_delta_t_t_Q2[A] = new TH2F(Form("delta_t_t_Q2_%i", (A+1)), Form("#Delta t vs t, %i < Q^{2} < %i; #Delta t (Percent); t", (5 + (A*5)), 10+(A*5)), 200, -100, 100, 100, 0, 1);
   }
   gDirectory->cd("../");
@@ -328,7 +334,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
       for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++)
 	{
 	  nZDCPos.SetXYZ(hit_iter->second->get_x(0)-90, hit_iter->second->get_y(0), hit_iter->second->get_z(0));
-	  nZDCPosSmeared.SetXYZ(Position_Smear(hit_iter->second->get_x(0)-90), Position_Smear(hit_iter->second->get_y(0)), Position_Smear(hit_iter->second->get_z(0)));
+	  nZDCPosSmeared.SetXYZ(Position_Smear(hit_iter->second->get_x(0))-90, Position_Smear(hit_iter->second->get_y(0)), Position_Smear(hit_iter->second->get_z(0)));
 	  nEDep = hit_iter->second->get_edep();
 	  nEDepSmeared = EMCAL_Smear(hit_iter->second->get_edep());
 	  nTheta = nZDCPos.Theta();
@@ -369,15 +375,21 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
       }
 
     // Now have relevant information from this event, fill some histograms and calculate some stuff
-    // Calculate kinematic quantities
+    // Calculate kinematic quantities for electroproduction
     virtphoton4Vect = eBeam4Vect - e4Vect;
     t4Vect = virtphoton4Vect - pi4Vect;
+    // Currently, this alternative calculation of t gives wildly divergent results, this seems to be due to a combination of factors
+    // 1 - The hadron beam crossing angle and components are not correct
+    // 2 - The offset applied to the ZDC x position to get theta closer to 0 throws off the results, what is the "correct" offset that should be applied?
+    t_alt4Vect= pBeam4Vect - n4Vect;
     pmiss4Vect = (eBeam4Vect + pBeam4Vect) - (e4Vect+pi4Vect);
     Q2 = -1*(virtphoton4Vect.Mag2());
     W = (virtphoton4Vect+pBeam4Vect).Mag();
     t = -(t4Vect.Mag2());
+    t_alt = -(t_alt4Vect.Mag2());
     xb =  Q2/(2*(pBeam4Vect.Dot(virtphoton4Vect)));
     xi = xb/(2-xb);
+    //cout << t_alt4Vect[0] << "  " << t_alt4Vect[1] << "  " << t_alt4Vect[2] << "  " << t_alt4Vect[3] << "   " << t_alt << endl;
 
     // Truth versions of kinematic quantities
     virtphoton4VectTruth = eBeam4Vect - e4VectTruth;
@@ -388,7 +400,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     t_truth = -(t4VectTruth.Mag2());
     xb_truth =  Q2_truth/(2*(pBeam4Vect.Dot(virtphoton4VectTruth)));
     xi_truth = xb_truth/(2-xb_truth);
-      
+
     // Fill histograms
     h1_pi_px->Fill(pi4Vect.Px());
     h1_pi_py->Fill(pi4Vect.Py());
@@ -429,6 +441,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_Q2_Dist->Fill(Q2);
     h1_W_Dist->Fill(W);
     h1_t_Dist->Fill(t);
+    h1_t_alt_Dist->Fill(t_alt);
+    h1_t_comp->Fill(((t_alt-t)/t)*100);
     h1_xb_Dist->Fill(xb);
     h1_xi_Dist->Fill(xi);
 
@@ -438,12 +452,16 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_xbTruth_Dist->Fill(xb_truth);
     h1_xiTruth_Dist->Fill(xi_truth);
 
+    h2_t_ep->Fill(t, e4Vect.P());
+    h2_t_Q2->Fill(t,Q2);
     h2_delta_t_t->Fill(((t - t_truth)/t_truth)*100, t);
     
     for(Int_t B = 0; B < 7; B++){
       Double_t Q2_low = 5+(B*5);
       Double_t Q2_high = 10+(B*5);
       if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
+	h1_t_Q2[B]->Fill(t);
+	h1_t_alt_Q2[B]->Fill(t_alt);
 	h2_delta_t_t_Q2[B]->Fill(((t - t_truth)/t_truth)*100, t);
       }
     }
