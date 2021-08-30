@@ -117,6 +117,8 @@ class ECCE_DEMP : public SubsysReco
 
   double crossing_angle;
 
+  double wgt;
+
   TLorentzVector r_lelectron;
 //  TLorentzVector r_lproton;
 
@@ -306,6 +308,130 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_t_Q2;
   TH2F* h2_delta_t_t;
   TH2F* h2_delta_t_t_Q2[7];
+
+  // 1D distributions for each particle
+  TH1F* h1_pi_px_Weighted;
+  TH1F* h1_pi_py_Weighted;
+  TH1F* h1_pi_pz_Weighted;
+  TH1F* h1_pi_p_Weighted;
+  TH1F* h1_pi_E_Weighted;
+  TH1F* h1_pi_Theta_Weighted;
+  TH1F* h1_pi_Phi_Weighted;
+  TH1F* h1_e_px_Weighted;
+  TH1F* h1_e_py_Weighted;
+  TH1F* h1_e_pz_Weighted;
+  TH1F* h1_e_p_Weighted;
+  TH1F* h1_e_E_Weighted;
+  TH1F* h1_e_Theta_Weighted;
+  TH1F* h1_e_Phi_Weighted;
+  TH1F* h1_n_px_Weighted;
+  TH1F* h1_n_py_Weighted;
+  TH1F* h1_n_pz_Weighted;
+  TH1F* h1_n_p_Weighted;
+  TH1F* h1_n_E_Weighted;
+  TH1F* h1_n_Theta_Weighted;
+  TH1F* h1_n_Phi_Weighted;
+  TH1F* h1_pmiss_px_Weighted;
+  TH1F* h1_pmiss_py_Weighted;
+  TH1F* h1_pmiss_pz_Weighted;
+  TH1F* h1_pmiss_p_Weighted;
+  TH1F* h1_pmiss_E_Weighted;
+  TH1F* h1_pmiss_Theta_Weighted;
+  TH1F* h1_pmiss_Phi_Weighted;
+  TH1F* h1_gamma_px_Weighted;
+  TH1F* h1_gamma_py_Weighted;
+  TH1F* h1_gamma_pz_Weighted;
+  TH1F* h1_gamma_p_Weighted;
+  TH1F* h1_gamma_E_Weighted;
+  TH1F* h1_gamma_Theta_Weighted;
+  TH1F* h1_gamma_Phi_Weighted;
+  
+  TH1F* h1_Q2_Dist_Weighted;
+  TH1F* h1_W_Dist_Weighted;
+  TH1F* h1_t_Dist_Weighted;
+  TH1F* h1_t_alt_Dist_Weighted;
+  TH1F* h1_t_comp_Weighted;
+  TH1F* h1_xb_Dist_Weighted;
+  TH1F* h1_xi_Dist_Weighted;
+
+  TH1F* h1_Q2Truth_Dist_Weighted;
+  TH1F* h1_WTruth_Dist_Weighted;
+  TH1F* h1_tTruth_Dist_Weighted;
+  TH1F* h1_xbTruth_Dist_Weighted;
+  TH1F* h1_xiTruth_Dist_Weighted;
+
+  // Resolution test plots for unsmeared vectors
+  TH1F* h1_piTruth_p_Weighted;
+  TH1F* h1_piTruth_px_Weighted;
+  TH1F* h1_piTruth_py_Weighted;
+  TH1F* h1_piTruth_pz_Weighted;
+  TH1F* h1_piTruth_E_Weighted;
+  TH1F* h1_eTruth_p_Weighted;
+  TH1F* h1_eTruth_px_Weighted;
+  TH1F* h1_eTruth_py_Weighted;
+  TH1F* h1_eTruth_pz_Weighted;
+  TH1F* h1_eTruth_E_Weighted;
+  TH1F* h1_nTruth_p_Weighted;
+  TH1F* h1_nTruth_px_Weighted;
+  TH1F* h1_nTruth_py_Weighted;
+  TH1F* h1_nTruth_pz_Weighted;
+  TH1F* h1_nTruth_E_Weighted;
+  // Resolution test plots with smeared vectors
+  TH1F* h1_piTruth_p_Smeared_Weighted;
+  TH1F* h1_piTruth_px_Smeared_Weighted;
+  TH1F* h1_piTruth_py_Smeared_Weighted;
+  TH1F* h1_piTruth_pz_Smeared_Weighted;
+  TH1F* h1_piTruth_E_Smeared_Weighted;
+  TH1F* h1_eTruth_p_Smeared_Weighted;
+  TH1F* h1_eTruth_px_Smeared_Weighted;
+  TH1F* h1_eTruth_py_Smeared_Weighted;
+  TH1F* h1_eTruth_pz_Smeared_Weighted;
+  TH1F* h1_eTruth_E_Smeared_Weighted;
+  TH1F* h1_nTruth_p_Smeared_Weighted;
+  TH1F* h1_nTruth_px_Smeared_Weighted;
+  TH1F* h1_nTruth_py_Smeared_Weighted;
+  TH1F* h1_nTruth_pz_Smeared_Weighted;
+  TH1F* h1_nTruth_E_Smeared_Weighted;
+
+  // 2D distributions 
+  TH2F* h2_ZDC_XY_Weighted;
+  TH2F* h2_ZDC_XY_Smeared_Weighted;
+  // Particle Theta/Phi and Theta/p distributions
+  TH2F* h2_eTrack_ThetaPhi_Weighted;
+  TH2F* h2_eTrack_pTheta_Weighted;
+  TH2F* h2_piTrack_ThetaPhi_Weighted;
+  TH2F* h2_piTrack_pTheta_Weighted;
+  TH2F* h2_nTrack_ThetaPhi_Weighted;
+  TH2F* h2_nTrack_pTheta_Weighted;
+  TH2F* h2_eTrack_ThetaPhi_Smeared_Weighted;
+  TH2F* h2_eTrack_pTheta_Smeared_Weighted;
+  TH2F* h2_piTrack_ThetaPhi_Smeared_Weighted;
+  TH2F* h2_piTrack_pTheta_Smeared_Weighted;
+  TH2F* h2_nTrack_ThetaPhi_Smeared_Weighted;
+  TH2F* h2_nTrack_pTheta_Smeared_Weighted;
+  // 2D resolution test plots
+  TH2F* h2_eTruth_pxpy_Weighted;
+  TH2F* h2_piTruth_pxpy_Weighted;
+  TH2F* h2_nTruth_pxpy_Weighted;
+  TH2F* h2_eTruth_pxpz_Weighted;
+  TH2F* h2_piTruth_pxpz_Weighted;
+  TH2F* h2_nTruth_pxpz_Weighted;
+  TH2F* h2_eTruth_pypz_Weighted;
+  TH2F* h2_piTruth_pypz_Weighted;
+  TH2F* h2_nTruth_pypz_Weighted;
+  TH2F* h2_eTruth_pxpy_Smeared_Weighted;
+  TH2F* h2_piTruth_pxpy_Smeared_Weighted;
+  TH2F* h2_nTruth_pxpy_Smeared_Weighted;
+  
+  // 1D Kinematic analysis plots
+  TH1F* h1_t_Q2_Weighted[7];
+  TH1F* h1_t_alt_Q2_Weighted[7];
+
+  // 2D Kinematic analysis plots
+  TH2F* h2_t_ep_Weighted;
+  TH2F* h2_t_Q2_Weighted;
+  TH2F* h2_delta_t_t_Weighted;
+  TH2F* h2_delta_t_t_Q2_Weighted[7];
  
 };
 
