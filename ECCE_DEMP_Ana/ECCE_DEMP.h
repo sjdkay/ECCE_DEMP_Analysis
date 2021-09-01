@@ -8,7 +8,8 @@
 #include <string>
 #include <memory>
 #include <string>
-#include <utility>  // std::pair, std::make_pair                                                                                                                                                            
+#include <utility>  // std::pair, std::make_pair
+
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
 
@@ -135,17 +136,11 @@ class ECCE_DEMP : public SubsysReco
 
   // Quantities we want to determine
   TVector3 eVect;
-  TVector3 eVectSmeared;
   TVector3 piVect;
-  TVector3 piVectSmeared;
   TVector3 nZDCPos;
-  TVector3 nZDCPosSmeared;
   TLorentzVector e4Vect;
-  TLorentzVector e4VectSmeared;
   TLorentzVector pi4Vect;
-  TLorentzVector pi4VectSmeared;
   TLorentzVector n4Vect;
-  TLorentzVector n4VectSmeared;
   TLorentzVector e4VectTruth;
   TLorentzVector pi4VectTruth;
   TLorentzVector n4VectTruth;
@@ -160,13 +155,9 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector pmiss4VectTruth;
 
   Double_t nEDep;
-  Double_t nEDepSmeared;
   Double_t nTheta;
-  Double_t nThetaSmeared;
   Double_t nPhi;
-  Double_t nPhiSmeared;
   Double_t nPMag;
-  Double_t nPMagSmeared;
 
   Double_t Q2;
   Double_t W;
@@ -183,7 +174,21 @@ class ECCE_DEMP : public SubsysReco
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
-  // Histogram for coincidence analysis routine
+  // Histograms for coincidence analysis routine
+
+  TH1F* h1_Q2_DetEff_Uncut;
+  TH1F* h1_Q2_DetEff_Cut;
+  TH1F* h1_Q2_DetEff;
+  TH2F* h2_Q2_t_DetEff_Uncut;
+  TH2F* h2_Q2_t_DetEff_Cut;
+  TH2F* h2_Q2_t_DetEff;
+    
+  TH1F* h1_Q2_DetEff_Uncut_Weighted;
+  TH1F* h1_Q2_DetEff_Cut_Weighted;
+  TH1F* h1_Q2_DetEff_Weighted;
+  TH2F* h2_Q2_t_DetEff_Uncut_Weighted;
+  TH2F* h2_Q2_t_DetEff_Cut_Weighted;
+  TH2F* h2_Q2_t_DetEff_Weighted;
 
   // 1D distributions for each particle
   TH1F* h1_pi_px;
@@ -252,26 +257,9 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTruth_py;
   TH1F* h1_nTruth_pz;
   TH1F* h1_nTruth_E;
-  // Resolution test plots with smeared vectors
-  TH1F* h1_piTruth_p_Smeared;
-  TH1F* h1_piTruth_px_Smeared;
-  TH1F* h1_piTruth_py_Smeared;
-  TH1F* h1_piTruth_pz_Smeared;
-  TH1F* h1_piTruth_E_Smeared;
-  TH1F* h1_eTruth_p_Smeared;
-  TH1F* h1_eTruth_px_Smeared;
-  TH1F* h1_eTruth_py_Smeared;
-  TH1F* h1_eTruth_pz_Smeared;
-  TH1F* h1_eTruth_E_Smeared;
-  TH1F* h1_nTruth_p_Smeared;
-  TH1F* h1_nTruth_px_Smeared;
-  TH1F* h1_nTruth_py_Smeared;
-  TH1F* h1_nTruth_pz_Smeared;
-  TH1F* h1_nTruth_E_Smeared;
 
   // 2D distributions 
   TH2F* h2_ZDC_XY;
-  TH2F* h2_ZDC_XY_Smeared;
   // Particle Theta/Phi and Theta/p distributions
   TH2F* h2_eTrack_ThetaPhi;
   TH2F* h2_eTrack_pTheta;
@@ -279,12 +267,6 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_piTrack_pTheta;
   TH2F* h2_nTrack_ThetaPhi;
   TH2F* h2_nTrack_pTheta;
-  TH2F* h2_eTrack_ThetaPhi_Smeared;
-  TH2F* h2_eTrack_pTheta_Smeared;
-  TH2F* h2_piTrack_ThetaPhi_Smeared;
-  TH2F* h2_piTrack_pTheta_Smeared;
-  TH2F* h2_nTrack_ThetaPhi_Smeared;
-  TH2F* h2_nTrack_pTheta_Smeared;
   // 2D resolution test plots
   TH2F* h2_eTruth_pxpy;
   TH2F* h2_piTruth_pxpy;
@@ -295,9 +277,6 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_eTruth_pypz;
   TH2F* h2_piTruth_pypz;
   TH2F* h2_nTruth_pypz;
-  TH2F* h2_eTruth_pxpy_Smeared;
-  TH2F* h2_piTruth_pxpy_Smeared;
-  TH2F* h2_nTruth_pxpy_Smeared;
   
   // 1D Kinematic analysis plots
   TH1F* h1_t_Q2[7];
@@ -376,26 +355,9 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTruth_py_Weighted;
   TH1F* h1_nTruth_pz_Weighted;
   TH1F* h1_nTruth_E_Weighted;
-  // Resolution test plots with smeared vectors
-  TH1F* h1_piTruth_p_Smeared_Weighted;
-  TH1F* h1_piTruth_px_Smeared_Weighted;
-  TH1F* h1_piTruth_py_Smeared_Weighted;
-  TH1F* h1_piTruth_pz_Smeared_Weighted;
-  TH1F* h1_piTruth_E_Smeared_Weighted;
-  TH1F* h1_eTruth_p_Smeared_Weighted;
-  TH1F* h1_eTruth_px_Smeared_Weighted;
-  TH1F* h1_eTruth_py_Smeared_Weighted;
-  TH1F* h1_eTruth_pz_Smeared_Weighted;
-  TH1F* h1_eTruth_E_Smeared_Weighted;
-  TH1F* h1_nTruth_p_Smeared_Weighted;
-  TH1F* h1_nTruth_px_Smeared_Weighted;
-  TH1F* h1_nTruth_py_Smeared_Weighted;
-  TH1F* h1_nTruth_pz_Smeared_Weighted;
-  TH1F* h1_nTruth_E_Smeared_Weighted;
 
   // 2D distributions 
   TH2F* h2_ZDC_XY_Weighted;
-  TH2F* h2_ZDC_XY_Smeared_Weighted;
   // Particle Theta/Phi and Theta/p distributions
   TH2F* h2_eTrack_ThetaPhi_Weighted;
   TH2F* h2_eTrack_pTheta_Weighted;
@@ -403,12 +365,6 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_piTrack_pTheta_Weighted;
   TH2F* h2_nTrack_ThetaPhi_Weighted;
   TH2F* h2_nTrack_pTheta_Weighted;
-  TH2F* h2_eTrack_ThetaPhi_Smeared_Weighted;
-  TH2F* h2_eTrack_pTheta_Smeared_Weighted;
-  TH2F* h2_piTrack_ThetaPhi_Smeared_Weighted;
-  TH2F* h2_piTrack_pTheta_Smeared_Weighted;
-  TH2F* h2_nTrack_ThetaPhi_Smeared_Weighted;
-  TH2F* h2_nTrack_pTheta_Smeared_Weighted;
   // 2D resolution test plots
   TH2F* h2_eTruth_pxpy_Weighted;
   TH2F* h2_piTruth_pxpy_Weighted;
@@ -419,9 +375,6 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_eTruth_pypz_Weighted;
   TH2F* h2_piTruth_pypz_Weighted;
   TH2F* h2_nTruth_pypz_Weighted;
-  TH2F* h2_eTruth_pxpy_Smeared_Weighted;
-  TH2F* h2_piTruth_pxpy_Smeared_Weighted;
-  TH2F* h2_nTruth_pxpy_Smeared_Weighted;
   
   // 1D Kinematic analysis plots
   TH1F* h1_t_Q2_Weighted[7];
