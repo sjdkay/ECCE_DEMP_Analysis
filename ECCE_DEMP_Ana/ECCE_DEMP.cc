@@ -94,156 +94,174 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   std::cout << "ECCE_DEMP::Init(PHCompositeNode *topNode) Initializing" << std::endl;
 
   event_itt = 0;
+  // In future, the value below should be determined more accurately - average value of all 100 files?
+  nTried = 170000; // This is the approximate total number of events generated in a single file of this sample (5on100 epi)
   
-  // Make the histograms which include the weight
-  gDirectory->mkdir("Weighted_Distributions");
-  gDirectory->cd("Weighted_Distributions");
   gDirectory->mkdir("Detection_Efficiency");
   gDirectory->cd("Detection_Efficiency");
-  h1_Q2_DetEff_Uncut_Weighted = new TH1F("Q2_DetEff_Uncut_Weighted", "Q^{2}_{Truth} for thrown events; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Uncut_Weighted->Sumw2();
-  h1_Q2_DetEff_Cut_Weighted = new TH1F("Q2_DetEff_Cut_Weighted", "Q^{2}_{Truth} for detected events; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Cut_Weighted->Sumw2();
-  h1_Q2_DetEff_Weighted = new TH1F("Q2_DetEff_Weighted", "Q^{2}_{Truth} detected/thrown ratio; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Weighted->Sumw2();
-  h2_Q2_t_DetEff_Uncut_Weighted = new TH2F("Q2_t_DetEff_Uncut_Weighted", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Uncut_Weighted->Sumw2();
-  h2_Q2_t_DetEff_Cut_Weighted = new TH2F("Q2_t_DetEff_Cut_Weighted", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Cut_Weighted->Sumw2();
-  h2_Q2_t_DetEff_Weighted = new TH2F("Q2_t_DetEff_Weighted", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Weighted->Sumw2();
+  h1_Q2_DetEff_Uncut = new TH1F("Q2_DetEff_Uncut", "Q^{2}_{Truth} for thrown events; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Uncut->Sumw2();
+  h1_Q2_DetEff_Cut = new TH1F("Q2_DetEff_Cut", "Q^{2}_{Truth} for detected events; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Cut->Sumw2();
+  h1_Q2_DetEff = new TH1F("Q2_DetEff", "Q^{2}_{Truth} detected/thrown ratio; Q^{2}", 100, 0, 50); h1_Q2_DetEff->Sumw2();
+  h2_Q2_t_DetEff_Uncut = new TH2F("Q2_t_DetEff_Uncut", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Uncut->Sumw2();
+  h2_Q2_t_DetEff_Cut = new TH2F("Q2_t_DetEff_Cut", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Cut->Sumw2();
+  h2_Q2_t_DetEff = new TH2F("Q2_t_DetEff", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff->Sumw2();
   gDirectory->cd("../");  
 
   gDirectory->mkdir("Pion_Info");
   gDirectory->cd("Pion_Info");
-  h1_pi_px_Weighted = new TH1F("pi_px_Weighted", "#pi p_{x} Distribution;p_{x} [GeV]", 200, -20, 20);
-  h1_pi_py_Weighted = new TH1F("pi_py_Weighted", "#pi p_{y} Distribution;p_{y} [GeV]", 200, -20, 20);
-  h1_pi_pz_Weighted = new TH1F("pi_pz_Weighted", "#pi p_{z} Distribution;p_{z} [GeV]", 200, -50, 50); 
-  h1_pi_p_Weighted = new TH1F("pi_p_Weighted", "#pi p Distribution;p [GeV]", 200, 0, 50);
-  h1_pi_E_Weighted = new TH1F("pi_E_Weighted", "#pi E Distribution;E [GeV]", 200, 0, 50);
-  h1_pi_Theta_Weighted = new TH1F("pi_Theta_Weighted", "#pi #theta Distribution; #theta [deg]", 200, 0, 50);
-  h1_pi_Phi_Weighted = new TH1F("pi_Phi_Weighted", "#pi #phi Distribution; #phi [deg]", 360, -180, 180);
-  h2_piTrack_ThetaPhi_Weighted = new TH2F("piTrack_ThetaPhi_Weighted", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
-  h2_piTrack_pTheta_Weighted = new TH2F("piTrack_pTheta_Weighted", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
+  h1_pi_px = new TH1F("pi_px", "#pi p_{x} Distribution;p_{x} [GeV]", 200, -20, 20);
+  h1_pi_py = new TH1F("pi_py", "#pi p_{y} Distribution;p_{y} [GeV]", 200, -20, 20);
+  h1_pi_pz = new TH1F("pi_pz", "#pi p_{z} Distribution;p_{z} [GeV]", 200, -50, 50); 
+  h1_pi_p = new TH1F("pi_p", "#pi p Distribution;p [GeV]", 200, 0, 50);
+  h1_pi_E = new TH1F("pi_E", "#pi E Distribution;E [GeV]", 200, 0, 50);
+  h1_pi_Theta = new TH1F("pi_Theta", "#pi #theta Distribution; #theta [deg]", 200, 0, 50);
+  h1_pi_Phi = new TH1F("pi_Phi", "#pi #phi Distribution; #phi [deg]", 360, -180, 180);
+  h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
+  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Pion_Truth_Info");
   gDirectory->cd("Pion_Truth_Info");
-  h1_piTruth_px_Weighted = new TH1F("piTrtuh_px_Weighted", "#pi Truth p_{x} Distribution;p_{x} [GeV]", 200, -20, 20);
-  h1_piTruth_py_Weighted = new TH1F("piTrtuh_py_Weighted", "#pi Truth p_{y} Distribution;p_{y} [GeV]", 200, -20, 20);
-  h1_piTruth_pz_Weighted = new TH1F("piTrtuh_pz_Weighted", "#pi Truth p_{z} Distribution;p_{z} [GeV]", 200, -50, 50); 
-  h1_piTruth_p_Weighted = new TH1F("piTrtuh_p_Weighted", "#pi Truth p Distribution;p [GeV]", 200, 0, 50);
-  h1_piTruth_E_Weighted = new TH1F("piTrtuh_E_Weighted", "#pi Truth E Distribution;E [GeV]", 200, 0, 50);
-  h1_piTruth_Theta_Weighted = new TH1F("piTrtuh_Theta_Weighted", "#pi Truth #theta Distribution; #theta [deg]", 200, 0, 50);
+  h1_piTruth_px = new TH1F("piTrtuh_px", "#pi Truth p_{x} Distribution;p_{x} [GeV]", 200, -20, 20);
+  h1_piTruth_py = new TH1F("piTrtuh_py", "#pi Truth p_{y} Distribution;p_{y} [GeV]", 200, -20, 20);
+  h1_piTruth_pz = new TH1F("piTrtuh_pz", "#pi Truth p_{z} Distribution;p_{z} [GeV]", 200, -50, 50); 
+  h1_piTruth_p = new TH1F("piTrtuh_p", "#pi Truth p Distribution;p [GeV]", 200, 0, 50);
+  h1_piTruth_E = new TH1F("piTrtuh_E", "#pi Truth E Distribution;E [GeV]", 200, 0, 50);
+  h1_piTruth_Theta = new TH1F("piTrtuh_Theta", "#pi Truth #theta Distribution; #theta [deg]", 200, 0, 50);
 
-  h2_piTruth_pxpy_Weighted = new TH2F("piTruth_pxpy_Weighted", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-  h2_piTruth_pxpz_Weighted = new TH2F("piTruth_pxpz_Weighted", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
-  h2_piTruth_pypz_Weighted = new TH2F("piTruth_pypz_Weighted", "#pi #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_piTruth_pxpy = new TH2F("piTruth_pxpy", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  h2_piTruth_pxpz = new TH2F("piTruth_pxpz", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_piTruth_pypz = new TH2F("piTruth_pypz", "#pi #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   gDirectory->cd("../");
   
   gDirectory->mkdir("Scattered_Electron_Info");
   gDirectory->cd("Scattered_Electron_Info");
-  h1_e_px_Weighted = new TH1F("e_px_Weighted", "e' p_{x} Distribution;p_{x} [GeV]", 240, -6, 6);
-  h1_e_py_Weighted = new TH1F("e_py_Weighted", "e' p_{y} Distribution;p_{y} [GeV]", 240, -6, 6);
-  h1_e_pz_Weighted = new TH1F("e_pz_Weighted", "e' p_{z} Distribution;p_{z} [GeV]", 120, -6, 0); 
-  h1_e_p_Weighted = new TH1F("e_p_Weighted", "e' p Distribution;p [GeV]", 160, 0, 8);
-  h1_e_E_Weighted = new TH1F("e_E_Weighted", "e' E Distribution;E [GeV]", 160, 0, 8);
-  h1_e_Theta_Weighted = new TH1F("e_Theta_Weighted", "e' #theta Distribution; #theta [deg]", 200, 110, 160);
-  h1_e_Phi_Weighted = new TH1F("e_Phi_Weighted", "e' #phi Distribution; #phi [deg]", 360, -180, 180);
-  h2_eTrack_ThetaPhi_Weighted = new TH2F("eTrack_ThetaPhi_Weighted", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
-  h2_eTrack_pTheta_Weighted = new TH2F("eTrack_pTheta_Weighted", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
+  h1_e_px = new TH1F("e_px", "e' p_{x} Distribution;p_{x} [GeV]", 240, -6, 6);
+  h1_e_py = new TH1F("e_py", "e' p_{y} Distribution;p_{y} [GeV]", 240, -6, 6);
+  h1_e_pz = new TH1F("e_pz", "e' p_{z} Distribution;p_{z} [GeV]", 120, -6, 0); 
+  h1_e_p = new TH1F("e_p", "e' p Distribution;p [GeV]", 160, 0, 8);
+  h1_e_E = new TH1F("e_E", "e' E Distribution;E [GeV]", 160, 0, 8);
+  h1_e_Theta = new TH1F("e_Theta", "e' #theta Distribution; #theta [deg]", 200, 110, 160);
+  h1_e_Phi = new TH1F("e_Phi", "e' #phi Distribution; #phi [deg]", 360, -180, 180);
+  h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
+  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Scattered_Electron_Truth_Info");
   gDirectory->cd("Scattered_Electron_Truth_Info");
-  h1_eTruth_px_Weighted = new TH1F("eTruth_px_Weighted", "e' Truth p_{x} Distribution;p_{x} [GeV]", 240, -6, 6);
-  h1_eTruth_py_Weighted = new TH1F("eTruth_py_Weighted", "e' Truth p_{y} Distribution;p_{y} [GeV]", 240, -6, 6);
-  h1_eTruth_pz_Weighted = new TH1F("eTruth_pz_Weighted", "e' Truth p_{z} Distribution;p_{z} [GeV]", 120, -6, 0); 
-  h1_eTruth_p_Weighted = new TH1F("eTruth_p_Weighted", "e' Truth p Distribution;p [GeV]", 160, 0, 8);
-  h1_eTruth_E_Weighted = new TH1F("eTruth_E_Weighted", "e' Truth E Distribution;E [GeV]", 160, 0, 8);
-  h1_eTruth_Theta_Weighted = new TH1F("eTruth_Theta_Weighted", "e' Truth #theta Distribution; #theta [deg]", 200, 110, 160);
-  h2_eTruth_pxpy_Weighted = new TH2F("eTruth_pxpy_Weighted", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);  
-  h2_eTruth_pxpz_Weighted = new TH2F("eTruth_pxpz_Weighted", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
-  h2_eTruth_pypz_Weighted = new TH2F("eTruth_pypz_Weighted", "e' #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
+  h1_eTruth_px = new TH1F("eTruth_px", "e' Truth p_{x} Distribution;p_{x} [GeV]", 240, -6, 6);
+  h1_eTruth_py = new TH1F("eTruth_py", "e' Truth p_{y} Distribution;p_{y} [GeV]", 240, -6, 6);
+  h1_eTruth_pz = new TH1F("eTruth_pz", "e' Truth p_{z} Distribution;p_{z} [GeV]", 120, -6, 0); 
+  h1_eTruth_p = new TH1F("eTruth_p", "e' Truth p Distribution;p [GeV]", 160, 0, 8);
+  h1_eTruth_E = new TH1F("eTruth_E", "e' Truth E Distribution;E [GeV]", 160, 0, 8);
+  h1_eTruth_Theta = new TH1F("eTruth_Theta", "e' Truth #theta Distribution; #theta [deg]", 200, 110, 160);
+  h2_eTruth_pxpy = new TH2F("eTruth_pxpy", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);  
+  h2_eTruth_pxpz = new TH2F("eTruth_pxpz", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
+  h2_eTruth_pypz = new TH2F("eTruth_pypz", "e' #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
   gDirectory->cd("../");
 
   gDirectory->mkdir("Neutron_Info");
   gDirectory->cd("Neutron_Info");
-  h1_n_px_Weighted = new TH1F("n_px_Weighted", "n p_{x} Distribution;p_{x} [GeV]", 480, -6, 6);
-  h1_n_py_Weighted = new TH1F("n_py_Weighted", "n p_{y} Distribution;p_{y} [GeV]", 200, -2.5, 2.5);
-  h1_n_pz_Weighted = new TH1F("n_pz_Weighted", "n p_{z} Distribution;p_{z} [GeV]", 240, 0, 120); 
-  h1_n_p_Weighted = new TH1F("n_p_Weighted", "n p Distribution;p [GeV]", 240, 0, 120);
-  h1_n_E_Weighted = new TH1F("n_E_Weighted", "n E Distribution;E [GeV]", 240, 0, 120);
-  h1_n_Theta_Weighted = new TH1F("n_Theta_Weighted", "n #theta Distribution; #theta [deg]", 500, 0, 5);
-  h1_n_Phi_Weighted = new TH1F("n_Phi_Weighted", "n #phi Distribution; #phi [deg]", 360, -180, 180);
-  h2_nTrack_ThetaPhi_Weighted = new TH2F("nTrack_ThetaPhi_Weighted", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 500, 0, 5, 360, -180, 180);
-  h2_nTrack_pTheta_Weighted = new TH2F("nTrack_pTheta_Weighted", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 500, 0, 5, 1000, 0, 100);
+  h1_n_px = new TH1F("n_px", "n p_{x} Distribution;p_{x} [GeV]", 480, -6, 6);
+  h1_n_py = new TH1F("n_py", "n p_{y} Distribution;p_{y} [GeV]", 200, -2.5, 2.5);
+  h1_n_pz = new TH1F("n_pz", "n p_{z} Distribution;p_{z} [GeV]", 240, 0, 120); 
+  h1_n_p = new TH1F("n_p", "n p Distribution;p [GeV]", 240, 0, 120);
+  h1_n_E = new TH1F("n_E", "n E Distribution;E [GeV]", 240, 0, 120);
+  h1_n_Theta = new TH1F("n_Theta", "n #theta Distribution; #theta [deg]", 500, 0, 5);
+  h1_n_Phi = new TH1F("n_Phi", "n #phi Distribution; #phi [deg]", 360, -180, 180);
+  h2_nTrack_ThetaPhi = new TH2F("nTrack_ThetaPhi", "n Track #theta vs #phi; #theta [deg]; #phi [deg]", 500, 0, 5, 360, -180, 180);
+  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta [deg]; P [GeV/c]", 500, 0, 5, 1000, 0, 100);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Neutron_Truth_Info");
   gDirectory->cd("Neutron_Truth_Info");
-  h1_nTruth_px_Weighted = new TH1F("nTruth_px_Weighted", "nTruth p_{x} Distribution;p_{x} [GeV]", 480, -6, 6);
-  h1_nTruth_py_Weighted = new TH1F("nTruth_py_Weighted", "nTruth p_{y} Distribution;p_{y} [GeV]", 200, -2.5, 2.5);
-  h1_nTruth_pz_Weighted = new TH1F("nTruth_pz_Weighted", "nTruth p_{z} Distribution;p_{z} [GeV]", 240, 0, 120); 
-  h1_nTruth_p_Weighted = new TH1F("nTruth_p_Weighted", "nTruth p Distribution;p [GeV]", 240, 0, 120);
-  h1_nTruth_E_Weighted = new TH1F("nTruth_E_Weighted", "nTruth E Distribution;E [GeV]", 240, 0, 120);
-  h1_nTruth_Theta_Weighted = new TH1F("nTruth_Theta_Weighted", "nTruth #theta Distribution; #theta [deg]", 500, 0, 5);
-  h2_nTruth_pxpy_Weighted = new TH2F("nTruth_pxpy_Weighted", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
-  h2_nTruth_pxpz_Weighted = new TH2F("nTruth_pxpz_Weighted", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
-  h2_nTruth_pypz_Weighted = new TH2F("nTruth_pypz_Weighted", "n #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h1_nTruth_px = new TH1F("nTruth_px", "nTruth p_{x} Distribution;p_{x} [GeV]", 480, -6, 6);
+  h1_nTruth_py = new TH1F("nTruth_py", "nTruth p_{y} Distribution;p_{y} [GeV]", 200, -2.5, 2.5);
+  h1_nTruth_pz = new TH1F("nTruth_pz", "nTruth p_{z} Distribution;p_{z} [GeV]", 240, 0, 120); 
+  h1_nTruth_p = new TH1F("nTruth_p", "nTruth p Distribution;p [GeV]", 240, 0, 120);
+  h1_nTruth_E = new TH1F("nTruth_E", "nTruth E Distribution;E [GeV]", 240, 0, 120);
+  h1_nTruth_Theta = new TH1F("nTruth_Theta", "nTruth #theta Distribution; #theta [deg]", 500, 0, 5);
+  h2_nTruth_pxpy = new TH2F("nTruth_pxpy", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
+  h2_nTruth_pxpz = new TH2F("nTruth_pxpz", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_nTruth_pypz = new TH2F("nTruth_pypz", "n #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   gDirectory->cd("../");
 
   gDirectory->mkdir("PMiss_Info");
   gDirectory->cd("PMiss_Info");
-  h1_pmiss_px_Weighted = new TH1F("pmiss_px_Weighted", "p_{miss} p_{x} Distribution", 800, -10, 10);
-  h1_pmiss_py_Weighted = new TH1F("pmiss_py_Weighted", "p_{miss} p_{y} Distribution", 200, -2.5, 2.5);
-  h1_pmiss_pz_Weighted = new TH1F("pmiss_pz_Weighted", "p_{miss} p_{z} Distribution", 240, 0, 120); 
-  h1_pmiss_p_Weighted = new TH1F("pmiss_p_Weighted", "p_{miss} p Distribution", 240, 0, 120);
-  h1_pmiss_E_Weighted = new TH1F("pmiss_E_Weighted", "p_{miss} E Distribution", 240, 0, 120);
-  h1_pmiss_Theta_Weighted = new TH1F("pmiss_Theta_Weighted", "p_{miss} #theta Distribution; #theta [deg]", 1000, 0, 10);
-  h1_pmiss_Phi_Weighted = new TH1F("pmiss_Phi_Weighted", "p_{miss} #phi Distribution; #phi [deg]", 720, -180, 180);
+  h1_pmiss_px = new TH1F("pmiss_px", "p_{miss} p_{x} Distribution", 800, -10, 10);
+  h1_pmiss_py = new TH1F("pmiss_py", "p_{miss} p_{y} Distribution", 200, -2.5, 2.5);
+  h1_pmiss_pz = new TH1F("pmiss_pz", "p_{miss} p_{z} Distribution", 240, 0, 120); 
+  h1_pmiss_p = new TH1F("pmiss_p", "p_{miss} p Distribution", 240, 0, 120);
+  h1_pmiss_E = new TH1F("pmiss_E", "p_{miss} E Distribution", 240, 0, 120);
+  h1_pmiss_Theta = new TH1F("pmiss_Theta", "p_{miss} #theta Distribution; #theta [deg]", 1000, 0, 10);
+  h1_pmiss_Phi = new TH1F("pmiss_Phi", "p_{miss} #phi Distribution; #phi [deg]", 720, -180, 180);
   gDirectory->cd("../");
   
   gDirectory->mkdir("Virtual_Photon_Info");
   gDirectory->cd("Virtual_Photon_Info");
-  h1_gamma_px_Weighted = new TH1F("gamma_px_Weighted", "#gamma p_{x} Distribution", 200, -10, 10);
-  h1_gamma_py_Weighted = new TH1F("gamma_py_Weighted", "#gamma p_{y} Distribution", 200, -10, 10);
-  h1_gamma_pz_Weighted = new TH1F("gamma_pz_Weighted", "#gamma p_{z} Distribution", 200, -10, 0); 
-  h1_gamma_p_Weighted = new TH1F("gamma_p_Weighted", "#gamma p Distribution", 200, 0, 10);
-  h1_gamma_E_Weighted = new TH1F("gamma_E_Weighted", "#gamma E Distribution", 200, 0, 10);
-  h1_gamma_Theta_Weighted = new TH1F("gamma_Theta_Weighted", "#gamma #theta Distribution; #theta [deg]", 360, -180, 180);
-  h1_gamma_Phi_Weighted = new TH1F("gamma_Phi_Weighted", "#gamma #phi Distribution; #phi [deg]", 360, -180, 180);
+  h1_gamma_px = new TH1F("gamma_px", "#gamma p_{x} Distribution", 200, -10, 10);
+  h1_gamma_py = new TH1F("gamma_py", "#gamma p_{y} Distribution", 200, -10, 10);
+  h1_gamma_pz = new TH1F("gamma_pz", "#gamma p_{z} Distribution", 200, -10, 0); 
+  h1_gamma_p = new TH1F("gamma_p", "#gamma p Distribution", 200, 0, 10);
+  h1_gamma_E = new TH1F("gamma_E", "#gamma E Distribution", 200, 0, 10);
+  h1_gamma_Theta = new TH1F("gamma_Theta", "#gamma #theta Distribution; #theta [deg]", 360, -180, 180);
+  h1_gamma_Phi = new TH1F("gamma_Phi", "#gamma #phi Distribution; #phi [deg]", 360, -180, 180);
   gDirectory->cd("../");
  
   gDirectory->mkdir("Kinematics_Info");
   gDirectory->cd("Kinematics_Info");
-  h1_Q2_Dist_Weighted = new TH1F("Q2_Dist_Weighted", "Q^{2} Distribution", 200, 0, 50);
-  h1_W_Dist_Weighted = new TH1F("W_Dist_Weighted", "W Distribution", 500, 0, 50);
-  h1_t_Dist_Weighted = new TH1F("t_Dist_Weighted", "t Distribution", 100, 0, 10);
-  h1_t_alt_Dist_Weighted = new TH1F("t_alt_Dist_Weighted", "t (Alternative calculation) Distribution", 100, 0, 1);
-  h1_t_comp_Weighted = new TH1F("t_comp_Dist_Weighted", "#frac{#Delta t}{t} Distribution; #frac{t_{alt}-t}{t} (%)", 200, -100, 100);
-  h1_xb_Dist_Weighted = new TH1F("xb_Dist_Weighted", "x_{b} Distribution", 100, 0, 1);
-  h1_xi_Dist_Weighted = new TH1F("xi_Dist_Weighted", "#xi Distribution", 100, 0, 1);
+  h1_Q2_Dist = new TH1F("Q2_Dist", "Q^{2} Distribution", 200, 0, 50);
+  h1_W_Dist = new TH1F("W_Dist", "W Distribution", 500, 0, 50);
+  h1_t_Dist = new TH1F("t_Dist", "t Distribution", 100, 0, 10);
+  h1_t_alt_Dist = new TH1F("t_alt_Dist", "t (Alternative calculation) Distribution", 100, 0, 1);
+  h1_t_comp = new TH1F("t_comp_Dist", "#frac{#Delta t}{t} Distribution; #frac{t_{alt}-t}{t} (%)", 200, -100, 100);
+  h1_xb_Dist = new TH1F("xb_Dist", "x_{b} Distribution", 100, 0, 1);
+  h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Kinematics_Truth_Info");
   gDirectory->cd("Kinematics_Truth_Info");
-  h1_Q2Truth_Dist_Weighted = new TH1F("Q2Truth_Dist_Weighted", "Q^{2} Truth Distribution", 200, 0, 50);
-  h1_WTruth_Dist_Weighted = new TH1F("WTruth_Dist_Weighted", "W Truth Distribution", 500, 0, 50);
-  h1_tTruth_Dist_Weighted = new TH1F("tTruth_Dist_Weighted", "t Truth Distribution", 100, 0, 1);
-  h1_t_altTruth_Dist_Weighted = new TH1F("t_altTruth_Dist_Weighted", "-t_alt Truth (Alternative Calculation) Distribution", 100, 0, 1);
-  h1_xbTruth_Dist_Weighted = new TH1F("xbTruth_Dist_Weighted", "x_{b} Truth Distribution", 100, 0, 1);
-  h1_xiTruth_Dist_Weighted = new TH1F("xiTruth_Dist_Weighted", "#xi Truth Distribution", 100, 0, 1);
+  h1_Q2Truth_Dist = new TH1F("Q2Truth_Dist", "Q^{2} Truth Distribution", 200, 0, 50);
+  h1_WTruth_Dist = new TH1F("WTruth_Dist", "W Truth Distribution", 500, 0, 50);
+  h1_tTruth_Dist = new TH1F("tTruth_Dist", "t Truth Distribution", 100, 0, 1);
+  h1_t_altTruth_Dist = new TH1F("t_altTruth_Dist", "-t_alt Truth (Alternative Calculation) Distribution", 100, 0, 1);
+  h1_xbTruth_Dist = new TH1F("xbTruth_Dist", "x_{b} Truth Distribution", 100, 0, 1);
+  h1_xiTruth_Dist = new TH1F("xiTruth_Dist", "#xi Truth Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Kinematics_Analysis");
   gDirectory->cd("Kinematics_Analysis");
-  h2_t_ep_Weighted = new TH2F("t_ep_Weighted", "t vs ScatElec P; t; P_{e'}", 100, 0, 10, 200, 0, 10);
-  h2_t_Q2_Weighted = new TH2F("t_Q2_Weighted", "t vs Q^{2}; t; Q^{2}", 100, 0, 10, 200, 0, 50);
-  h2_delta_t_t_Weighted = new TH2F("delta_t_t_Weighted", "#Delta t vs t; #Delta t (%); t", 200, -100, 100, 100, 0, 1);
+  h2_t_ep = new TH2F("t_ep", "t vs ScatElec P; t; P_{e'}", 100, 0, 10, 200, 0, 10);
+  h2_t_Q2 = new TH2F("t_Q2", "t vs Q^{2}; t; Q^{2}", 100, 0, 10, 200, 0, 50);
+  h2_delta_t_t = new TH2F("delta_t_t", "#Delta t vs t; #Delta t (%); t", 200, -100, 100, 100, 0, 1);
   
   for(Int_t A = 0; A < 7; A++){
-    h1_t_Q2_Weighted[A] = new TH1F(Form("t_Q2_%i_Weighted", (A+1)), Form("t dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
-    h1_t_alt_Q2_Weighted[A] = new TH1F(Form("t_alt_Q2_%i_Weighted", (A+1)), Form("t (Alternative calculation) dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
-    h2_delta_t_t_Q2_Weighted[A] = new TH2F(Form("delta_t_t_Q2_%i_Weighted", (A+1)), Form("#Delta t vs t, %i < Q^{2} < %i; #Delta t (Percent); t", (5 + (A*5)), 10+(A*5)), 200, -100, 100, 100, 0, 1);
+    h1_t_Q2[A] = new TH1F(Form("t_Q2_%i", (A+1)), Form("t dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
+    h1_t_alt_Q2[A] = new TH1F(Form("t_alt_Q2_%i", (A+1)), Form("t (Alternative calculation) dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
+    h2_delta_t_t_Q2[A] = new TH2F(Form("delta_t_t_Q2_%i", (A+1)), Form("#Delta t vs t, %i < Q^{2} < %i; #Delta t (Percent); t", (5 + (A*5)), 10+(A*5)), 200, -100, 100, 100, 0, 1);
   }
   gDirectory->cd("../");
 
-  h2_ZDC_XY_Weighted = new TH2F("ZDC_XY_Weighted", "ZDC XY", 200, -150, -50, 200, -50, 50);
+  gDirectory->mkdir("Physics_Results");
+  gDirectory->cd("Physics_Results");
+  // Results histograms are binned in Q2, first two bins are special
+  for(Int_t A = 0; A < 8; A++){
+    if ( A <= 1){
+      h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
+      h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 500, 0, 5);
+      h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 240, 0, 120) ;
+      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);;
+    }
+    else{
+      h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
+      h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 500, 0, 5);
+      h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 240, 0, 120) ;
+      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);;
+    }
+  }
+  gDirectory->cd("../");
+
+  h2_ZDC_XY = new TH2F("ZDC_XY", "ZDC XY", 200, -150, -50, 200, -50, 50);
 
   // Define beam 4 vectors
   e_beam_energy = 5;
@@ -256,6 +274,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   pBeam4Vect.SetPxPyPzE(-ion_beam_pmag*TMath::Sin(crossing_angle),0,ion_beam_pmag*TMath::Cos(crossing_angle),ion_beam_energy);
   // ion_beam_pmag*TMath::Sin(crossing_angle)*TMath::Sin(Pi) was the y component, but this is 0 by a longer route...
 
+  // Set cut values for physics analysis
+  Thetan_Cent = 1.45; // Cut will be +/- 0.4 from this value
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -272,7 +292,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
   ZDC_hit = 0;
   EEMC_hit = 0;
   event_itt++; 
- 
+
   if(event_itt%100 == 0)
     std::cout << "Event Processing Counter: " << event_itt << endl;
   // Get event header info for the event (weight)
@@ -319,8 +339,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
   xb_truth =  Q2_truth/(2*(pBeam4Vect.Dot(virtphoton4VectTruth)));
   xi_truth = xb_truth/(2-xb_truth);
 
-  h1_Q2_DetEff_Uncut_Weighted->Fill(Q2_truth, wgt);
-  h2_Q2_t_DetEff_Uncut_Weighted->Fill(Q2_truth, t_truth, wgt);
+  h1_Q2_DetEff_Uncut->Fill(Q2_truth, wgt);
+  h2_Q2_t_DetEff_Uncut->Fill(Q2_truth, t_truth, wgt);
 
   if (Check_n(topNode) == true && Check_ePi(topNode) == true){ // For event, check if it look like we have an e/pi/n in the event
     // Get track map for e'/pi info
@@ -391,113 +411,134 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     // Fill histograms
     // Fill weighted histograms
 
-    h1_Q2_DetEff_Cut_Weighted->Fill(Q2_truth, wgt);
-    h2_Q2_t_DetEff_Cut_Weighted->Fill(Q2_truth, t_truth, wgt);
+    h1_Q2_DetEff_Cut->Fill(Q2_truth, wgt);
+    h2_Q2_t_DetEff_Cut->Fill(Q2_truth, t_truth, wgt);
 
-    h1_pi_px_Weighted->Fill(pi4Vect.Px(), wgt);
-    h1_pi_py_Weighted->Fill(pi4Vect.Py(), wgt);
-    h1_pi_pz_Weighted->Fill(pi4Vect.Pz(), wgt);
-    h1_pi_p_Weighted->Fill(pi4Vect.P(), wgt);
-    h1_pi_E_Weighted->Fill(pi4Vect.E(), wgt);
-    h1_pi_Theta_Weighted->Fill(pi4Vect.Theta()*TMath::RadToDeg(), wgt);
-    h1_pi_Phi_Weighted->Fill(pi4Vect.Phi()*TMath::RadToDeg(), wgt);
-    h1_e_px_Weighted->Fill(e4Vect.Px(), wgt);
-    h1_e_py_Weighted->Fill(e4Vect.Py(), wgt);
-    h1_e_pz_Weighted->Fill(e4Vect.Pz(), wgt);
-    h1_e_p_Weighted->Fill(e4Vect.P(), wgt);
-    h1_e_E_Weighted->Fill(e4Vect.E(), wgt);
-    h1_e_Theta_Weighted->Fill(e4Vect.Theta()*TMath::RadToDeg(), wgt);
-    h1_e_Phi_Weighted->Fill(e4Vect.Phi()*TMath::RadToDeg(), wgt);
-    h1_n_px_Weighted->Fill(n4Vect.Px(), wgt);
-    h1_n_py_Weighted->Fill(n4Vect.Py(), wgt);
-    h1_n_pz_Weighted->Fill(n4Vect.Pz(), wgt);
-    h1_n_p_Weighted->Fill(n4Vect.P(), wgt);
-    h1_n_E_Weighted->Fill(n4Vect.E(), wgt);
-    h1_n_Theta_Weighted->Fill(n4Vect.Theta()*TMath::RadToDeg(), wgt);
-    h1_n_Phi_Weighted->Fill(n4Vect.Phi()*TMath::RadToDeg(), wgt);
-    h1_pmiss_px_Weighted->Fill(pmiss4Vect.Px(), wgt);
-    h1_pmiss_py_Weighted->Fill(pmiss4Vect.Py(), wgt);
-    h1_pmiss_pz_Weighted->Fill(pmiss4Vect.Pz(), wgt);
-    h1_pmiss_p_Weighted->Fill(pmiss4Vect.P(), wgt);
-    h1_pmiss_E_Weighted->Fill(pmiss4Vect.E(), wgt);
-    h1_pmiss_Theta_Weighted->Fill(pmiss4Vect.Theta()*TMath::RadToDeg(), wgt);
-    h1_pmiss_Phi_Weighted->Fill(pmiss4Vect.Phi()*TMath::RadToDeg(), wgt);
-    h1_gamma_px_Weighted->Fill(virtphoton4Vect.Px(), wgt);
-    h1_gamma_py_Weighted->Fill(virtphoton4Vect.Py(), wgt);
-    h1_gamma_pz_Weighted->Fill(virtphoton4Vect.Pz(), wgt);
-    h1_gamma_p_Weighted->Fill(virtphoton4Vect.P(), wgt);
-    h1_gamma_E_Weighted->Fill(virtphoton4Vect.E(), wgt);
-    h1_gamma_Theta_Weighted->Fill(virtphoton4Vect.Theta()*TMath::RadToDeg(), wgt);
-    h1_gamma_Phi_Weighted->Fill(virtphoton4Vect.Phi()*TMath::RadToDeg(), wgt);
+    h1_pi_px->Fill(pi4Vect.Px(), wgt);
+    h1_pi_py->Fill(pi4Vect.Py(), wgt);
+    h1_pi_pz->Fill(pi4Vect.Pz(), wgt);
+    h1_pi_p->Fill(pi4Vect.P(), wgt);
+    h1_pi_E->Fill(pi4Vect.E(), wgt);
+    h1_pi_Theta->Fill(pi4Vect.Theta()*TMath::RadToDeg(), wgt);
+    h1_pi_Phi->Fill(pi4Vect.Phi()*TMath::RadToDeg(), wgt);
+    h1_e_px->Fill(e4Vect.Px(), wgt);
+    h1_e_py->Fill(e4Vect.Py(), wgt);
+    h1_e_pz->Fill(e4Vect.Pz(), wgt);
+    h1_e_p->Fill(e4Vect.P(), wgt);
+    h1_e_E->Fill(e4Vect.E(), wgt);
+    h1_e_Theta->Fill(e4Vect.Theta()*TMath::RadToDeg(), wgt);
+    h1_e_Phi->Fill(e4Vect.Phi()*TMath::RadToDeg(), wgt);
+    h1_n_px->Fill(n4Vect.Px(), wgt);
+    h1_n_py->Fill(n4Vect.Py(), wgt);
+    h1_n_pz->Fill(n4Vect.Pz(), wgt);
+    h1_n_p->Fill(n4Vect.P(), wgt);
+    h1_n_E->Fill(n4Vect.E(), wgt);
+    h1_n_Theta->Fill(n4Vect.Theta()*TMath::RadToDeg(), wgt);
+    h1_n_Phi->Fill(n4Vect.Phi()*TMath::RadToDeg(), wgt);
+    h1_pmiss_px->Fill(pmiss4Vect.Px(), wgt);
+    h1_pmiss_py->Fill(pmiss4Vect.Py(), wgt);
+    h1_pmiss_pz->Fill(pmiss4Vect.Pz(), wgt);
+    h1_pmiss_p->Fill(pmiss4Vect.P(), wgt);
+    h1_pmiss_E->Fill(pmiss4Vect.E(), wgt);
+    h1_pmiss_Theta->Fill(pmiss4Vect.Theta()*TMath::RadToDeg(), wgt);
+    h1_pmiss_Phi->Fill(pmiss4Vect.Phi()*TMath::RadToDeg(), wgt);
+    h1_gamma_px->Fill(virtphoton4Vect.Px(), wgt);
+    h1_gamma_py->Fill(virtphoton4Vect.Py(), wgt);
+    h1_gamma_pz->Fill(virtphoton4Vect.Pz(), wgt);
+    h1_gamma_p->Fill(virtphoton4Vect.P(), wgt);
+    h1_gamma_E->Fill(virtphoton4Vect.E(), wgt);
+    h1_gamma_Theta->Fill(virtphoton4Vect.Theta()*TMath::RadToDeg(), wgt);
+    h1_gamma_Phi->Fill(virtphoton4Vect.Phi()*TMath::RadToDeg(), wgt);
 
-    h1_Q2_Dist_Weighted->Fill(Q2, wgt);
-    h1_W_Dist_Weighted->Fill(W, wgt);
-    h1_t_Dist_Weighted->Fill(t, wgt);
-    h1_t_alt_Dist_Weighted->Fill(t_alt, wgt);
-    h1_t_comp_Weighted->Fill(((t_alt-t)/t)*100, wgt);
-    h1_xb_Dist_Weighted->Fill(xb, wgt);
-    h1_xi_Dist_Weighted->Fill(xi, wgt);
+    h1_Q2_Dist->Fill(Q2, wgt);
+    h1_W_Dist->Fill(W, wgt);
+    h1_t_Dist->Fill(t, wgt);
+    h1_t_alt_Dist->Fill(t_alt, wgt);
+    h1_t_comp->Fill(((t_alt-t)/t)*100, wgt);
+    h1_xb_Dist->Fill(xb, wgt);
+    h1_xi_Dist->Fill(xi, wgt);
 
-    h1_Q2Truth_Dist_Weighted->Fill(Q2_truth, wgt);
-    h1_WTruth_Dist_Weighted->Fill(W_truth, wgt);
-    h1_tTruth_Dist_Weighted->Fill(t_truth, wgt);
-    h1_t_altTruth_Dist_Weighted->Fill(t_alt_truth, wgt);
-    h1_xbTruth_Dist_Weighted->Fill(xb_truth, wgt);
-    h1_xiTruth_Dist_Weighted->Fill(xi_truth, wgt);
+    h1_Q2Truth_Dist->Fill(Q2_truth, wgt);
+    h1_WTruth_Dist->Fill(W_truth, wgt);
+    h1_tTruth_Dist->Fill(t_truth, wgt);
+    h1_t_altTruth_Dist->Fill(t_alt_truth, wgt);
+    h1_xbTruth_Dist->Fill(xb_truth, wgt);
+    h1_xiTruth_Dist->Fill(xi_truth, wgt);
 
-    h2_t_ep_Weighted->Fill(t, e4Vect.P(), wgt);
-    h2_t_Q2_Weighted->Fill(t,Q2, wgt);
-    h2_delta_t_t_Weighted->Fill(((t - t_truth)/t_truth)*100, t, wgt);
+    h2_t_ep->Fill(t, e4Vect.P(), wgt);
+    h2_t_Q2->Fill(t,Q2, wgt);
+    h2_delta_t_t->Fill(((t - t_truth)/t_truth)*100, t, wgt);
     
     for(Int_t B = 0; B < 7; B++){
-      Double_t Q2_low = 5+(B*5);
-      Double_t Q2_high = 10+(B*5);
+      Q2_low = 5+(B*5);
+      Q2_high = 10+(B*5);
       if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
-	h1_t_Q2_Weighted[B]->Fill(t, wgt);
-	h1_t_alt_Q2_Weighted[B]->Fill(t_alt, wgt);
-	h2_delta_t_t_Q2_Weighted[B]->Fill(((t - t_truth)/t_truth)*100, t, wgt);
+	h1_t_Q2[B]->Fill(t, wgt);
+	h1_t_alt_Q2[B]->Fill(t_alt, wgt);
+	h2_delta_t_t_Q2[B]->Fill(((t - t_truth)/t_truth)*100, t, wgt);
       }
     }
 
-    h1_piTruth_p_Weighted->Fill(pi4VectTruth.P(), wgt);
-    h1_piTruth_px_Weighted->Fill(pi4VectTruth.Px(), wgt);
-    h1_piTruth_py_Weighted->Fill(pi4VectTruth.Py(), wgt);
-    h1_piTruth_pz_Weighted->Fill(pi4VectTruth.Pz(), wgt);
-    h1_piTruth_E_Weighted->Fill(pi4VectTruth.E(), wgt);
-    h1_piTruth_Theta_Weighted->Fill(pi4VectTruth.Theta()*TMath::RadToDeg(), wgt);
-    h1_eTruth_p_Weighted->Fill(e4VectTruth.P(), wgt);
-    h1_eTruth_px_Weighted->Fill(e4VectTruth.Px(), wgt);
-    h1_eTruth_py_Weighted->Fill(e4VectTruth.Py(), wgt);
-    h1_eTruth_pz_Weighted->Fill(e4VectTruth.Pz(), wgt);
-    h1_eTruth_E_Weighted->Fill(e4VectTruth.E(), wgt);
-    h1_eTruth_Theta_Weighted->Fill(e4VectTruth.Theta()*TMath::RadToDeg(), wgt);
-    h1_nTruth_p_Weighted->Fill(n4VectTruth.P(), wgt);
-    h1_nTruth_px_Weighted->Fill(n4VectTruth.Px(), wgt);
-    h1_nTruth_py_Weighted->Fill(n4VectTruth.Py(), wgt);
-    h1_nTruth_pz_Weighted->Fill(n4VectTruth.Pz(), wgt);
-    h1_nTruth_E_Weighted->Fill(n4VectTruth.E(), wgt);
-    h1_nTruth_Theta_Weighted->Fill(n4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    for(Int_t B = 0; B < 8; B++){
+      if ( B <= 1){
+	Q2_low = 5+(B*2.5);
+	Q2_high = 7.5+(B*2.5);
+      }
+      else{
+	Q2_low = 5+((B-1)*5.0);
+	Q2_high = 10+((B-1)*5.0);
+      }
+      if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
+	h1_t_result[B]->Fill(t_alt, wgt);
+	h1_nTheta_result[B]->Fill(n4Vect.Theta()*TMath::RadToDeg(), wgt);
+	h1_pmiss_result[B]->Fill(pmiss4Vect.P(), wgt);
+	// Apply other cuts
+	if ( (pmiss4Vect.P() < PmissCutVal[B]) && ((n4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (n4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){
+	}
+	h1_t_cut_result[B]->Fill(t_alt, wgt);
+      }
+    }
+
+
+    h1_piTruth_p->Fill(pi4VectTruth.P(), wgt);
+    h1_piTruth_px->Fill(pi4VectTruth.Px(), wgt);
+    h1_piTruth_py->Fill(pi4VectTruth.Py(), wgt);
+    h1_piTruth_pz->Fill(pi4VectTruth.Pz(), wgt);
+    h1_piTruth_E->Fill(pi4VectTruth.E(), wgt);
+    h1_piTruth_Theta->Fill(pi4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    h1_eTruth_p->Fill(e4VectTruth.P(), wgt);
+    h1_eTruth_px->Fill(e4VectTruth.Px(), wgt);
+    h1_eTruth_py->Fill(e4VectTruth.Py(), wgt);
+    h1_eTruth_pz->Fill(e4VectTruth.Pz(), wgt);
+    h1_eTruth_E->Fill(e4VectTruth.E(), wgt);
+    h1_eTruth_Theta->Fill(e4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    h1_nTruth_p->Fill(n4VectTruth.P(), wgt);
+    h1_nTruth_px->Fill(n4VectTruth.Px(), wgt);
+    h1_nTruth_py->Fill(n4VectTruth.Py(), wgt);
+    h1_nTruth_pz->Fill(n4VectTruth.Pz(), wgt);
+    h1_nTruth_E->Fill(n4VectTruth.E(), wgt);
+    h1_nTruth_Theta->Fill(n4VectTruth.Theta()*TMath::RadToDeg(), wgt);
     
-    h2_ZDC_XY_Weighted->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
+    h2_ZDC_XY->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
 
-    h2_piTrack_ThetaPhi_Weighted->Fill((pi4Vect.Theta()*TMath::RadToDeg()), (pi4Vect.Phi()*TMath::RadToDeg()), wgt);
-    h2_piTrack_pTheta_Weighted->Fill((pi4Vect.Theta()*TMath::RadToDeg()), pi4Vect.P(), wgt);
-    h2_eTrack_ThetaPhi_Weighted->Fill((e4Vect.Theta()*TMath::RadToDeg()), (e4Vect.Phi()*TMath::RadToDeg()), wgt);
-    h2_eTrack_pTheta_Weighted->Fill((e4Vect.Theta()*TMath::RadToDeg()), e4Vect.P(), wgt);
-    h2_nTrack_ThetaPhi_Weighted->Fill((n4Vect.Theta()*TMath::RadToDeg()), (n4Vect.Phi()*TMath::RadToDeg()), wgt);
-    h2_nTrack_pTheta_Weighted->Fill((n4Vect.Theta()*TMath::RadToDeg()), n4Vect.P(), wgt);
+    h2_piTrack_ThetaPhi->Fill((pi4Vect.Theta()*TMath::RadToDeg()), (pi4Vect.Phi()*TMath::RadToDeg()), wgt);
+    h2_piTrack_pTheta->Fill((pi4Vect.Theta()*TMath::RadToDeg()), pi4Vect.P(), wgt);
+    h2_eTrack_ThetaPhi->Fill((e4Vect.Theta()*TMath::RadToDeg()), (e4Vect.Phi()*TMath::RadToDeg()), wgt);
+    h2_eTrack_pTheta->Fill((e4Vect.Theta()*TMath::RadToDeg()), e4Vect.P(), wgt);
+    h2_nTrack_ThetaPhi->Fill((n4Vect.Theta()*TMath::RadToDeg()), (n4Vect.Phi()*TMath::RadToDeg()), wgt);
+    h2_nTrack_pTheta->Fill((n4Vect.Theta()*TMath::RadToDeg()), n4Vect.P(), wgt);
     
-    h2_piTruth_pxpy_Weighted->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100, wgt);
-    h2_eTruth_pxpy_Weighted->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100, wgt);
-    h2_nTruth_pxpy_Weighted->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100, wgt);
+    h2_piTruth_pxpy->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100, wgt);
+    h2_eTruth_pxpy->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100, wgt);
+    h2_nTruth_pxpy->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100, wgt);
 
-    h2_piTruth_pxpz_Weighted->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100, wgt);
-    h2_eTruth_pxpz_Weighted->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100, wgt);
-    h2_nTruth_pxpz_Weighted->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100, wgt);
+    h2_piTruth_pxpz->Fill((pi4Vect.Px()-pi4VectTruth.Px())/(pi4VectTruth.Px())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100, wgt);
+    h2_eTruth_pxpz->Fill((e4Vect.Px()-e4VectTruth.Px())/(e4VectTruth.Px())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100, wgt);
+    h2_nTruth_pxpz->Fill((n4Vect.Px()-n4VectTruth.Px())/(n4VectTruth.Px())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100, wgt);
 
-    h2_piTruth_pypz_Weighted->Fill((pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100, wgt);
-    h2_eTruth_pypz_Weighted->Fill((e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100, wgt);
-    h2_nTruth_pypz_Weighted->Fill((n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100, wgt);
+    h2_piTruth_pypz->Fill((pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100, wgt);
+    h2_eTruth_pypz->Fill((e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100, wgt);
+    h2_nTruth_pypz->Fill((n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100, wgt);
 
   }
 
@@ -523,9 +564,13 @@ int ECCE_DEMP::EndRun(const int runnumber)
 int ECCE_DEMP::End(PHCompositeNode *topNode)
 {
   std::cout << "ECCE_DEMP::End(PHCompositeNode *topNode) This is the End..." << std::endl;
-  h1_Q2_DetEff_Weighted->Divide(h1_Q2_DetEff_Cut_Weighted, h1_Q2_DetEff_Uncut_Weighted);
-  h2_Q2_t_DetEff_Weighted->Divide(h2_Q2_t_DetEff_Cut_Weighted, h2_Q2_t_DetEff_Uncut_Weighted);
-
+  h1_Q2_DetEff->Divide(h1_Q2_DetEff_Cut, h1_Q2_DetEff_Uncut);
+  h2_Q2_t_DetEff->Divide(h2_Q2_t_DetEff_Cut, h2_Q2_t_DetEff_Uncut);
+  ScalingFact = double(event_itt)/nTried; // This scaling factor is needed to normalise the weighted results
+  for(Int_t C = 0; C < 8; C++){
+    h1_t_result[C]->Scale((1/ScalingFact));
+    h1_t_cut_result[C]->Scale((1/ScalingFact));
+  }
   outfile->cd();
   outfile->Write();
   outfile->Close();

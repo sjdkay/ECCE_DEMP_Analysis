@@ -118,10 +118,12 @@ class ECCE_DEMP : public SubsysReco
 
   double crossing_angle;
 
+  double nTried;
+  double ScalingFact;
   double wgt;
 
   TLorentzVector r_lelectron;
-//  TLorentzVector r_lproton;
+  //TLorentzVector r_lproton;
 
   TLorentzVector r_lscatelec;
   TLorentzVector r_l_scat_nucleon;
@@ -173,119 +175,130 @@ class ECCE_DEMP : public SubsysReco
   Double_t xb_truth;
   Double_t xi_truth;
 
+  Double_t Q2_low;
+  Double_t Q2_high;
+  Double_t Thetan_Cent; // Central thetan value to determine cuts from
+  // The Pmiss cut values are chosen a little arbitrarily, hard to judge w/o SIDIS to compare with
+  // Cut will be anything ABOVE this value for each bin
+  Double_t PmissCutVal[8] = {96.0, 93.5, 91.0, 87.0, 83.0, 80.0, 77.5, 75.0}; // Array to store Pmiss cut values in
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
   // Histograms for coincidence analysis routine
-
-  TH1F* h1_Q2_DetEff_Uncut_Weighted;
-  TH1F* h1_Q2_DetEff_Cut_Weighted;
-  TH1F* h1_Q2_DetEff_Weighted;
-  TH2F* h2_Q2_t_DetEff_Uncut_Weighted;
-  TH2F* h2_Q2_t_DetEff_Cut_Weighted;
-  TH2F* h2_Q2_t_DetEff_Weighted;
+  TH1F* h1_Q2_DetEff_Uncut;
+  TH1F* h1_Q2_DetEff_Cut;
+  TH1F* h1_Q2_DetEff;
+  TH2F* h2_Q2_t_DetEff_Uncut;
+  TH2F* h2_Q2_t_DetEff_Cut;
+  TH2F* h2_Q2_t_DetEff;
 
   // 1D distributions for each particle
-  TH1F* h1_pi_px_Weighted;
-  TH1F* h1_pi_py_Weighted;
-  TH1F* h1_pi_pz_Weighted;
-  TH1F* h1_pi_p_Weighted;
-  TH1F* h1_pi_E_Weighted;
-  TH1F* h1_pi_Theta_Weighted;
-  TH1F* h1_pi_Phi_Weighted;
-  TH1F* h1_e_px_Weighted;
-  TH1F* h1_e_py_Weighted;
-  TH1F* h1_e_pz_Weighted;
-  TH1F* h1_e_p_Weighted;
-  TH1F* h1_e_E_Weighted;
-  TH1F* h1_e_Theta_Weighted;
-  TH1F* h1_e_Phi_Weighted;
-  TH1F* h1_n_px_Weighted;
-  TH1F* h1_n_py_Weighted;
-  TH1F* h1_n_pz_Weighted;
-  TH1F* h1_n_p_Weighted;
-  TH1F* h1_n_E_Weighted;
-  TH1F* h1_n_Theta_Weighted;
-  TH1F* h1_n_Phi_Weighted;
-  TH1F* h1_pmiss_px_Weighted;
-  TH1F* h1_pmiss_py_Weighted;
-  TH1F* h1_pmiss_pz_Weighted;
-  TH1F* h1_pmiss_p_Weighted;
-  TH1F* h1_pmiss_E_Weighted;
-  TH1F* h1_pmiss_Theta_Weighted;
-  TH1F* h1_pmiss_Phi_Weighted;
-  TH1F* h1_gamma_px_Weighted;
-  TH1F* h1_gamma_py_Weighted;
-  TH1F* h1_gamma_pz_Weighted;
-  TH1F* h1_gamma_p_Weighted;
-  TH1F* h1_gamma_E_Weighted;
-  TH1F* h1_gamma_Theta_Weighted;
-  TH1F* h1_gamma_Phi_Weighted;
+  TH1F* h1_pi_px;
+  TH1F* h1_pi_py;
+  TH1F* h1_pi_pz;
+  TH1F* h1_pi_p;
+  TH1F* h1_pi_E;
+  TH1F* h1_pi_Theta;
+  TH1F* h1_pi_Phi;
+  TH1F* h1_e_px;
+  TH1F* h1_e_py;
+  TH1F* h1_e_pz;
+  TH1F* h1_e_p;
+  TH1F* h1_e_E;
+  TH1F* h1_e_Theta;
+  TH1F* h1_e_Phi;
+  TH1F* h1_n_px;
+  TH1F* h1_n_py;
+  TH1F* h1_n_pz;
+  TH1F* h1_n_p;
+  TH1F* h1_n_E;
+  TH1F* h1_n_Theta;
+  TH1F* h1_n_Phi;
+  TH1F* h1_pmiss_px;
+  TH1F* h1_pmiss_py;
+  TH1F* h1_pmiss_pz;
+  TH1F* h1_pmiss_p;
+  TH1F* h1_pmiss_E;
+  TH1F* h1_pmiss_Theta;
+  TH1F* h1_pmiss_Phi;
+  TH1F* h1_gamma_px;
+  TH1F* h1_gamma_py;
+  TH1F* h1_gamma_pz;
+  TH1F* h1_gamma_p;
+  TH1F* h1_gamma_E;
+  TH1F* h1_gamma_Theta;
+  TH1F* h1_gamma_Phi;
   
-  TH1F* h1_Q2_Dist_Weighted;
-  TH1F* h1_W_Dist_Weighted;
-  TH1F* h1_t_Dist_Weighted;
-  TH1F* h1_t_alt_Dist_Weighted;
-  TH1F* h1_t_comp_Weighted;
-  TH1F* h1_xb_Dist_Weighted;
-  TH1F* h1_xi_Dist_Weighted;
+  TH1F* h1_Q2_Dist;
+  TH1F* h1_W_Dist;
+  TH1F* h1_t_Dist;
+  TH1F* h1_t_alt_Dist;
+  TH1F* h1_t_comp;
+  TH1F* h1_xb_Dist;
+  TH1F* h1_xi_Dist;
 
-  TH1F* h1_Q2Truth_Dist_Weighted;
-  TH1F* h1_WTruth_Dist_Weighted;
-  TH1F* h1_tTruth_Dist_Weighted;
-  TH1F* h1_t_altTruth_Dist_Weighted;
-  TH1F* h1_xbTruth_Dist_Weighted;
-  TH1F* h1_xiTruth_Dist_Weighted;
+  TH1F* h1_Q2Truth_Dist;
+  TH1F* h1_WTruth_Dist;
+  TH1F* h1_tTruth_Dist;
+  TH1F* h1_t_altTruth_Dist;
+  TH1F* h1_xbTruth_Dist;
+  TH1F* h1_xiTruth_Dist;
 
   // Resolution test plots for unsmeared vectors
-  TH1F* h1_piTruth_p_Weighted;
-  TH1F* h1_piTruth_px_Weighted;
-  TH1F* h1_piTruth_py_Weighted;
-  TH1F* h1_piTruth_pz_Weighted;
-  TH1F* h1_piTruth_E_Weighted;
-  TH1F* h1_piTruth_Theta_Weighted;
-  TH1F* h1_eTruth_p_Weighted;
-  TH1F* h1_eTruth_px_Weighted;
-  TH1F* h1_eTruth_py_Weighted;
-  TH1F* h1_eTruth_pz_Weighted;
-  TH1F* h1_eTruth_E_Weighted; 
-  TH1F* h1_eTruth_Theta_Weighted;
-  TH1F* h1_nTruth_p_Weighted;
-  TH1F* h1_nTruth_px_Weighted;
-  TH1F* h1_nTruth_py_Weighted;
-  TH1F* h1_nTruth_pz_Weighted;
-  TH1F* h1_nTruth_E_Weighted;
-  TH1F* h1_nTruth_Theta_Weighted;
+  TH1F* h1_piTruth_p;
+  TH1F* h1_piTruth_px;
+  TH1F* h1_piTruth_py;
+  TH1F* h1_piTruth_pz;
+  TH1F* h1_piTruth_E;
+  TH1F* h1_piTruth_Theta;
+  TH1F* h1_eTruth_p;
+  TH1F* h1_eTruth_px;
+  TH1F* h1_eTruth_py;
+  TH1F* h1_eTruth_pz;
+  TH1F* h1_eTruth_E; 
+  TH1F* h1_eTruth_Theta;
+  TH1F* h1_nTruth_p;
+  TH1F* h1_nTruth_px;
+  TH1F* h1_nTruth_py;
+  TH1F* h1_nTruth_pz;
+  TH1F* h1_nTruth_E;
+  TH1F* h1_nTruth_Theta;
 
   // 2D distributions 
-  TH2F* h2_ZDC_XY_Weighted;
+  TH2F* h2_ZDC_XY;
   // Particle Theta/Phi and Theta/p distributions
-  TH2F* h2_eTrack_ThetaPhi_Weighted;
-  TH2F* h2_eTrack_pTheta_Weighted;
-  TH2F* h2_piTrack_ThetaPhi_Weighted;
-  TH2F* h2_piTrack_pTheta_Weighted;
-  TH2F* h2_nTrack_ThetaPhi_Weighted;
-  TH2F* h2_nTrack_pTheta_Weighted;
+  TH2F* h2_eTrack_ThetaPhi;
+  TH2F* h2_eTrack_pTheta;
+  TH2F* h2_piTrack_ThetaPhi;
+  TH2F* h2_piTrack_pTheta;
+  TH2F* h2_nTrack_ThetaPhi;
+  TH2F* h2_nTrack_pTheta;
   // 2D resolution test plots
-  TH2F* h2_eTruth_pxpy_Weighted;
-  TH2F* h2_piTruth_pxpy_Weighted;
-  TH2F* h2_nTruth_pxpy_Weighted;
-  TH2F* h2_eTruth_pxpz_Weighted;
-  TH2F* h2_piTruth_pxpz_Weighted;
-  TH2F* h2_nTruth_pxpz_Weighted;
-  TH2F* h2_eTruth_pypz_Weighted;
-  TH2F* h2_piTruth_pypz_Weighted;
-  TH2F* h2_nTruth_pypz_Weighted;
+  TH2F* h2_eTruth_pxpy;
+  TH2F* h2_piTruth_pxpy;
+  TH2F* h2_nTruth_pxpy;
+  TH2F* h2_eTruth_pxpz;
+  TH2F* h2_piTruth_pxpz;
+  TH2F* h2_nTruth_pxpz;
+  TH2F* h2_eTruth_pypz;
+  TH2F* h2_piTruth_pypz;
+  TH2F* h2_nTruth_pypz;
   
   // 1D Kinematic analysis plots
-  TH1F* h1_t_Q2_Weighted[7];
-  TH1F* h1_t_alt_Q2_Weighted[7];
+  TH1F* h1_t_Q2[7];
+  TH1F* h1_t_alt_Q2[7];
 
   // 2D Kinematic analysis plots
-  TH2F* h2_t_ep_Weighted;
-  TH2F* h2_t_Q2_Weighted;
-  TH2F* h2_delta_t_t_Weighted;
-  TH2F* h2_delta_t_t_Q2_Weighted[7];
+  TH2F* h2_t_ep;
+  TH2F* h2_t_Q2;
+  TH2F* h2_delta_t_t;
+  TH2F* h2_delta_t_t_Q2[7];
+
+  // 1D Physics results plots
+  TH1F* h1_t_result[8];
+  TH1F* h1_nTheta_result[8];
+  TH1F* h1_pmiss_result[8];
+  TH1F* h1_t_cut_result[8];
  
 };
 
