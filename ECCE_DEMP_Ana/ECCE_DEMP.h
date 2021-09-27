@@ -299,7 +299,14 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTheta_result[8];
   TH1F* h1_pmiss_result[8];
   TH1F* h1_t_cut_result[8];
- 
+  TH1F* h1_Q2_cut_result[8];
+  TH1F* h1_W_cut_result[8];
+
+  // 2D Physics Results Plots
+  TH2F* h2_Q2_W_result;
+  TH2F* h2_t_t_alt_result;
+  TH2F* h2_Q2_t_result[8];
+
 };
 
 #endif // ECCE_DEMP_ANA_H

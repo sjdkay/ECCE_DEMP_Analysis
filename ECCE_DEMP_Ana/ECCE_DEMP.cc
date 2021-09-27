@@ -242,23 +242,42 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   }
   gDirectory->cd("../");
 
-  gDirectory->mkdir("Physics_Results");
-  gDirectory->cd("Physics_Results");
-  // Results histograms are binned in Q2, first two bins are special
+  gDirectory->mkdir("Physics_Results_Cuts");
+  gDirectory->cd("Physics_Results_Cuts");
   for(Int_t A = 0; A < 8; A++){
     if ( A <= 1){
       h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
       h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 500, 0, 5);
       h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 240, 0, 120) ;
-      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);;
     }
     else{
       h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
       h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 500, 0, 5);
       h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 240, 0, 120) ;
-      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);;
     }
   }
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("Physics_Results");
+  gDirectory->cd("Physics_Results");
+  h2_Q2_W_result = new TH2F("Q2_W_Result", "Q^{2} vs W, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); W (GeV)", 200, 0, 40, 60, 0, 30);
+  h2_t_t_alt_result = new TH2F("t_t_alt_result", "-t vs -t_{alt}, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); -t_{alt}(GeV^{2})", 50, 0, 10, 12, 0, 0.48); 
+  for(Int_t A = 0; A < 8; A++){
+    if ( A <= 1){
+      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
+      h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, (5+(A*2.5)), (7.5+(A*2.5)));
+      h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 60, 0, 30);
+      h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+(A*2.5)), (7.5+(A*2.5))), 25, (5+(A*2.5)), (7.5+(A*2.5)), 10, 0, 0.4);
+    }
+    else{
+      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);;
+      h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 50, (5+((A-1)*5)), (10+((A-1)*5)));
+      h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 60, 0, 30);
+      h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+(A*2.5)), (7.5+(A*2.5))), 50, (5+((A-1)*5)), (10+((A-1)*5)), 10, 0, 0.4);
+    }
+  }
+  // Results histograms are binned in Q2, first two bins are special
+
   gDirectory->cd("../");
 
   h2_ZDC_XY = new TH2F("ZDC_XY", "ZDC XY", 200, -150, -50, 200, -50, 50);
@@ -488,17 +507,21 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	Q2_low = 5+((B-1)*5.0);
 	Q2_high = 10+((B-1)*5.0);
       }
-      if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
+      if ( Q2 > Q2_low && Q2 < Q2_high){
 	h1_t_result[B]->Fill(t_alt, wgt);
 	h1_nTheta_result[B]->Fill(n4Vect.Theta()*TMath::RadToDeg(), wgt);
 	h1_pmiss_result[B]->Fill(pmiss4Vect.P(), wgt);
 	// Apply other cuts
 	if ( (pmiss4Vect.P() < PmissCutVal[B]) && ((n4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (n4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){
-	}
 	h1_t_cut_result[B]->Fill(t_alt, wgt);
+	h1_Q2_cut_result[B]->Fill(Q2, wgt);
+	h1_W_cut_result[B]->Fill(W, wgt);
+	h2_t_t_alt_result->Fill(t, t_alt, wgt);
+	h2_Q2_W_result->Fill(Q2, W, wgt);
+	h2_Q2_t_result[B]->Fill(Q2, t_alt, wgt);
+	}
       }
     }
-
 
     h1_piTruth_p->Fill(pi4VectTruth.P(), wgt);
     h1_piTruth_px->Fill(pi4VectTruth.Px(), wgt);
@@ -564,12 +587,20 @@ int ECCE_DEMP::EndRun(const int runnumber)
 int ECCE_DEMP::End(PHCompositeNode *topNode)
 {
   std::cout << "ECCE_DEMP::End(PHCompositeNode *topNode) This is the End..." << std::endl;
+  ScalingFact = double(event_itt)/nTried; // This scaling factor is needed to normalise the weighted results
   h1_Q2_DetEff->Divide(h1_Q2_DetEff_Cut, h1_Q2_DetEff_Uncut);
   h2_Q2_t_DetEff->Divide(h2_Q2_t_DetEff_Cut, h2_Q2_t_DetEff_Uncut);
-  ScalingFact = double(event_itt)/nTried; // This scaling factor is needed to normalise the weighted results
+  h2_Q2_W_result->Scale((1/ScalingFact));
+  h2_ZDC_XY->Scale((1/ScalingFact));
+  h2_t_t_alt_result->Scale((1/ScalingFact));
+
   for(Int_t C = 0; C < 8; C++){
+    h1_pmiss_result[C]->Scale((1/ScalingFact));
     h1_t_result[C]->Scale((1/ScalingFact));
     h1_t_cut_result[C]->Scale((1/ScalingFact));
+    h1_Q2_cut_result[C]->Scale((1/ScalingFact));
+    h1_W_cut_result[C]->Scale((1/ScalingFact));
+    h2_Q2_t_result[C]->Scale((1/ScalingFact));
   }
   outfile->cd();
   outfile->Write();
