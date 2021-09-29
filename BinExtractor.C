@@ -48,10 +48,31 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   TH1F* WHists[8];
   TH2F* Q2tHists[8];
 
-  TH2F* Q2WHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results/Q2_W_Result"));
+  TH2F* Q2WHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/Q2_W_Result"));
   TH2F* ZDCHist = (TH2F*)((TH2F*)InFile->Get("ZDC_XY"));
   TH1F* Q2EffHist = (TH1F*)((TH1F*)InFile->Get("Detection_Efficiency/Q2_DetEff"));
   TH2F* Q2tEffHist = (TH2F*)((TH2F*)InFile->Get("Detection_Efficiency/Q2_t_DetEff"));
+
+  TH2F* tvstHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/t_ttruth_result"));
+  TH2F* t_altvstHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/t_alt_ttruth_result"));
+  TH1F* MmissHist  = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_result"));
+  TH1F* Mmiss_truth_Hist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_truth_result"));
+  TH1F* Mmiss_comp_Hist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/MMiss_Comp_result")); // Change to Mmiss next reprocessing round
+
+  TH1F* piRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_p"));
+  TH1F* piRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_px"));
+  TH1F* piRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_py"));
+  TH1F* piRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_pz"));
+
+  TH1F* eRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_p"));
+  TH1F* eRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_px"));
+  TH1F* eRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_py"));
+  TH1F* eRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_pz"));
+ 
+  TH1F* nRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_p"));
+  TH1F* nRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_px"));
+  TH1F* nRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_py"));
+  TH1F* nRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_pz"));
   
   for(Int_t A = 1; A <9; A++){
     tHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/t_cut_Result_Q2_%i",A)));
@@ -108,7 +129,7 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     Outfile << errors[A] << "\n";
   }
   
-  TCanvas *c_Output[9];
+  TCanvas *c_Output[14];
   for(Int_t A = 0; A < 8; A++){
     c_Output[A] = new TCanvas(Form("c_Output_%i", (A+1)), Form("Results_p%i", (A+1)), 100, 0, 1000, 900);
     c_Output[A]->Divide(2,2);
@@ -141,9 +162,61 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   Q2EffHist->Draw("HISTERR");
   c_Output[8]->cd(4);
   Q2tEffHist->Draw("COLZ");
+  c_Output[8]->Print(Outpdf);
+
+  c_Output[9] = new TCanvas("c_Output10", "Results_p10", 100, 0, 1000, 900);
+  c_Output[9]->Divide(1,2);
+  c_Output[9]->cd(1);
+  tvstHist->Draw("COLZ");
+  c_Output[9]->cd(2);
+  t_altvstHist->Draw("COLZ");
+  c_Output[9]->Print(Outpdf);
+
+  c_Output[10] = new TCanvas("c_Output11", "Results_p11", 100, 0, 1000, 900);
+  c_Output[10]->Divide(1,3);
+  c_Output[10]->cd(1);
+  MmissHist->Draw("HISTERR");
+  c_Output[10]->cd(2);
+  Mmiss_truth_Hist->Draw("HISTERR");
+  c_Output[10]->cd(3);
+  Mmiss_comp_Hist->Draw("HISTERR");
+  c_Output[10]->Print(Outpdf);
+
+  c_Output[11] = new TCanvas("c_Output12", "Results_p12", 100, 0, 1000, 900);
+  c_Output[11]->Divide(2,2);
+  c_Output[11]->cd(1);
+  piRes_p_Hist->Draw("HISTERR");
+  c_Output[11]->cd(2);
+  piRes_px_Hist->Draw("HISTERR");
+  c_Output[11]->cd(3);
+  piRes_py_Hist->Draw("HISTERR");
+  c_Output[11]->cd(4);
+  piRes_pz_Hist->Draw("HISTERR");
+  c_Output[11]->Print(Outpdf);
   
-  c_Output[8]->Print(Outpdf + ')');
+  c_Output[12] = new TCanvas("c_Output13", "Results_p13", 100, 0, 1000, 900);
+  c_Output[12]->Divide(2,2);
+  c_Output[12]->cd(1);
+  eRes_p_Hist->Draw("HISTERR");
+  c_Output[12]->cd(2);
+  eRes_px_Hist->Draw("HISTERR");
+  c_Output[12]->cd(3);
+  eRes_py_Hist->Draw("HISTERR");
+  c_Output[12]->cd(4);
+  eRes_pz_Hist->Draw("HISTERR");
+  c_Output[12]->Print(Outpdf);
   
+  c_Output[13] = new TCanvas("c_Output14", "Results_p14", 100, 0, 1000, 900);
+  c_Output[13]->Divide(2,2);
+  c_Output[13]->cd(1);
+  nRes_p_Hist->Draw("HISTERR");
+  c_Output[13]->cd(2);
+  nRes_px_Hist->Draw("HISTERR");
+  c_Output[13]->cd(3);
+  nRes_py_Hist->Draw("HISTERR");
+  c_Output[13]->cd(4);
+  nRes_pz_Hist->Draw("HISTERR");
+  c_Output[13]->Print(Outpdf + ')');
   
   InFile->Close();  
   Outfile.close();

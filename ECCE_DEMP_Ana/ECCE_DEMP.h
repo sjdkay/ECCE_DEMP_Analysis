@@ -156,6 +156,8 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector t4VectTruth;
   TLorentzVector t_alt4VectTruth;
   TLorentzVector pmiss4VectTruth;
+  TLorentzVector pmiss4Vect_2;
+  TLorentzVector pmiss4VectTruth_2;
 
   Double_t nEDep;
   Double_t nTheta;
@@ -228,6 +230,10 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_gamma_E;
   TH1F* h1_gamma_Theta;
   TH1F* h1_gamma_Phi;
+
+  TH2F* h2_pi_XY;
+  TH2F* h2_e_XY;
+  TH2F* h2_n_XY;
   
   TH1F* h1_Q2_Dist;
   TH1F* h1_W_Dist;
@@ -244,7 +250,7 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_xbTruth_Dist;
   TH1F* h1_xiTruth_Dist;
 
-  // Resolution test plots for unsmeared vectors
+  // Particle Truth info
   TH1F* h1_piTruth_p;
   TH1F* h1_piTruth_px;
   TH1F* h1_piTruth_py;
@@ -264,6 +270,20 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTruth_E;
   TH1F* h1_nTruth_Theta;
 
+  // Particle Resolution histograms
+  TH1F* h1_piRes_p;
+  TH1F* h1_piRes_px;
+  TH1F* h1_piRes_py;
+  TH1F* h1_piRes_pz;  
+  TH1F* h1_eRes_p;
+  TH1F* h1_eRes_px;
+  TH1F* h1_eRes_py;
+  TH1F* h1_eRes_pz;
+  TH1F* h1_nRes_p;
+  TH1F* h1_nRes_px;
+  TH1F* h1_nRes_py;
+  TH1F* h1_nRes_pz;
+  
   // 2D distributions 
   TH2F* h2_ZDC_XY;
   // Particle Theta/Phi and Theta/p distributions
@@ -295,6 +315,9 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_delta_t_t_Q2[7];
 
   // 1D Physics results plots
+  TH1F* h1_Mmiss_result;
+  TH1F* h1_Mmiss_truth_result;
+  TH1F* h1_Mmiss_Comp_result;
   TH1F* h1_t_result[8];
   TH1F* h1_nTheta_result[8];
   TH1F* h1_pmiss_result[8];
@@ -304,6 +327,8 @@ class ECCE_DEMP : public SubsysReco
 
   // 2D Physics Results Plots
   TH2F* h2_Q2_W_result;
+  TH2F* h2_t_ttruth_result;
+  TH2F* h2_t_alt_ttruth_result;
   TH2F* h2_t_t_alt_result;
   TH2F* h2_Q2_t_result[8];
 
