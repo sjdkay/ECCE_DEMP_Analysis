@@ -182,7 +182,7 @@ class ECCE_DEMP : public SubsysReco
   Double_t Thetan_Cent; // Central thetan value to determine cuts from
   // The Pmiss cut values are chosen a little arbitrarily, hard to judge w/o SIDIS to compare with
   // Cut will be anything ABOVE this value for each bin
-  Double_t PmissCutVal[8] = {96.0, 93.5, 91.0, 87.0, 83.0, 80.0, 77.5, 75.0}; // Array to store Pmiss cut values in
+  Double_t PmissCutVal[8] = {96.0, 93.5, 91.0, 87.0, 83.0, 80.0, 77.5, 75.0}; // Array to store Pmiss cut values in, 5on 100
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
@@ -329,6 +329,7 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_Q2_W_result;
   TH2F* h2_t_ttruth_result;
   TH2F* h2_t_alt_ttruth_result;
+  TH2F* h2_t_alt_ttruth_result_Q2[8];
   TH2F* h2_t_t_alt_result;
   TH2F* h2_Q2_t_result[8];
 
