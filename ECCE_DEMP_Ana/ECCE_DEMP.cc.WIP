@@ -97,15 +97,12 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   
   gDirectory->mkdir("Detection_Efficiency");
   gDirectory->cd("Detection_Efficiency");
-  h1_Q2_DetEff_Uncut = new TH1F("Q2_DetEff_Uncut", "Q^{2}_{Truth} for thrown events; Q^{2}", 100, 0, 40); h1_Q2_DetEff_Uncut->Sumw2();
-  h1_Q2_DetEff_Cut = new TH1F("Q2_DetEff_Cut", "Q^{2}_{Truth} for detected events; Q^{2}", 100, 0, 40); h1_Q2_DetEff_Cut->Sumw2();
-  h1_Q2_DetEff = new TH1F("Q2_DetEff", "Q^{2}_{Truth} detected/thrown ratio; Q^{2}", 100, 0, 40); h1_Q2_DetEff->Sumw2();
-  h2_Q2_t_DetEff_Uncut = new TH2F("Q2_t_DetEff_Uncut", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff_Uncut->Sumw2();
-  h2_Q2_t_DetEff_Cut = new TH2F("Q2_t_DetEff_Cut", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff_Cut->Sumw2();
-  h2_Q2_t_DetEff = new TH2F("Q2_t_DetEff", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff->Sumw2();
-  h2_Q2_t_DetEff_v2_Uncut = new TH2F("Q2_t_DetEff_v2_Uncut", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_v2_Uncut->Sumw2();
-  h2_Q2_t_DetEff_v2_Cut = new TH2F("Q2_t_DetEff_v2_Cut", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_v2_Cut->Sumw2();
-  h2_Q2_t_DetEff_v2 = new TH2F("Q2_t_DetEff_v2", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_v2->Sumw2();
+  h1_Q2_DetEff_Uncut = new TH1F("Q2_DetEff_Uncut", "Q^{2}_{Truth} for thrown events; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Uncut->Sumw2();
+  h1_Q2_DetEff_Cut = new TH1F("Q2_DetEff_Cut", "Q^{2}_{Truth} for detected events; Q^{2}", 100, 0, 50); h1_Q2_DetEff_Cut->Sumw2();
+  h1_Q2_DetEff = new TH1F("Q2_DetEff", "Q^{2}_{Truth} detected/thrown ratio; Q^{2}", 100, 0, 50); h1_Q2_DetEff->Sumw2();
+  h2_Q2_t_DetEff_Uncut = new TH2F("Q2_t_DetEff_Uncut", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Uncut->Sumw2();
+  h2_Q2_t_DetEff_Cut = new TH2F("Q2_t_DetEff_Cut", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff_Cut->Sumw2();
+  h2_Q2_t_DetEff = new TH2F("Q2_t_DetEff", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t", 10, 0, 50, 10, 0, 0.5); h2_Q2_t_DetEff->Sumw2();
   gDirectory->cd("../");  
 
   gDirectory->mkdir("Particle_Momenta_Resolution");
@@ -118,10 +115,10 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_eRes_px = new TH1F("eRes_px", "e' #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
   h1_eRes_py = new TH1F("eRes_py", "e' #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
   h1_eRes_pz = new TH1F("eRes_pz", "e' #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
-  h1_nRes_p = new TH1F("nRes_p", "n #frac{#Delta p}{Truth p} Distribution (%); %", 100, -5, 5);
-  h1_nRes_px = new TH1F("nRes_px", "n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -5, 5);
-  h1_nRes_py = new TH1F("nRes_py", "n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -5, 5);
-  h1_nRes_pz = new TH1F("nRes_pz", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -5, 5);
+  h1_nRes_p = new TH1F("nRes_p", "n #frac{#Delta p}{Truth p} Distribution (%); %", 100, -50, 50);
+  h1_nRes_px = new TH1F("nRes_px", "n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -50, 50);
+  h1_nRes_py = new TH1F("nRes_py", "n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -50, 50);
+  h1_nRes_pz = new TH1F("nRes_pz", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -50, 50);
   gDirectory->cd("../");  
 
   gDirectory->mkdir("Pion_Info");
@@ -153,26 +150,26 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   
   gDirectory->mkdir("Scattered_Electron_Info");
   gDirectory->cd("Scattered_Electron_Info");
-  h1_e_px = new TH1F("e_px", "e' p_{x} Distribution;p_{x} [GeV]", 240, -6, 6);
-  h1_e_py = new TH1F("e_py", "e' p_{y} Distribution;p_{y} [GeV]", 240, -6, 6);
-  h1_e_pz = new TH1F("e_pz", "e' p_{z} Distribution;p_{z} [GeV]", 120, -6, 0); 
-  h1_e_p = new TH1F("e_p", "e' p Distribution;p [GeV]", 160, 0, 8);
-  h1_e_E = new TH1F("e_E", "e' E Distribution;E [GeV]", 160, 0, 8);
-  h1_e_Theta = new TH1F("e_Theta", "e' #theta Distribution; #theta [deg]", 200, 110, 160);
+  h1_e_px = new TH1F("e_px", "e' p_{x} Distribution;p_{x} [GeV]", 480, -12, 12);
+  h1_e_py = new TH1F("e_py", "e' p_{y} Distribution;p_{y} [GeV]", 480, -12, 12);
+  h1_e_pz = new TH1F("e_pz", "e' p_{z} Distribution;p_{z} [GeV]", 240, -12, 0); 
+  h1_e_p = new TH1F("e_p", "e' p Distribution;p [GeV]", 240, 0, 12);
+  h1_e_E = new TH1F("e_E", "e' E Distribution;E [GeV]", 240, 0, 12);
+  h1_e_Theta = new TH1F("e_Theta", "e' #theta Distribution; #theta [deg]", 300, 95, 170);
   h1_e_Phi = new TH1F("e_Phi", "e' #phi Distribution; #phi [deg]", 360, -180, 180);
   h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
-  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
+  h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 120, 0, 12);
   h2_pi_XY = new TH2F("pi_XY", "#{pi} X vs Y at z=100cm Dist; x(cm); y(cm)", 200, -1000, 1000, 200, -1000, 1000);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Scattered_Electron_Truth_Info");
   gDirectory->cd("Scattered_Electron_Truth_Info");
-  h1_eTruth_px = new TH1F("eTruth_px", "e' Truth p_{x} Distribution;p_{x} [GeV]", 240, -6, 6);
-  h1_eTruth_py = new TH1F("eTruth_py", "e' Truth p_{y} Distribution;p_{y} [GeV]", 240, -6, 6);
-  h1_eTruth_pz = new TH1F("eTruth_pz", "e' Truth p_{z} Distribution;p_{z} [GeV]", 120, -6, 0); 
-  h1_eTruth_p = new TH1F("eTruth_p", "e' Truth p Distribution;p [GeV]", 160, 0, 8);
-  h1_eTruth_E = new TH1F("eTruth_E", "e' Truth E Distribution;E [GeV]", 160, 0, 8);
-  h1_eTruth_Theta = new TH1F("eTruth_Theta", "e' Truth #theta Distribution; #theta [deg]", 200, 110, 160);
+  h1_eTruth_px = new TH1F("eTruth_px", "e' Truth p_{x} Distribution;p_{x} [GeV]", 480, -12, 12);
+  h1_eTruth_py = new TH1F("eTruth_py", "e' Truth p_{y} Distribution;p_{y} [GeV]", 480, -12, 12);
+  h1_eTruth_pz = new TH1F("eTruth_pz", "e' Truth p_{z} Distribution;p_{z} [GeV]", 240, -12, 0); 
+  h1_eTruth_p = new TH1F("eTruth_p", "e' Truth p Distribution;p [GeV]", 240, 0, 12);
+  h1_eTruth_E = new TH1F("eTruth_E", "e' Truth E Distribution;E [GeV]", 240, 0, 12);
+  h1_eTruth_Theta = new TH1F("eTruth_Theta", "e' Truth #theta Distribution; #theta [deg]", 300, 95, 170);
   h2_eTruth_pxpy = new TH2F("eTruth_pxpy", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);  
   h2_eTruth_pxpz = new TH2F("eTruth_pxpz", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
   h2_eTruth_pypz = new TH2F("eTruth_pypz", "e' #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
@@ -284,19 +281,17 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   for(Int_t A = 0; A < 8; A++){
     if ( A <= 1){
       h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
-      h1_t_truth_thrown_result[A] = new TH1F(Form("t_truth_thrown_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
       h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, (5+(A*2.5)), (7.5+(A*2.5)));
       h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 60, 0, 30);
       h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+(A*2.5)), (7.5+(A*2.5))), 25, (5+(A*2.5)), (7.5+(A*2.5)), 10, 0, 0.4);
       h2_t_alt_ttruth_result_Q2[A] = new TH2F(Form("t_alt_ttruth_Result_Q2_%i",(A+1)), Form("-t_{alt} vs -t_{truth}, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})",(5+(A*2.5)), (7.5+(A*2.5))), 50, 0, 0.5, 50, 0, 0.5); 
     }
     else{
-      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
-      h1_t_truth_thrown_result[A] = new TH1F(Form("t_truth_thrown_Result_Q2_%i", (A+1)), Form("-t_{truth} Dist, %i < Q^{2} < %i; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
+      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);;
       h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 50, (5+((A-1)*5)), (10+((A-1)*5)));
       h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 60, 0, 30);
-      h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+((A-1)*5)), (10+((A-1)*5))), 50, (5+((A-1)*5)), (10+((A-1)*5)), 10, 0, 0.4);
-      h2_t_alt_ttruth_result_Q2[A] = new TH2F(Form("t_alt_ttruth_Result_Q2_%i",(A+1)), Form("-t_{alt} vs -t_{truth}, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})",(5+((A-1)*5)), (10+((A-1)*5))), 50, 0, 0.5, 50, 0, 0.5); 
+      h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+(A*2.5)), (7.5+(A*2.5))), 50, (5+((A-1)*5)), (10+((A-1)*5)), 10, 0, 0.4);
+      h2_t_alt_ttruth_result_Q2[A] = new TH2F(Form("t_alt_ttruth_Result_Q2_%i",(A+1)), Form("-t_{alt} vs -t_{truth}, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})",(5+(A*2.5)), (7.5+(A*2.5))), 50, 0, 0.5, 50, 0, 0.5); 
     }
   }
 
@@ -306,10 +301,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_Q2_W_result = new TH2F("Q2_W_Result", "Q^{2} vs W, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); W (GeV)", 200, 0, 40, 60, 0, 30);
   h2_t_t_alt_result = new TH2F("t_t_alt_result", "-t vs -t_{alt}, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); -t_{alt}(GeV^{2})", 50, 0, 10, 12, 0, 0.48); 
   h1_Mmiss_result = new TH1F("Mmiss_result", "Missing Mass Dist;M_{Miss}(GeV/c^{2})", 100, -5, 5);
-  h1_MmissSq_result = new TH1F("MmissSq_result", "Missing Mass Squared Dist;M_{Miss}^{2}((GeV/c^{2})^{2})", 80, 0, 4);
   h1_Mmiss_truth_result = new TH1F("Mmiss_truth_result", "Missing Mass (truth) Dist; M_{Miss}(GeV/c^{2})", 40, -2, 2);
   h1_Mmiss_Comp_result = new TH1F("Mmiss_Comp_result", "#Delta M_{Miss} Distribution; #Delta(M_{Miss})(GeV/c^{2})", 100, -5, 5);
-  h1_taltres_result = new TH1F("taltres_result", "t_{alt} - t_{truth} Dist; t_{alt} - t_{truth} (GeV^{2}", 100, -0.2, 0.2);
   h2_t_ttruth_result = new TH2F("t_ttruth_result", "-t vs -t_{truth} Dist; -t (GeV^{2}); -t_{truth}(GeV^{2})", 50, 0, 10, 50, 0, 0.5);
   h2_t_alt_ttruth_result = new TH2F("t_alt_ttruth_result", "-t_{alt} vs -t_{truth} Dist; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})", 50, 0, 0.5, 50, 0, 0.5);
 
@@ -409,22 +402,6 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 
   h1_Q2_DetEff_Uncut->Fill(Q2_truth, wgt);
   h2_Q2_t_DetEff_Uncut->Fill(Q2_truth, t_truth, wgt);
-  h2_Q2_t_DetEff_v2_Uncut->Fill(Q2_truth, t_truth, wgt);
-
-  for(Int_t B = 0; B < 8; B++){
-    if ( B <= 1){
-      Q2_low = 5+(B*2.5);
-      Q2_high = 7.5+(B*2.5);
-    }
-    else{
-      Q2_low = 5+((B-1)*5.0);
-      Q2_high = 10+((B-1)*5.0);
-    }
-    if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
-    h1_t_truth_thrown_result[B]->Fill(t_truth, wgt);
-    }
-  }
-
 
   if (Check_n(topNode) == true && Check_ePi(topNode) == true){ // For event, check if it look like we have an e/pi/n in the event
     // Get track map for e'/pi info
@@ -498,7 +475,6 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 
     h1_Q2_DetEff_Cut->Fill(Q2_truth, wgt);
     h2_Q2_t_DetEff_Cut->Fill(Q2_truth, t_truth, wgt);
-    h2_Q2_t_DetEff_v2_Cut->Fill(Q2_truth, t_truth, wgt);
 
     h1_pi_px->Fill(pi4Vect.Px(), wgt);
     h1_pi_py->Fill(pi4Vect.Py(), wgt);
@@ -551,8 +527,6 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_xbTruth_Dist->Fill(xb_truth, wgt);
     h1_xiTruth_Dist->Fill(xi_truth, wgt);
 
-    h1_taltres_result->Fill((t_alt-t_truth),wgt);
-
     h2_t_ep->Fill(t, e4Vect.P(), wgt);
     h2_t_Q2->Fill(t,Q2, wgt);
     h2_delta_t_t->Fill(((t - t_truth)/t_truth)*100, t, wgt);
@@ -588,7 +562,6 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	h2_t_ttruth_result->Fill(t, t_truth, wgt);
 	h2_t_alt_ttruth_result->Fill(t_alt, t_truth, wgt);
 	h1_Mmiss_result->Fill(pmiss4Vect_2.M(),wgt);
-	h1_MmissSq_result->Fill(((pmiss4Vect_2.M()*(pmiss4Vect_2.M()))),wgt);
 	h1_Mmiss_truth_result->Fill(pmiss4VectTruth_2.M(),wgt);
 	h1_Mmiss_Comp_result->Fill((pmiss4VectTruth_2.M()-pmiss4Vect_2.M()), wgt);
 	h2_t_t_alt_result->Fill(t, t_alt, wgt);
@@ -679,16 +652,13 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
   ScalingFact = double(event_itt)/nTried; // This scaling factor is needed to normalise the weighted results
   h1_Q2_DetEff->Divide(h1_Q2_DetEff_Cut, h1_Q2_DetEff_Uncut);
   h2_Q2_t_DetEff->Divide(h2_Q2_t_DetEff_Cut, h2_Q2_t_DetEff_Uncut);
-  h2_Q2_t_DetEff_v2->Divide(h2_Q2_t_DetEff_v2_Cut, h2_Q2_t_DetEff_v2_Uncut);
   h2_Q2_W_result->Scale((1/ScalingFact));
   h2_ZDC_XY->Scale((1/ScalingFact));
   h2_t_ttruth_result->Scale((1/ScalingFact));
   h2_t_alt_ttruth_result->Scale((1/ScalingFact));
   h1_Mmiss_result->Scale((1/ScalingFact));
-  h1_MmissSq_result->Scale((1/ScalingFact));
   h1_Mmiss_truth_result->Scale((1/ScalingFact));
   h1_Mmiss_Comp_result->Scale((1/ScalingFact));
-  h1_taltres_result->Scale((1/ScalingFact));
   h2_t_t_alt_result->Scale((1/ScalingFact));
 
   h1_piRes_p->Scale((1/ScalingFact));
@@ -707,7 +677,6 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
   for(Int_t C = 0; C < 8; C++){
     h1_pmiss_result[C]->Scale((1/ScalingFact));
     h1_t_result[C]->Scale((1/ScalingFact));
-    h1_t_truth_thrown_result[C]->Scale((1/ScalingFact));
     h1_t_cut_result[C]->Scale((1/ScalingFact));
     h1_Q2_cut_result[C]->Scale((1/ScalingFact));
     h1_W_cut_result[C]->Scale((1/ScalingFact));

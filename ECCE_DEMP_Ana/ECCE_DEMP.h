@@ -193,6 +193,9 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_Q2_t_DetEff_Uncut;
   TH2F* h2_Q2_t_DetEff_Cut;
   TH2F* h2_Q2_t_DetEff;
+  TH2F* h2_Q2_t_DetEff_v2_Uncut;
+  TH2F* h2_Q2_t_DetEff_v2_Cut;
+  TH2F* h2_Q2_t_DetEff_v2;
 
   // 1D distributions for each particle
   TH1F* h1_pi_px;
@@ -316,9 +319,12 @@ class ECCE_DEMP : public SubsysReco
 
   // 1D Physics results plots
   TH1F* h1_Mmiss_result;
+  TH1F* h1_MmissSq_result;
   TH1F* h1_Mmiss_truth_result;
   TH1F* h1_Mmiss_Comp_result;
+  TH1F* h1_taltres_result;
   TH1F* h1_t_result[8];
+  TH1F* h1_t_truth_thrown_result[8];
   TH1F* h1_nTheta_result[8];
   TH1F* h1_pmiss_result[8];
   TH1F* h1_t_cut_result[8];

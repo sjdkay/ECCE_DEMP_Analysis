@@ -18,6 +18,7 @@
 #include <TTree.h>
 #include <TArc.h>
 #include <TH1.h>
+#include <TLatex.h>
 
 void BinExtractor(string InFilename = "", string OutFilename = ""){
   
@@ -43,21 +44,30 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   TFile *InFile = new TFile(rootFile);
   TString TOutFilename = OutFilename;
 
+  TLatex InfoDump;
+  InfoDump.SetTextSize(0.1);
+  InfoDump.SetTextAlign(12);  //align at centre
+  
   TH1F* tHists[8];
+  TH1F* ttruthHists[8];
   TH1F* Q2Hists[8];
   TH1F* WHists[8];
   TH2F* Q2tHists[8];
+  TH2F* taltvst_Q2_Hists[8];
 
   TH2F* Q2WHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/Q2_W_Result"));
   TH2F* ZDCHist = (TH2F*)((TH2F*)InFile->Get("ZDC_XY"));
   TH1F* Q2EffHist = (TH1F*)((TH1F*)InFile->Get("Detection_Efficiency/Q2_DetEff"));
   TH2F* Q2tEffHist = (TH2F*)((TH2F*)InFile->Get("Detection_Efficiency/Q2_t_DetEff"));
+  TH2F* Q2tEffHist_v2 = (TH2F*)((TH2F*)InFile->Get("Detection_Efficiency/Q2_t_DetEff_v2"));
 
   TH2F* tvstHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/t_ttruth_result"));
   TH2F* t_altvstHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/t_alt_ttruth_result"));
-  TH1F* MmissHist  = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_result"));
+  TH1F* tresHist =  (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/taltres_result"));
+  TH1F* MmissHist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_result"));
+  TH1F* MmissSqHist  = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/MmissSq_result"));
   TH1F* Mmiss_truth_Hist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_truth_result"));
-  TH1F* Mmiss_comp_Hist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/MMiss_Comp_result")); // Change to Mmiss next reprocessing round
+  TH1F* Mmiss_comp_Hist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_Comp_result"));
 
   TH1F* piRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_p"));
   TH1F* piRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_px"));
@@ -76,9 +86,11 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   
   for(Int_t A = 1; A <9; A++){
     tHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/t_cut_Result_Q2_%i",A)));
+    ttruthHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/t_truth_thrown_Result_Q2_%i",A)));
     Q2Hists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/Q2_cut_Result_Q2_%i",A)));
     WHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/W_cut_Result_Q2_%i",A)));
     Q2tHists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/Q2_t_cut_Result_Q2_%i",A)));
+    taltvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_alt_ttruth_Result_Q2_%i",A))); 
   }
 
   Double_t BinVals[10];
@@ -129,10 +141,10 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     Outfile << errors[A] << "\n";
   }
   
-  TCanvas *c_Output[14];
+  TCanvas *c_Output[15];
   for(Int_t A = 0; A < 8; A++){
     c_Output[A] = new TCanvas(Form("c_Output_%i", (A+1)), Form("Results_p%i", (A+1)), 100, 0, 1000, 900);
-    c_Output[A]->Divide(2,2);
+    c_Output[A]->Divide(3,2);
     c_Output[A]->cd(1);
     tHists[A]->Draw("HISTERR");
     c_Output[A]->cd(2);
@@ -141,19 +153,23 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     WHists[A]->Draw("HISTERR");
     c_Output[A]->cd(4);
     Q2tHists[A]->Draw("COLZ");
+    c_Output[A]->cd(5);
+    taltvst_Q2_Hists[A]->Draw("COLZ");
+    c_Output[A]->cd(6);
+    InfoDump.DrawLatex(.2,.8,"L = 10^{34} cm^{-2}s^{-1}");
+    InfoDump.DrawLatex(.2,.7,"assumed in rate");
+    InfoDump.DrawLatex(.2,.6,"calculation");
+    
     if (A == 0){
       c_Output[A]->Print(Outpdf + '(');
     }
-    else if(A < 7){
-      c_Output[A]->Print(Outpdf);
-    }
-    else if(A == 7){
+    else {
       c_Output[A]->Print(Outpdf);
     }
   }
 
   c_Output[8] = new TCanvas("c_Output_9", "Results_p9", 100, 0, 1000, 900);
-  c_Output[8]->Divide(2,2);
+  c_Output[8]->Divide(3,2);
   c_Output[8]->cd(1);
   Q2WHist->Draw("COLZ");
   c_Output[8]->cd(2);
@@ -162,6 +178,10 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   Q2EffHist->Draw("HISTERR");
   c_Output[8]->cd(4);
   Q2tEffHist->Draw("COLZ");
+  c_Output[8]->cd(5);
+  Q2tEffHist_v2->Draw("COLZ");
+  c_Output[8]->cd(6);
+  tresHist->Draw("HISTERR");
   c_Output[8]->Print(Outpdf);
 
   c_Output[9] = new TCanvas("c_Output10", "Results_p10", 100, 0, 1000, 900);
@@ -173,12 +193,14 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   c_Output[9]->Print(Outpdf);
 
   c_Output[10] = new TCanvas("c_Output11", "Results_p11", 100, 0, 1000, 900);
-  c_Output[10]->Divide(1,3);
+  c_Output[10]->Divide(2,2);
   c_Output[10]->cd(1);
   MmissHist->Draw("HISTERR");
   c_Output[10]->cd(2);
-  Mmiss_truth_Hist->Draw("HISTERR");
+  MmissSqHist->Draw("HISTERR");
   c_Output[10]->cd(3);
+  Mmiss_truth_Hist->Draw("HISTERR");
+  c_Output[10]->cd(4);
   Mmiss_comp_Hist->Draw("HISTERR");
   c_Output[10]->Print(Outpdf);
 
@@ -216,7 +238,15 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   nRes_py_Hist->Draw("HISTERR");
   c_Output[13]->cd(4);
   nRes_pz_Hist->Draw("HISTERR");
-  c_Output[13]->Print(Outpdf + ')');
+  c_Output[13]->Print(Outpdf);
+
+  c_Output[14] = new TCanvas("c_Output15", "Results_p15", 100, 0, 1000, 900);
+  c_Output[14]->Divide(3,3);
+  for(Int_t A = 0; A < 8; A++){
+    c_Output[14]->cd(A+1);
+    ttruthHists[A]->Draw("HISTERR");
+  }
+  c_Output[14]->Print(Outpdf + ')');
   
   InFile->Close();  
   Outfile.close();
