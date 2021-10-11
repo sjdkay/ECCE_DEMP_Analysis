@@ -286,16 +286,23 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nRes_px;
   TH1F* h1_nRes_py;
   TH1F* h1_nRes_pz;
-  
+  TH1F* h1_pmissDiff_p;
+  TH1F* h1_pmissDiff_px;
+  TH1F* h1_pmissDiff_py;
+  TH1F* h1_pmissDiff_pz;
+
   // 2D distributions 
   TH2F* h2_ZDC_XY;
   // Particle Theta/Phi and Theta/p distributions
   TH2F* h2_eTrack_ThetaPhi;
   TH2F* h2_eTrack_pTheta;
+  TH2F* h2_eTrack_pTheta_Truth;
   TH2F* h2_piTrack_ThetaPhi;
   TH2F* h2_piTrack_pTheta;
+  TH2F* h2_piTrack_pTheta_Truth;
   TH2F* h2_nTrack_ThetaPhi;
   TH2F* h2_nTrack_pTheta;
+  TH2F* h2_nTrack_pTheta_Truth;
   // 2D resolution test plots
   TH2F* h2_eTruth_pxpy;
   TH2F* h2_piTruth_pxpy;

@@ -122,6 +122,10 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_nRes_px = new TH1F("nRes_px", "n #frac{#Delta px}{Truth px} Distribution (%); %", 100, -5, 5);
   h1_nRes_py = new TH1F("nRes_py", "n #frac{#Delta py}{Truth py} Distribution (%); %", 100, -5, 5);
   h1_nRes_pz = new TH1F("nRes_pz", "n #frac{#Delta pz}{Truth pz} Distribution (%); %", 100, -5, 5);
+  h1_pmissDiff_p = new TH1F("pmissDiff_p", "#Delta p_{miss} (p_{miss} - p_{nTruth}) Dist; #Delta p_{miss}(GeV/c)", 100 -5, 5);
+  h1_pmissDiff_px = new TH1F("pmissDiff_px", "#Delta p_{xmiss} (p_{xmiss} - p_{xnTruth}) Dist; #Delta p_{xmiss}(GeV/c)", 100 -5, 5);
+  h1_pmissDiff_py = new TH1F("pmissDiff_py", "#Delta p_{ymiss} (p_{ymiss} - p_{ynTruth}) Dist; #Delta p_{ymiss}(GeV/c)", 100 -5, 5);
+  h1_pmissDiff_pz = new TH1F("pmissDiff_pz", "#Delta p_{zmiss} (p_{zmiss} - p_{znTruth}) Dist; #Delta p_{ymiss}(GeV/c)", 100 -5, 5);
   gDirectory->cd("../");  
 
   gDirectory->mkdir("Pion_Info");
@@ -134,7 +138,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_pi_Theta = new TH1F("pi_Theta", "#pi #theta Distribution; #theta [deg]", 200, 0, 50);
   h1_pi_Phi = new TH1F("pi_Phi", "#pi #phi Distribution; #phi [deg]", 360, -180, 180);
   h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta [deg]; #phi [deg]", 120, 0, 60, 720, -180, 180);
-  h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
+  h2_pi_XY = new TH2F("pi_XY", "#{pi} X vs Y at z=100cm Dist; x(cm); y(cm)", 200, -1000, 1000, 200, -1000, 1000);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Pion_Truth_Info");
@@ -145,10 +149,10 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_piTruth_p = new TH1F("piTrtuh_p", "#pi Truth p Distribution;p [GeV]", 200, 0, 50);
   h1_piTruth_E = new TH1F("piTrtuh_E", "#pi Truth E Distribution;E [GeV]", 200, 0, 50);
   h1_piTruth_Theta = new TH1F("piTrtuh_Theta", "#pi Truth #theta Distribution; #theta [deg]", 200, 0, 50);
-
   h2_piTruth_pxpy = new TH2F("piTruth_pxpy", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
   h2_piTruth_pxpz = new TH2F("piTruth_pxpz", "#pi #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   h2_piTruth_pypz = new TH2F("piTruth_pypz", "#pi #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_piTrack_pTheta_Truth = new TH2F("piTrack_pTheta_Truth", "#pi Track #theta vs P (Truth); #theta [deg]; P [GeV/c]", 120, 0, 60, 500, 0, 50);
   gDirectory->cd("../");
   
   gDirectory->mkdir("Scattered_Electron_Info");
@@ -162,7 +166,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_e_Phi = new TH1F("e_Phi", "e' #phi Distribution; #phi [deg]", 360, -180, 180);
   h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta [deg]; #phi [deg]", 140, 110, 180, 720, -180, 180);
   h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
-  h2_pi_XY = new TH2F("pi_XY", "#{pi} X vs Y at z=100cm Dist; x(cm); y(cm)", 200, -1000, 1000, 200, -1000, 1000);
+  h2_e_XY = new TH2F("e_XY", "e' X vs Y at z=100cm Dist; x(cm); y(cm)", 200, -1000, 1000, 200, -1000, 1000);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Scattered_Electron_Truth_Info");
@@ -176,7 +180,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_eTruth_pxpy = new TH2F("eTruth_pxpy", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);  
   h2_eTruth_pxpz = new TH2F("eTruth_pxpz", "e' #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);  
   h2_eTruth_pypz = new TH2F("eTruth_pypz", "e' #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
-  h2_e_XY = new TH2F("e_XY", "e' X vs Y at z=100cm Dist; x(cm); y(cm)", 200, -1000, 1000, 200, -1000, 1000);
+  h2_eTrack_pTheta_Truth = new TH2F("eTrack_pTheta_Truth", "e' Track #theta vs P (Truth); #theta [deg]; P [GeV/c]", 140, 110, 180, 100, 0, 10);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Neutron_Info");
@@ -204,6 +208,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_nTruth_pxpy = new TH2F("nTruth_pxpy", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
   h2_nTruth_pxpz = new TH2F("nTruth_pxpz", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   h2_nTruth_pypz = new TH2F("nTruth_pypz", "n #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
+  h2_nTrack_pTheta_Truth = new TH2F("nTrack_pTheta_Truth", "n Track #theta vs P (Truth); #theta [deg]; P [GeV/c]", 500, 0, 5, 500, 0, 50);
   gDirectory->cd("../");
 
   gDirectory->mkdir("PMiss_Info");
