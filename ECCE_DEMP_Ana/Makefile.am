@@ -36,7 +36,9 @@ libeccedemp_la_LDFLAGS  = \
   -lphg4hit\
   -lgsl \
   -lgslcblas \
-  -lg4eval
+  -lg4eval \
+  -lg4eval_io \
+  -leiceval
 
 #   -L/cvmfs/eic.opensciencegrid.org/x8664_sl7/opt/fun4all/core/gsl-2.6/lib \
 #   \ -lm

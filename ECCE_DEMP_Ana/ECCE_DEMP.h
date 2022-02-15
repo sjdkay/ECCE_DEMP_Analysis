@@ -17,6 +17,9 @@
 #include "TH1.h"
 #include "TH2.h"
 
+#include <pdbcalbase/PdbParameterMap.h>
+#include <phparameter/PHParameters.h>
+
 class Fun4AllHistoManager;
 class PHCompositeNode;
 class TFile;
@@ -91,6 +94,15 @@ class ECCE_DEMP : public SubsysReco
   float HCAL_Smear(float E);
   float PbWO4_Smear(float E);
   float Position_Smear(float E);
+
+  //*********************************
+  // Coordinate transformation from global to local
+
+  float Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot);
+  float Get_Local_Y(float global_x, float global_y, float global_z, float det_tilt, float det_rot);
+  float Get_Local_X(float global_x, float global_y, float global_z, PdbParameterMapContainer *det_nodeparams);
+//  float Get_Local_X(float global_x, float global_y, float global_z) {return 1;};
+  float Get_Local_X(float global_x, float global_y, float global_z, PHParameters Det_params);
 
   //---------------------
   // From ejana
@@ -345,6 +357,22 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_t_alt_ttruth_result_Q2[8];
   TH2F* h2_t_t_alt_result;
   TH2F* h2_Q2_t_result[8];
+
+  PHParameters Enclosure_params{"PHGEnclosure"};
+  PHParameters ZDC_params{"PHG4RP"};
+  PHParameters RP_1_params{"PHG4RP"};
+  PHParameters RP2_params{"PHG4RP2"};
+  PHParameters B0_params{"PHG4B0"};
+  PHParameters BeamLineMagnet_params{"PHG4BeamLinMagnet"};
+
+  PdbParameterMapContainer *encloseure_nodeparams; 
+  PdbParameterMapContainer *zdc_nodeparams; 
+  PdbParameterMapContainer *rp_nodeparams;
+  PdbParameterMapContainer *rp2_nodeparams;
+  PdbParameterMapContainer *b0_nodeparams;
+  PdbParameterMapContainer *beamlinemagnet_nodeparams; 
+
+  TString IP_design;
 
 };
 

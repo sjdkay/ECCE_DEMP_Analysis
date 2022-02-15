@@ -3,12 +3,10 @@
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <fun4all/Fun4AllServer.h>
 #include <fun4all/PHTFileServer.h>
+#include <fun4all/Fun4AllDstInputManager.h>
+#include <fun4all/Fun4AllHistoManager.h>
 
 #include <phool/PHCompositeNode.h>
-
-#include <stdio.h>
-
-#include <fun4all/Fun4AllHistoManager.h>
 
 #include <phool/PHCompositeNode.h>
 #include <phool/PHIODataNode.h>
@@ -29,6 +27,7 @@
 // Jet includes
 #include <g4eval/JetEvalStack.h>
 #include <g4jets/JetMap.h>
+#include <g4eval/SvtxEvalStack.h>
 
 // Cluster includes
 #include <calobase/RawCluster.h>
@@ -44,6 +43,7 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/EicEventHeader.h>
+#include <g4main/PHG4Reco.h>
 
 #include <TFile.h>
 #include <TNtuple.h>
@@ -58,9 +58,15 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <stdio.h>
 
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
+
+#include <phparameter/PHParameters.h>
+
+#include <pdbcalbase/PdbParameterMap.h>
+#include <pdbcalbase/PdbParameterMapContainer.h>
 
 using namespace std;
 
