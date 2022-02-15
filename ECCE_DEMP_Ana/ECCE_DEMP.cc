@@ -94,6 +94,9 @@ ECCE_DEMP::~ECCE_DEMP()
 //____________________________________________________________________________..
 int ECCE_DEMP::Init(PHCompositeNode *topNode)
 {
+
+  static_event_counter = 0;
+
   hm = new Fun4AllHistoManager(Name());
   outfile = new TFile(outfilename.c_str(), "RECREATE");
 
@@ -328,6 +331,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 
   gDirectory->cd("../");
   h2_ZDC_XY = new TH2F("ZDC_XY", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
+  h2_ZDC_XY_l = new TH2F("ZDC_XY_l", "n X vs Y at ZDC (Local Co-ords); x(cm); y(cm)", 400, -100, 100, 400, -100, 100);
 
   // Define beam 4 vectors
   e_beam_energy = 5;
@@ -362,7 +366,49 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 //____________________________________________________________________________..
 int ECCE_DEMP::InitRun(PHCompositeNode *topNode)
 {
-  std::cout << "ECCE_DEMP::InitRun(PHCompositeNode *topNode) Initializing for Run XXX" << std::endl;
+  if( static_event_counter == 0){
+    encloseure_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_hFarFwdBeamLineEnclosure_0");
+    encloseure_nodeparams->Print();
+    if (encloseure_nodeparams){
+      Enclosure_params.FillFrom(encloseure_nodeparams, 0);
+    } 
+    else {
+      cerr << "There is a issue finding the detector paramter node!" << endl;
+    }
+
+    beamlinemagnet_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_BEAMLINEMAGNET");
+
+    if (encloseure_nodeparams){
+      BeamLineMagnet_params.FillFrom(beamlinemagnet_nodeparams, 0);
+    }
+    else{
+      cerr << "There is a issue finding the detector paramter node!" << endl;
+    }
+
+    zdc_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_ZDCsurrogate");
+    // SJDK - 15/02/22 - This analysis doesn't really use any of these detectors, so beyond getting them to determine the IP, we don't reall care
+    rp_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_rpTruth");
+    rp2_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_rpTruth2");
+    b0_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_b0Truth");
+
+    static_event_counter++;
+	
+    /// Determining which IP design
+    if (zdc_nodeparams) {
+      if (rp2_nodeparams) {
+	IP_design = "IP8";
+      } 
+      else {
+	IP_design = "IP6";
+      }
+    } 
+    else {
+      IP_design = "UNKNOWN";
+    }
+  }
+  
+  cout << " END initialization" << endl;
+
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -486,7 +532,26 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	  nTheta = nZDCPos.Theta();
 	  nPhi = nZDCPos.Phi();
 	  nPMag = sqrt((pow(nEDep,2)) - (pow(mNeut,2)));
-	  n4Vect.SetPxPyPzE(nPMag*sin(nTheta)*cos(nPhi), nPMag*sin(nTheta)*sin(nPhi), nPMag*cos(nTheta), nEDep);	  
+	  n4Vect.SetPxPyPzE(nPMag*sin(nTheta)*cos(nPhi), nPMag*sin(nTheta)*sin(nPhi), nPMag*cos(nTheta), nEDep);
+	  
+	  // SJDK - 15/02/22 - Implement Bill's conversion to local co-ordinates, fill new local ZDC XY histo
+	  PHParameters ZDC_params{"PHG4RP"};
+            
+	  if (zdc_nodeparams){
+	      ZDC_params.FillFrom(zdc_nodeparams, 0);
+	  } 
+	  else {
+	    cerr << "There is a issue finding the detector paramter node!" << endl;
+	  }
+
+	  det_x_pos = Enclosure_params.get_double_param("place_x")  + ZDC_params.get_double_param("place_x");
+	  det_z_pos = Enclosure_params.get_double_param("place_z")  + ZDC_params.get_double_param("place_z");
+
+	  ZDC_params.set_double_param("place_x", det_x_pos); 
+	  ZDC_params.set_double_param("place_z", det_z_pos); 
+
+	  local_x = Get_Local_X(hit_iter->second->get_x(0), hit_iter->second->get_y(0), hit_iter->second->get_z(0), ZDC_params);
+	  local_y = hit_iter->second->get_y(0);
 	}
     }
 
@@ -650,7 +715,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h2_pi_XY->Fill((375*(TMath::Cos(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), (375*(TMath::Sin(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), wgt);
     h2_e_XY->Fill((200*(TMath::Cos(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), (375*(TMath::Sin(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), wgt);
     h2_ZDC_XY->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
-
+    h2_ZDC_XY_l->Fill(local_x, local_y, wgt);
+ 
     h2_piTrack_ThetaPhi->Fill((pi4Vect.Theta()*TMath::RadToDeg()), (pi4Vect.Phi()*TMath::RadToDeg()), wgt);
     h2_piTrack_pTheta->Fill((pi4Vect.Theta()*TMath::RadToDeg()), pi4Vect.P(), wgt);
     h2_eTrack_ThetaPhi->Fill((e4Vect.Theta()*TMath::RadToDeg()), (e4Vect.Phi()*TMath::RadToDeg()), wgt);
@@ -892,4 +958,77 @@ bool ECCE_DEMP::Check_n(PHCompositeNode* topNode)
     return false;
   }
   else return false;
+}
+
+
+// SJDK - 15/02/22 - Added in new co-ordinate conversions
+// Conversion to local co-ordinate system from global values - from Bill's Diff_Tagg_Ana scripts
+//*******************************************
+
+float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot) {
+
+   TVector3 global_cor(global_x, global_y, global_z);
+   float local_x;
+
+   global_cor.RotateY(-det_rot);
+   local_x = global_cor.X()/cos(det_tilt - det_rot);
+	
+   return local_x;
+
+}
+
+//*******************************************
+
+float ECCE_DEMP::Get_Local_Y(float global_x, float global_y, float global_z, float det_tilt, float cross_angle) {
+
+	return global_y;
+
+}
+
+//*******************************************
+float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, PdbParameterMapContainer *det_nodeparams) {
+
+   PHParameters Det_params{"PHDet"};
+
+   if (det_nodeparams)
+   {
+      Det_params.FillFrom(det_nodeparams, 0);
+   } else {
+      cerr << "There is a issue finding the detector paramter node!" << endl;
+   }
+
+   float det_xCent = Enclosure_params.get_double_param("place_x") + Det_params.get_double_param("place_x");
+   float det_zCent = Enclosure_params.get_double_param("place_z") + Det_params.get_double_param("place_z");
+   float det_tilt = Det_params.get_double_param("rot_y")/180. * TMath::Pi(); // in Rad
+
+   float det_rot = atan( det_xCent / det_zCent);  // in Rad
+
+   TVector3 global_cor(global_x, global_y, global_z);
+   float local_x;
+
+   global_cor.RotateY(-det_rot);
+   local_x = global_cor.X()/cos(det_tilt);
+
+   return local_x;
+
+}
+
+//*******************************************
+
+float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, PHParameters Det_params) {
+
+   float det_xCent = Det_params.get_double_param("place_x");
+   float det_zCent = Det_params.get_double_param("place_z");
+
+   float det_tilt = Det_params.get_double_param("rot_y"); // in Rad
+
+   float det_rot = atan( det_xCent / det_zCent);  // in Rad
+
+   TVector3 global_cor(global_x, global_y, global_z);
+
+
+   float local_x1 = Get_Local_X(global_x, global_y, global_z, det_tilt, det_rot);
+
+   return local_x1;
+
 }

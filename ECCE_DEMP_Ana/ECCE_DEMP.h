@@ -87,6 +87,7 @@ class ECCE_DEMP : public SubsysReco
   unsigned long long int event_itt;
   gsl_rng* m_RandomGenerator;
 
+  int static_event_counter;
   //*********************************
   // Energy and Position smearing
 
@@ -101,7 +102,6 @@ class ECCE_DEMP : public SubsysReco
   float Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot);
   float Get_Local_Y(float global_x, float global_y, float global_z, float det_tilt, float det_rot);
   float Get_Local_X(float global_x, float global_y, float global_z, PdbParameterMapContainer *det_nodeparams);
-//  float Get_Local_X(float global_x, float global_y, float global_z) {return 1;};
   float Get_Local_X(float global_x, float global_y, float global_z, PHParameters Det_params);
 
   //---------------------
@@ -175,6 +175,13 @@ class ECCE_DEMP : public SubsysReco
   Double_t nTheta;
   Double_t nPhi;
   Double_t nPMag;
+
+  float det_x_pos;
+  float det_y_pos;
+  float det_z_pos;
+
+  float local_x;
+  float local_y;
 
   Double_t Q2;
   Double_t W;
@@ -305,6 +312,7 @@ class ECCE_DEMP : public SubsysReco
 
   // 2D distributions 
   TH2F* h2_ZDC_XY;
+  TH2F* h2_ZDC_XY_l;
   // Particle Theta/Phi and Theta/p distributions
   TH2F* h2_eTrack_ThetaPhi;
   TH2F* h2_eTrack_pTheta;
