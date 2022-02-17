@@ -311,7 +311,8 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_pmissDiff_pz;
 
   // 2D distributions 
-  TH2F* h2_ZDC_XY;
+  TH2F* h2_ZDC_XY_IP6;
+  TH2F* h2_ZDC_XY_IP8;
   TH2F* h2_ZDC_XY_l;
   // Particle Theta/Phi and Theta/p distributions
   TH2F* h2_eTrack_ThetaPhi;

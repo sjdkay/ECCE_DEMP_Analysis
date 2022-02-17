@@ -96,7 +96,6 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 {
 
   static_event_counter = 0;
-
   hm = new Fun4AllHistoManager(Name());
   outfile = new TFile(outfilename.c_str(), "RECREATE");
 
@@ -330,10 +329,11 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_t_alt_ttruth_result = new TH2F("t_alt_ttruth_result", "-t_{alt} vs -t_{truth} Dist; -t_{alt} (GeV^{2}); -t_{truth} (GeV^{2})", 50, 0, 0.5, 50, 0, 0.5);
 
   gDirectory->cd("../");
-  h2_ZDC_XY = new TH2F("ZDC_XY", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
-  h2_ZDC_XY_l = new TH2F("ZDC_XY_l", "n X vs Y at ZDC (Local Co-ords); x(cm); y(cm)", 400, -100, 100, 400, -100, 100);
+  h2_ZDC_XY_IP6 = new TH2F("ZDC_XY_IP6", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
+  h2_ZDC_XY_IP8 = new TH2F("ZDC_XY_IP8", "n X vs Y at ZDC; x (cm); y (cm)", 200, 50, 150, 200, -50, 50);
+  h2_ZDC_XY_l = new TH2F("ZDC_XY_l", "n X vs Y at ZDC (Local Co-ords); x (cm); y (cm)", 800, -200, 200, 200, -50, 50);
 
-  // Define beam 4 vectors
+  // Define beam 4 vectors - Assume IP6 by default, for other IPs, adjust in the Process Event loop (at the top)
   e_beam_energy = 5;
   e_beam_pmag = sqrt(pow(e_beam_energy,2)-pow(mElec,2));
   ion_beam_energy = 100;
@@ -406,7 +406,7 @@ int ECCE_DEMP::InitRun(PHCompositeNode *topNode)
       IP_design = "UNKNOWN";
     }
   }
-  
+
   cout << " END initialization" << endl;
 
   return Fun4AllReturnCodes::EVENT_OK;
@@ -418,7 +418,13 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
   ZDC_hit = 0;
   EEMC_hit = 0;
   event_itt++; 
-
+  
+  if (IP_design == "IP8" ){ // If IP8, need to adjust crossing angle and adjust incoming beams
+    crossing_angle = 0.035; // IP8 has a 35 mRad crossing angle
+    eBeam4Vect.SetPxPyPzE(0,0,-1*e_beam_pmag,e_beam_energy);
+    pBeam4Vect.SetPxPyPzE(ion_beam_pmag*TMath::Sin(crossing_angle),0,ion_beam_pmag*TMath::Cos(crossing_angle),ion_beam_energy);
+  }
+  
   if(event_itt%100 == 0)
     std::cout << "Event Processing Counter: " << event_itt << endl;
   // Get event header info for the event (weight)
@@ -714,7 +720,15 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 
     h2_pi_XY->Fill((375*(TMath::Cos(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), (375*(TMath::Sin(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), wgt);
     h2_e_XY->Fill((200*(TMath::Cos(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), (375*(TMath::Sin(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), wgt);
-    h2_ZDC_XY->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
+    if ( IP_design == "IP6"){
+      h2_ZDC_XY_IP6->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
+    }
+    else if ( IP_design == "IP8"){
+      h2_ZDC_XY_IP8->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
+    }
+    else{
+      h2_ZDC_XY_IP6->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
+    }
     h2_ZDC_XY_l->Fill(local_x, local_y, wgt);
  
     h2_piTrack_ThetaPhi->Fill((pi4Vect.Theta()*TMath::RadToDeg()), (pi4Vect.Phi()*TMath::RadToDeg()), wgt);
@@ -735,7 +749,6 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h2_piTruth_pypz->Fill((pi4Vect.Py()-pi4VectTruth.Py())/(pi4VectTruth.Py())*100, (pi4Vect.Pz()-pi4VectTruth.Pz())/(pi4VectTruth.Pz())*100, wgt);
     h2_eTruth_pypz->Fill((e4Vect.Py()-e4VectTruth.Py())/(e4VectTruth.Py())*100, (e4Vect.Pz()-e4VectTruth.Pz())/(e4VectTruth.Pz())*100, wgt);
     h2_nTruth_pypz->Fill((n4Vect.Py()-n4VectTruth.Py())/(n4VectTruth.Py())*100, (n4Vect.Pz()-n4VectTruth.Pz())/(n4VectTruth.Pz())*100, wgt);
-
 
     h2_piTrack_pTheta_Truth->Fill((pi4VectTruth.Theta()*TMath::RadToDeg()), pi4VectTruth.P(), wgt);
     h2_eTrack_pTheta_Truth->Fill((e4VectTruth.Theta()*TMath::RadToDeg()), e4VectTruth.P(), wgt);
@@ -772,7 +785,19 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
   h2_Q2_W_result->Scale((1/ScalingFact));
   h2_pi_XY->Scale((1/ScalingFact));  
   h2_e_XY->Scale((1/ScalingFact));
-  h2_ZDC_XY->Scale((1/ScalingFact));
+  if ( IP_design == "IP6"){
+    delete h2_ZDC_XY_IP8;
+    h2_ZDC_XY_IP6->Scale((1/ScalingFact));
+  }
+  else if ( IP_design == "IP8"){
+    delete h2_ZDC_XY_IP6;
+    h2_ZDC_XY_IP8->Scale((1/ScalingFact));
+  }
+  else{
+    delete h2_ZDC_XY_IP8;
+    h2_ZDC_XY_IP6->Scale((1/ScalingFact));
+  }
+  h2_ZDC_XY_l->Scale((1/ScalingFact));
   h2_t_ttruth_result->Scale((1/ScalingFact));
   h2_t_alt_ttruth_result->Scale((1/ScalingFact));
   h1_Mmiss_result->Scale((1/ScalingFact));
