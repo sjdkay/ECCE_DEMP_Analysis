@@ -88,13 +88,14 @@ class ECCE_DEMP : public SubsysReco
   gsl_rng* m_RandomGenerator;
 
   int static_event_counter;
-  //*********************************
-  // Energy and Position smearing
 
-  float EMCAL_Smear(float E);
-  float HCAL_Smear(float E);
-  float PbWO4_Smear(float E);
-  float Position_Smear(float E);
+  //*********************************
+  // ZDC Energy and Position smearing
+
+  float ZDC_Energy_Smear_EMCAL(float E);
+  float ZDC_Energy_Smear_HCAL(float E);
+  float ZDC_Energy_Smear_PbWO4(float E);
+  float ZDC_Position_Smear(float E);
 
   //*********************************
   // Coordinate transformation from global to local
@@ -142,7 +143,7 @@ class ECCE_DEMP : public SubsysReco
 
   TLorentzVector lproton;
 
-  // Particle Masses
+  // Particle Masses in GeV
   Double_t mPi = 0.139570;
   Double_t mElec = 0.000510998950;
   Double_t mNeut = 0.93965420;
@@ -152,9 +153,11 @@ class ECCE_DEMP : public SubsysReco
   TVector3 eVect;
   TVector3 piVect;
   TVector3 nZDCPos;
+  TVector3 nRecZDCPos;
   TLorentzVector e4Vect;
   TLorentzVector pi4Vect;
   TLorentzVector n4Vect;
+  TLorentzVector nRec4Vect;
   TLorentzVector e4VectTruth;
   TLorentzVector pi4VectTruth;
   TLorentzVector n4VectTruth;
@@ -176,6 +179,14 @@ class ECCE_DEMP : public SubsysReco
   Double_t nPhi;
   Double_t nPMag;
 
+  Double_t nRecEDep;
+  Double_t nRecTheta;
+  Double_t nRecPhi;
+  Double_t nRecPMag;
+
+  Double_t nTheta_Diff;
+  Double_t nPhi_Diff;
+
   float det_x_pos;
   float det_y_pos;
   float det_z_pos;
@@ -196,6 +207,8 @@ class ECCE_DEMP : public SubsysReco
   Double_t xb_truth;
   Double_t xi_truth;
 
+  Double_t t_low;
+  Double_t t_high;
   Double_t Q2_low;
   Double_t Q2_high;
   Double_t Thetan_Cent; // Central thetan value to determine cuts from
@@ -238,6 +251,42 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_n_E;
   TH1F* h1_n_Theta;
   TH1F* h1_n_Phi;
+  TH1F* h1_n_ThetaDiff;
+  TH1F* h1_n_PhiDiff;
+
+  TH1F* h1_nRec_px;
+  TH1F* h1_nRec_py;
+  TH1F* h1_nRec_pz;
+  TH1F* h1_nRec_p;
+  TH1F* h1_nRec_E;
+  TH1F* h1_nRec_Theta;
+  TH1F* h1_nRec_Phi;
+
+  TH1F* h1_pi_px_Unweighted;
+  TH1F* h1_pi_py_Unweighted;
+  TH1F* h1_pi_pz_Unweighted;
+  TH1F* h1_pi_p_Unweighted;
+  TH1F* h1_pi_E_Unweighted;
+  TH1F* h1_pi_Theta_Unweighted;
+  TH1F* h1_pi_Phi_Unweighted;
+  TH1F* h1_e_px_Unweighted;
+  TH1F* h1_e_py_Unweighted;
+  TH1F* h1_e_pz_Unweighted;
+  TH1F* h1_e_p_Unweighted;
+  TH1F* h1_e_E_Unweighted;
+  TH1F* h1_e_Theta_Unweighted;
+  TH1F* h1_e_Phi_Unweighted;
+  TH1F* h1_n_px_Unweighted;
+  TH1F* h1_n_py_Unweighted;
+  TH1F* h1_n_pz_Unweighted;
+  TH1F* h1_n_p_Unweighted;
+  TH1F* h1_n_E_Unweighted;
+  TH1F* h1_n_Theta_Unweighted;
+  TH1F* h1_n_Phi_Unweighted;
+  TH1F* h1_n_ThetaDiff_Unweighted;
+  TH1F* h1_n_PhiDiff_Unweighted;
+
+
   TH1F* h1_pmiss_px;
   TH1F* h1_pmiss_py;
   TH1F* h1_pmiss_pz;
@@ -351,10 +400,12 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_Mmiss_truth_result;
   TH1F* h1_Mmiss_Comp_result;
   TH1F* h1_taltres_result;
+  TH1F* h1_taltres_result_ttruth[10]; // Binned in t_truth
   TH1F* h1_t_result[8];
   TH1F* h1_t_truth_thrown_result[8];
   TH1F* h1_nTheta_result[8];
   TH1F* h1_pmiss_result[8];
+  TH1F* h1_pn_result[8];
   TH1F* h1_t_cut_result[8];
   TH1F* h1_Q2_cut_result[8];
   TH1F* h1_W_cut_result[8];
@@ -363,6 +414,7 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_Q2_W_result;
   TH2F* h2_t_ttruth_result;
   TH2F* h2_t_alt_ttruth_result;
+  TH2F* h2_t_ttruth_result_Q2[8];
   TH2F* h2_t_alt_ttruth_result_Q2[8];
   TH2F* h2_t_t_alt_result;
   TH2F* h2_Q2_t_result[8];
