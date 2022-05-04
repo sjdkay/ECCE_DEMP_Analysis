@@ -1,6 +1,9 @@
 // 22/09/21 - Stephen JD Kay, University of Regina
+// 03/03/22 - Added in SIDIS comparison plot at the end
 
 // A quick script to extract values from the bins in a histogram and save them to a .csv file
+// Also plots a bunch of histograms too, outputs a pdf and some other plots (comment/uncomment as needed)
+// Execute via root -l 'BinExtractor.C("INPUT_FILE.root", "OUTPUT_NAME")'
 #define BinExtractor_cxx
           
 // Include relevant stuff
@@ -19,8 +22,11 @@
 #include <TArc.h>
 #include <TH1.h>
 #include <TLatex.h>
+#include <TLegend.h>
 
 void BinExtractor(string InFilename = "", string OutFilename = ""){
+
+  gROOT->SetBatch(kTRUE); // Force script to always run without flashing up graphics
   
   TString rootFile;
 
@@ -53,10 +59,43 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   TH1F* Q2Hists[8];
   TH1F* WHists[8];
   TH2F* Q2tHists[8];
+  TH2F* tvst_Q2_Hists[8];
   TH2F* taltvst_Q2_Hists[8];
+  TH1F* taltres_Hists[10]; // 22/02/22 - SJDK - t binned t resolution plots  
+  
+  TH2F* pipThetaTruthHist = (TH2F*)((TH2F*)InFile->Get("Pion_Truth_Info/piTrack_pTheta_Truth"));
+  TH2F* epThetaTruthHist = (TH2F*)((TH2F*)InFile->Get("Scattered_Electron_Truth_Info/eTrack_pTheta_Truth"));
+  TH2F* npThetaTruthHist = (TH2F*)((TH2F*)InFile->Get("Neutron_Truth_Info/nTrack_pTheta_Truth"));
 
   TH2F* Q2WHist = (TH2F*)((TH2F*)InFile->Get("Physics_Results_Misc/Q2_W_Result"));
-  TH2F* ZDCHist = (TH2F*)((TH2F*)InFile->Get("ZDC_XY"));
+  TH2F* piXYHist = (TH2F*)((TH2F*)InFile->Get("Pion_Info/pi_XY"));
+  TH2F* eXYHist = (TH2F*)((TH2F*)InFile->Get("Scattered_Electron_Info/e_XY"));
+  TH2F* ZDCHist;
+   
+  // SJDK - Check which ZDC hist exists, grab the one that does
+  if ( InFile->GetListOfKeys()->Contains("ZDC_XY_IP6")){ 
+    ZDCHist = (TH2F*)((TH2F*)InFile->Get("ZDC_XY_IP6"));
+  }
+  else{
+    ZDCHist = (TH2F*)((TH2F*)InFile->Get("ZDC_XY_IP8"));
+  }
+
+  TH2F* nThetaPhiDiff;
+  // 22/02/22 - SJDK - If the t binned t resolution plots exist, grab them
+  if (((TDirectory*)InFile->Get("ZDC_Neutron_Info"))->GetListOfKeys()->Contains("n_ThetaPhiDiff")){
+    nThetaPhiDiff = (TH2F*)((TH2F*)InFile->Get("ZDC_Neutron_Info/n_ThetaPhiDiff"));
+  }
+  else{
+    nThetaPhiDiff = new TH2F("h2_Empty_Plot", "No Plot", 100, -10, 10, 100, -10, 10);
+  }
+
+  // 22/02/22 - SJDK - If the t binned t resolution plots exist, grab them
+  if (((TDirectory*)InFile->Get("Physics_Results_Misc"))->GetListOfKeys()->Contains("taltres_result_ttruth_1")){
+    for(Int_t A = 0; A <10; A++){
+      taltres_Hists[A] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results_Misc/taltres_result_ttruth_%i",(A+1))));
+    }
+  }
+  
   TH1F* Q2EffHist = (TH1F*)((TH1F*)InFile->Get("Detection_Efficiency/Q2_DetEff"));
   TH2F* Q2tEffHist = (TH2F*)((TH2F*)InFile->Get("Detection_Efficiency/Q2_t_DetEff"));
   TH2F* Q2tEffHist_v2 = (TH2F*)((TH2F*)InFile->Get("Detection_Efficiency/Q2_t_DetEff_v2"));
@@ -70,19 +109,21 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   TH1F* Mmiss_comp_Hist = (TH1F*)((TH1F*)InFile->Get("Physics_Results_Misc/Mmiss_Comp_result"));
 
   TH1F* piRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_p"));
-  TH1F* piRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_px"));
-  TH1F* piRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_py"));
-  TH1F* piRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_pz"));
-
+  TH1F* piRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_p_{x}"));
+  TH1F* piRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_p_{y}"));
+  TH1F* piRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/piRes_p_{z}"));
   TH1F* eRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_p"));
-  TH1F* eRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_px"));
-  TH1F* eRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_py"));
-  TH1F* eRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_pz"));
- 
+  TH1F* eRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_p_{x}"));
+  TH1F* eRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_p_{y}"));
+  TH1F* eRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/eRes_p_{z}"));
   TH1F* nRes_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_p"));
-  TH1F* nRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_px"));
-  TH1F* nRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_py"));
-  TH1F* nRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_pz"));
+  TH1F* nRes_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_p_{x}"));
+  TH1F* nRes_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_p_{y}"));
+  TH1F* nRes_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/nRes_p_{z}"));
+  TH1F* pmissDiff_p_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/pmissDiff_p"));
+  TH1F* pmissDiff_px_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/pmissDiff_p_{x}"));
+  TH1F* pmissDiff_py_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/pmissDiff_p_{y}"));
+  TH1F* pmissDiff_pz_Hist = (TH1F*)((TH1F*)InFile->Get("Particle_Momenta_Resolution/pmissDiff_p_{z}"));
   
   for(Int_t A = 1; A <9; A++){
     tHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/t_cut_Result_Q2_%i",A)));
@@ -90,6 +131,7 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     Q2Hists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/Q2_cut_Result_Q2_%i",A)));
     WHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/W_cut_Result_Q2_%i",A)));
     Q2tHists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/Q2_t_cut_Result_Q2_%i",A)));
+    tvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_ttruth_Result_Q2_%i",A))); 
     taltvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_alt_ttruth_Result_Q2_%i",A))); 
   }
 
@@ -125,7 +167,7 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
       }
     }
   }
-
+  
   ofstream Outfile;
   TString Outpdf = TOutFilename+".pdf";
   Outfile.open(TOutFilename);
@@ -141,7 +183,7 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     Outfile << errors[A] << "\n";
   }
   
-  TCanvas *c_Output[15];
+  TCanvas *c_Output[17];
   for(Int_t A = 0; A < 8; A++){
     c_Output[A] = new TCanvas(Form("c_Output_%i", (A+1)), Form("Results_p%i", (A+1)), 100, 0, 1000, 900);
     c_Output[A]->Divide(3,2);
@@ -189,7 +231,7 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   c_Output[9]->cd(1);
   tvstHist->Draw("COLZ");
   c_Output[9]->cd(2);
-  t_altvstHist->Draw("COLZ");
+  t_altvstHist->GetXaxis()->SetRangeUser(0,0.4); t_altvstHist->Draw("COLZ");
   c_Output[9]->Print(Outpdf);
 
   c_Output[10] = new TCanvas("c_Output11", "Results_p11", 100, 0, 1000, 900);
@@ -239,16 +281,39 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   c_Output[13]->cd(4);
   nRes_pz_Hist->Draw("HISTERR");
   c_Output[13]->Print(Outpdf);
-
+  // Draw t-truth distributions
   c_Output[14] = new TCanvas("c_Output15", "Results_p15", 100, 0, 1000, 900);
   c_Output[14]->Divide(3,3);
   for(Int_t A = 0; A < 8; A++){
     c_Output[14]->cd(A+1);
     ttruthHists[A]->Draw("HISTERR");
   }
-  c_Output[14]->Print(Outpdf + ')');
-  
-  InFile->Close();  
-  Outfile.close();
+  c_Output[14]->Print(Outpdf);
+    
+  // Draw reconstructed t distributions with cuts
+  c_Output[15] = new TCanvas("c_Output16", "Results_p16", 100, 0, 1000, 900);
+  c_Output[15]->Divide(3,3);
+  for(Int_t A = 0; A < 8; A++){
+    c_Output[15]->cd(A+1);
+    tHists[A]->SetStats(0);
+    tHists[A]->Draw("HISTERR");
+  }
 
+  // 22/02/22 - SJDK -  Check if t binned t resolution plots exist, print if they do, if not, p15 is the end
+  if (((TDirectory*)InFile->Get("Physics_Results_Misc"))->GetListOfKeys()->Contains("taltres_result_ttruth_1")){
+    c_Output[15]->Print(Outpdf);
+    c_Output[16] = new TCanvas("c_Output17", "Results_p17", 100, 0, 1000, 900);
+    c_Output[16]->Divide(5,2);
+    for(Int_t A = 0; A < 10; A++){
+      c_Output[16]->cd(A+1);
+      taltres_Hists[A]->Draw("HISTERR");
+    }
+    c_Output[16]->Print(Outpdf + ')');
+  }
+  else{
+    c_Output[15]->Print(Outpdf + ')');
+  }
+  
+  InFile->Close();
+  Outfile.close();
 }
