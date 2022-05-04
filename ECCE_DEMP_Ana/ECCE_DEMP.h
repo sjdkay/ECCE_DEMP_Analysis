@@ -166,6 +166,7 @@ class ECCE_DEMP : public SubsysReco
   TLorentzVector virtphoton4Vect;
   TLorentzVector t4Vect;
   TLorentzVector t_alt4Vect;
+  TLorentzVector t_alt4Vect_ZDC;
   TLorentzVector pmiss4Vect;
   TLorentzVector virtphoton4VectTruth;
   TLorentzVector t4VectTruth;
@@ -198,6 +199,7 @@ class ECCE_DEMP : public SubsysReco
   Double_t W;
   Double_t t;
   Double_t t_alt;
+  Double_t t_alt_ZDC;
   Double_t xb;
   Double_t xi;
   Double_t Q2_truth;
@@ -212,6 +214,8 @@ class ECCE_DEMP : public SubsysReco
   Double_t Q2_low;
   Double_t Q2_high;
   Double_t Thetan_Cent; // Central thetan value to determine cuts from
+  Double_t ThetaDiff_Cut;
+  Double_t PhiDiff_Cut;
   // The Pmiss cut values are chosen a little arbitrarily, hard to judge w/o SIDIS to compare with
   // Cut will be anything ABOVE this value for each bin
   Double_t PmissCutVal[8] = {96.0, 93.5, 91.0, 87.0, 83.0, 80.0, 77.5, 75.0}; // Array to store Pmiss cut values in, 5on 100
@@ -253,6 +257,7 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_n_Phi;
   TH1F* h1_n_ThetaDiff;
   TH1F* h1_n_PhiDiff;
+  TH2F* h2_n_ThetaPhiDiff;
 
   TH1F* h1_nRec_px;
   TH1F* h1_nRec_py;
@@ -285,7 +290,7 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_n_Phi_Unweighted;
   TH1F* h1_n_ThetaDiff_Unweighted;
   TH1F* h1_n_PhiDiff_Unweighted;
-
+  TH2F* h2_n_ThetaPhiDiff_Unweighted;
 
   TH1F* h1_pmiss_px;
   TH1F* h1_pmiss_py;
@@ -418,6 +423,25 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_t_alt_ttruth_result_Q2[8];
   TH2F* h2_t_t_alt_result;
   TH2F* h2_Q2_t_result[8];
+
+  // Cut analysis plots
+  TH1F* h1_nTheta_tCut; // nTheta dist with just the -t cut
+  TH1F* h1_t_cut1_Low; // Just the -t cut
+  TH1F* h1_t_cut2_Low; // -t cut and theta n cut
+  TH1F* h1_t_cut3_Low; // -t cut, theta n cut, theta/phi diff cuts
+  TH1F* h1_t_cut4_Low; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
+  TH1F* h1_t_cut1_Mid; // Just the -t cut
+  TH1F* h1_t_cut2_Mid; // -t cut and theta n cut
+  TH1F* h1_t_cut3_Mid; // -t cut, theta n cut, theta/phi diff cuts
+  TH1F* h1_t_cut4_Mid; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
+  TH1F* h1_t_cut1_High; // Just the -t cut
+  TH1F* h1_t_cut2_High; // -t cut and theta n cut
+  TH1F* h1_t_cut3_High; // -t cut, theta n cut, theta/phi diff cuts
+  TH1F* h1_t_cut4_High; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
+
+  TH1F* h1_t_Resolution[8];
+  TH1F* h1_talt_Resolution_ZDC[8];
+  TH1F* h1_talt_Resolution_pMiss[8];
 
   PHParameters Enclosure_params{"PHGEnclosure"};
   PHParameters ZDC_params{"PHG4RP"};

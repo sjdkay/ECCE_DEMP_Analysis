@@ -230,6 +230,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_n_XY = new TH2F("n_XY", "n X vs Y at ZDC Dist; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
   h1_n_ThetaDiff = new TH1F("n_ThetaDiff", "#theta_{pMiss} - #theta_{ZDC}; #theta_{pMiss}-#theta_{ZDC}(Deg)", 100, -5, 5);
   h1_n_PhiDiff = new TH1F("n_PhiDiff", " #phi_{pMiss} - #phi_{ZDC}; #phi_{pMiss}-#phi_{ZDC}(Deg)", 200, -25, 25);
+  h2_n_ThetaPhiDiff = new TH2F("n_ThetaPhiDiff", "#theta_{pMiss} - #theta_{ZDC} vs #phi_{pMiss} - #phi_{ZDC}; #theta_{pMiss}-#theta_{ZDC}; #phi_{pMiss}-#phi_{ZDC}(Deg)",100, -5, 5, 200, -25, 25);
   gDirectory->cd("../");
 
   gDirectory->mkdir("ZDC_Neutron_Unweighted_Info");
@@ -243,6 +244,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_n_Phi_Unweighted = new TH1F("n_Phi_Unweighted", "n #phi Distribution (Unweighted); #phi (deg)", 360, -180, 180);
   h1_n_ThetaDiff_Unweighted = new TH1F("n_ThetaDiff_Unweighted", "#theta_{pMiss} - #theta_{ZDC} (Unweighted); #theta_{pMiss}-#theta_{ZDC}(Deg)", 100, -5, 5);
   h1_n_PhiDiff_Unweighted = new TH1F("n_PhiDiff_Unweighted", "#phi_{pMiss} - #phi_{ZDC} (Unweighted); #phi_{pMiss}-#phi_{ZDC}(Deg)", 200, -25, 25);
+  h2_n_ThetaPhiDiff_Unweighted = new TH2F("n_ThetaPhiDiff_Unweighted", "#theta_{pMiss} - #theta_{ZDC} vs #phi_{pMiss} - #phi_{ZDC} (Unweighted); #theta_{pMiss}-#theta_{ZDC}; #phi_{pMiss}-#phi_{ZDC}(Deg)",100, -5, 5, 200, -25, 25);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Reconstructed_Neutron_Info");
@@ -379,10 +381,43 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_Mmiss_Comp_result = new TH1F("Mmiss_Comp_result", "#Delta M_{Miss} Distribution; #Delta(M_{Miss}) (GeV/c^{2})", 100, -5, 5);
   h1_taltres_result = new TH1F("taltres_result", "t_{alt} - t_{truth} Dist; t_{alt} - t_{truth} (GeV^{2})", 100, -0.5, 0.5);
   for(Int_t A = 0; A < 10; A++){
-    h1_taltres_result_ttruth[A] = new TH1F(Form("taltres_result_ttruth_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.2f < t_{truth} < %2.2f; t_{alt} - t_{truth} (GeV^{2})", (0+(A*0.05)), (0.05+(A*0.05))), 100, -0.2, 0.2);
+    h1_taltres_result_ttruth[A] = new TH1F(Form("taltres_result_ttruth_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.2f < t_{truth} < %2.2f; t_{alt} - t_{truth} (GeV^{2})", (0+(A*0.05)), (0.05+(A*0.05))), 100, -0.3, 0.8);
   }
   h2_t_ttruth_result = new TH2F("t_ttruth_result", "-t vs -t_{truth} Dist; -t (GeV^{2}); -t_{truth} (GeV^{2})", 50, 0, 10, 50, 0, 0.5);
   h2_t_alt_ttruth_result = new TH2F("t_alt_ttruth_result", "-t_{alt} vs -t_{truth} Dist; -t_{alt} (GeV^{2}); -t_{truth} (GeV^{2})", 50, 0, 0.5, 50, 0, 0.5);
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("Cut_Analysis");
+  gDirectory->cd("Cut_Analysis");
+  h1_nTheta_tCut = new TH1F("nTheta_tCut", "n #theta Distribution (-t < 0.4); #theta (deg)", 500, 0, 5);
+  h1_t_cut1_Low = new TH1F("t_result_cut1_Low", "t dist 7.5 < Q^{2} < 10, t cut only; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut2_Low = new TH1F("t_result_cut2_Low", "t dist 7.5 < Q^{2} < 10, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
+ h1_t_cut3_Low = new TH1F("t_result_cut3_Low", "t dist 7.5 < Q^{2} < 10, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut4_Low = new TH1F("t_result_cut4_Low", "t dist 7.5 < Q^{2} < 10,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
+  h1_t_cut1_Mid = new TH1F("t_result_cut1_Mid", "t dist 15 < Q^{2} < 20, t cut only; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut2_Mid = new TH1F("t_result_cut2_Mid", "t dist 15 < Q^{2} < 20, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
+ h1_t_cut3_Mid = new TH1F("t_result_cut3_Mid", "t dist 15 < Q^{2} < 20, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut4_Mid = new TH1F("t_result_cut4_Mid", "t dist 15 < Q^{2} < 20,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
+  h1_t_cut1_High = new TH1F("t_result_cut1_High", "t dist 25 < Q^{2} < 30, t cut only; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut2_High = new TH1F("t_result_cut2_High", "t dist 25 < Q^{2} < 30, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
+ h1_t_cut3_High = new TH1F("t_result_cut3_High", "t dist 25 < Q^{2} < 30, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut4_High = new TH1F("t_result_cut4_High", "t dist 25 < Q^{2} < 30,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("t_Resolution");
+  gDirectory->cd("t_Resolution");
+  for(Int_t A = 0; A < 8; A++){
+    if ( A <= 1){
+      h1_t_Resolution[A]=new TH1F(Form("t_Resolution_Q2_%i", (A+1)), Form("t - t_{truth} Dist, %2.1f < Q^{2} < %2.1f;  t - t_{truth} (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 150, -5.5, 0.5);
+      h1_talt_Resolution_ZDC[A]=new TH1F(Form("talt_Resolution_ZDC_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.1f < Q^{2} < %2.1f, ZDC Info Only;  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, -0.5, 0.5);
+      h1_talt_Resolution_pMiss[A]=new TH1F(Form("talt_Resolution_pMiss_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.1f < Q^{2} < %2.1f, Corrected p_{Miss};  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, -0.5, 0.5);
+    }
+    else{
+      h1_t_Resolution[A]=new TH1F(Form("t_Resolution_Q2_%i", (A+1)), Form("t - t_{truth} Dist, %i < Q^{2} < %i;  t - t_{truth} (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 150, -5.5, 0.5);
+      h1_talt_Resolution_ZDC[A]=new TH1F(Form("talt_Resolution_ZDC_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %i < Q^{2} < %i, ZDC Info Only;  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 25, -0.5, 0.5);
+      h1_talt_Resolution_pMiss[A]=new TH1F(Form("talt_Resolution_pMiss_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %i < Q^{2} < %i, Corrected p_{Miss};  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 25, -0.5, 0.5);
+    }
+  }
 
   gDirectory->cd("../");
   h2_ZDC_XY_IP6 = new TH2F("ZDC_XY_IP6", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
@@ -400,7 +435,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 
   // Set cut values for physics analysis
   Thetan_Cent = 1.45; // Cut will be +/- 0.4 from this value
-
+  ThetaDiff_Cut = 0.6;
+  PhiDiff_Cut = 3.0;
   // In future, the value below should be determined more accurately - average value of all 100 files?
   if (e_beam_energy == 5){
     if (ion_beam_energy == 100){
@@ -641,11 +677,13 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 
     t4Vect = eBeam4Vect - (e4Vect+pi4Vect);
     t_alt4Vect= pBeam4Vect - nRec4Vect;
+    t_alt4Vect_ZDC = pBeam4Vect - n4Vect;
     pmiss4Vect_2 = (eBeam4Vect + pBeam4Vect) - (e4Vect+pi4Vect+nRec4Vect);
     Q2 = -1*(virtphoton4Vect.Mag2());
     W = (virtphoton4Vect+pBeam4Vect).Mag();
     t = -(t4Vect.Mag2());
     t_alt = -(t_alt4Vect.Mag2());
+    t_alt_ZDC = -(t_alt4Vect_ZDC.Mag2());
     xb =  Q2/(2*(pBeam4Vect.Dot(virtphoton4Vect)));
     xi = xb/(2-xb);
     
@@ -685,6 +723,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_nRec_Phi->Fill(nRec4Vect.Phi()*TMath::RadToDeg(), wgt);
     h1_n_ThetaDiff->Fill(nTheta_Diff*TMath::RadToDeg(), wgt);
     h1_n_PhiDiff->Fill(nPhi_Diff*TMath::RadToDeg(), wgt);
+    h2_n_ThetaPhiDiff->Fill(nTheta_Diff*TMath::RadToDeg(), nPhi_Diff*TMath::RadToDeg(), wgt);
 
     h1_pi_px_Unweighted->Fill(pi4Vect.Px());
     h1_pi_py_Unweighted->Fill(pi4Vect.Py());
@@ -708,8 +747,9 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_n_E_Unweighted->Fill(n4Vect.E());
     h1_n_Theta_Unweighted->Fill(n4Vect.Theta()*TMath::RadToDeg());
     h1_n_Phi_Unweighted->Fill(n4Vect.Phi()*TMath::RadToDeg());
-    h1_n_ThetaDiff->Fill(nTheta_Diff*TMath::RadToDeg());
-    h1_n_PhiDiff->Fill(nPhi_Diff*TMath::RadToDeg());
+    h1_n_ThetaDiff_Unweighted->Fill(nTheta_Diff*TMath::RadToDeg());
+    h1_n_PhiDiff_Unweighted->Fill(nPhi_Diff*TMath::RadToDeg());
+    h2_n_ThetaPhiDiff_Unweighted->Fill(nTheta_Diff*TMath::RadToDeg(), nPhi_Diff*TMath::RadToDeg());
 
     h1_pmiss_px->Fill(pmiss4Vect.Px(), wgt);
     h1_pmiss_py->Fill(pmiss4Vect.Py(), wgt);
@@ -773,30 +813,107 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	Q2_low = 5+((B-1)*5.0);
 	Q2_high = 10+((B-1)*5.0);
       }
+
+      // Fill some histograms under different cut conditions for comparison
+      // These are used for some plots Garth wanted
+      if (Q2_low == 7.5){
+	if ( Q2 > Q2_low && Q2 < Q2_high){
+	  if (t_alt < 0.4){ 
+	    h1_t_cut1_Low->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){ 
+	    h1_t_cut2_Low->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){ 
+	    h1_t_cut3_Low->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && (nRec4Vect.P() < PmissCutVal[B])){ 
+	    h1_t_cut4_Low->Fill(t_alt, wgt);	  
+	  }
+	}
+      }
+      else if (Q2_low == 15.0){
+	if ( Q2 > Q2_low && Q2 < Q2_high){
+	  if (t_alt < 0.4){ 
+	    h1_t_cut1_Mid->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){ 
+	    h1_t_cut2_Mid->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){ 
+	    h1_t_cut3_Mid->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && (nRec4Vect.P() < PmissCutVal[B])){ 
+	    h1_t_cut4_Mid->Fill(t_alt, wgt);	  
+	  }
+	}
+      }
+      else if (Q2_low == 25.0){
+	if ( Q2 > Q2_low && Q2 < Q2_high){
+	  if (t_alt < 0.4){ 
+	    h1_t_cut1_High->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){ 
+	    h1_t_cut2_High->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){ 
+	    h1_t_cut3_High->Fill(t_alt, wgt);
+	  }
+	  if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && (nRec4Vect.P() < PmissCutVal[B])){ 
+	    h1_t_cut4_High->Fill(t_alt, wgt);	  
+	  }
+	}
+      }
+      // nTheta distribution with the t cut only
+      if(t_alt < 0.4){
+	h1_nTheta_tCut->Fill(nRec4Vect.Theta()*TMath::RadToDeg(), wgt);
+      }
+      
+      // t resolution plots under different conditions - we treat each different t value as though it is the "true" value of t
       if ( Q2 > Q2_low && Q2 < Q2_high){
-	h1_t_result[B]->Fill(t_alt, wgt);
-	h1_nTheta_result[B]->Fill(nRec4Vect.Theta()*TMath::RadToDeg(), wgt);
-	h1_pmiss_result[B]->Fill(pmiss4Vect.P(), wgt);
-	h1_pn_result[B]->Fill(nRec4Vect.P(), wgt);
-	// Apply other cuts
-	//if ( (pmiss4Vect.P() < PmissCutVal[B]) && ((nSmeared4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nSmeared4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){
-	// SJDK - 31/03/22
-	// nRec4Vect is EXACTLY the missing momentum vector for now, so comparing it to the pmiss cut value is fine
-	if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){
-	h1_t_cut_result[B]->Fill(t_alt, wgt);
-	h1_Q2_cut_result[B]->Fill(Q2, wgt);
-	h1_W_cut_result[B]->Fill(W, wgt);
-	h2_t_ttruth_result->Fill(t, t_truth, wgt);
-	h2_t_alt_ttruth_result->Fill(t_alt, t_truth, wgt);
-	h1_Mmiss_result->Fill(pmiss4Vect_2.M(),wgt);
-	h1_MmissSq_result->Fill(((pmiss4Vect_2.M()*(pmiss4Vect_2.M()))),wgt);
-	h1_Mmiss_truth_result->Fill(pmiss4VectTruth_2.M(),wgt);
-	h1_Mmiss_Comp_result->Fill((pmiss4VectTruth_2.M()-pmiss4Vect_2.M()), wgt);
-	h2_t_t_alt_result->Fill(t, t_alt, wgt);
-	h2_Q2_W_result->Fill(Q2, W, wgt);
-	h2_Q2_t_result[B]->Fill(Q2, t_alt, wgt);
-	h2_t_ttruth_result_Q2[B]->Fill(t, t_truth, wgt);
-	h2_t_alt_ttruth_result_Q2[B]->Fill(t_alt, t_truth, wgt);
+	if ( (pmiss4Vect.P() < PmissCutVal[B]) && ((pmiss4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (pmiss4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && t < 0.4){
+	  h1_t_Resolution[B]->Fill(t-t_truth, wgt);
+	}
+      }
+      if ( Q2 > Q2_low && Q2 < Q2_high){
+	if ( (n4Vect.P() < PmissCutVal[B]) && ((n4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (n4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && t_alt_ZDC < 0.4){
+	  h1_talt_Resolution_ZDC[B]->Fill(t_alt_ZDC-t_truth, wgt);
+	}
+      }
+      if ( Q2 > Q2_low && Q2 < Q2_high){
+	if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && t_alt < 0.4){
+	  h1_talt_Resolution_pMiss[B]->Fill(t_alt-t_truth, wgt);
+	}
+      }
+
+      // The main analysis is below
+      if ( Q2 > Q2_low && Q2 < Q2_high){
+	if (t_alt < 0.4){
+	  h1_t_result[B]->Fill(t_alt, wgt);
+	  h1_nTheta_result[B]->Fill(nRec4Vect.Theta()*TMath::RadToDeg(), wgt);
+	  h1_pmiss_result[B]->Fill(pmiss4Vect.P(), wgt);
+	  h1_pn_result[B]->Fill(nRec4Vect.P(), wgt);
+	  // Apply other cuts
+	  //if ( (pmiss4Vect.P() < PmissCutVal[B]) && ((nSmeared4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nSmeared4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){
+	  // SJDK - 31/03/22
+	  // nRec4Vect is EXACTLY the missing momentum vector for now, so comparing it to the pmiss cut value is fine
+	  //if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){ // Old version without theta/phi diff cuts
+	  if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){
+	    h1_t_cut_result[B]->Fill(t_alt, wgt);
+	    h1_Q2_cut_result[B]->Fill(Q2, wgt);
+	    h1_W_cut_result[B]->Fill(W, wgt);
+	    h2_t_ttruth_result->Fill(t, t_truth, wgt);
+	    h2_t_alt_ttruth_result->Fill(t_alt, t_truth, wgt);
+	    h1_Mmiss_result->Fill(pmiss4Vect_2.M(),wgt);
+	    h1_MmissSq_result->Fill(((pmiss4Vect_2.M()*(pmiss4Vect_2.M()))),wgt);
+	    h1_Mmiss_truth_result->Fill(pmiss4VectTruth_2.M(),wgt);
+	    h1_Mmiss_Comp_result->Fill((pmiss4VectTruth_2.M()-pmiss4Vect_2.M()), wgt);
+	    h2_t_t_alt_result->Fill(t, t_alt, wgt);
+	    h2_Q2_W_result->Fill(Q2, W, wgt);
+	    h2_Q2_t_result[B]->Fill(Q2, t_alt, wgt);
+	    h2_t_ttruth_result_Q2[B]->Fill(t, t_truth, wgt);
+	    h2_t_alt_ttruth_result_Q2[B]->Fill(t_alt, t_truth, wgt);
+	  }
 	}
       }
     }
@@ -960,7 +1077,25 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
     h2_Q2_t_result[C]->Scale((1/ScalingFact));
     h2_t_ttruth_result_Q2[C]->Scale((1/ScalingFact));
     h2_t_alt_ttruth_result_Q2[C]->Scale((1/ScalingFact));
+    h1_t_Resolution[C]->Scale((1/ScalingFact));
+    h1_talt_Resolution_ZDC[C]->Scale((1/ScalingFact));
+    h1_talt_Resolution_pMiss[C]->Scale((1/ScalingFact));
   }
+
+  h1_nTheta_tCut->Scale((1/ScalingFact));
+  h1_t_cut1_Low->Scale((1/ScalingFact));
+  h1_t_cut2_Low->Scale((1/ScalingFact));
+  h1_t_cut3_Low->Scale((1/ScalingFact));
+  h1_t_cut4_Low->Scale((1/ScalingFact));
+  h1_t_cut1_Mid->Scale((1/ScalingFact));
+  h1_t_cut2_Mid->Scale((1/ScalingFact));
+  h1_t_cut3_Mid->Scale((1/ScalingFact));
+  h1_t_cut4_Mid->Scale((1/ScalingFact));
+  h1_t_cut1_High->Scale((1/ScalingFact));
+  h1_t_cut2_High->Scale((1/ScalingFact));
+  h1_t_cut3_High->Scale((1/ScalingFact));
+  h1_t_cut4_High->Scale((1/ScalingFact));
+
   outfile->cd();
   outfile->Write();
   outfile->Close();
@@ -1005,7 +1140,8 @@ float ECCE_DEMP::ZDC_Energy_Smear_HCAL(float E) {
 
   float resolution, E_reco;
 
-  resolution = sqrt(.5*.5/E + 0.1*0.1); // YR Resolution
+  //resolution = sqrt(.5*.5/E + 0.1*0.1); // YR Resolution
+  resolution = sqrt(.45*.45/E + 0.042*0.042); // Updated Resolution
   //resolution = 0.25/sqrt(E); // Test 25% over sqrt E resolution
   E_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * E;
 
@@ -1031,7 +1167,7 @@ float ECCE_DEMP::ZDC_Position_Smear(float P) {
 
   float resolution, P_reco;
 
-  resolution = 0.1;         /// Position resolution 0.1 cm
+  resolution = 0.15;         /// Position resolution 0.15 cm
   P_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * P;
 
   return P_reco;
