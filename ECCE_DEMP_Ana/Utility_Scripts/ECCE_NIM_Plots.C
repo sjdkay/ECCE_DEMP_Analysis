@@ -21,11 +21,12 @@
 #include <TH1.h>
 #include <TLatex.h>
 #include <TLegend.h>
+#include "ECCEStyle.C"
 
 void ECCE_NIM_Plots(string InFilename = ""){
 
   gROOT->SetBatch(kTRUE); // Force script to always run without flashing up graphics
-  
+  gROOT->ProcessLine("SetECCEStyle()");
   TString rootFile;
 
   if(InFilename == ""){
@@ -128,6 +129,7 @@ void ECCE_NIM_Plots(string InFilename = ""){
     taltvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_alt_ttruth_Result_Q2_%i",A))); 
   }
     
+
   // Section below is for tech note/presentation plots
   
   // TCanvas *c_piXY = new TCanvas("c_piXY", "Pion XY Dist at HCal", 100, 0, 2560, 1920);
@@ -135,8 +137,10 @@ void ECCE_NIM_Plots(string InFilename = ""){
   // TCanvas *c_eXY = new TCanvas("c_eXY", "Electron XY Dist at EMCal", 100, 0, 2560, 1920);
   // eXYHist->SetStats(0); eXYHist->GetXaxis()->SetTitle("x (cm)"); eXYHist->GetYaxis()->SetTitle("y (cm)"); eXYHist->Draw("COLZ"); c_eXY->Print("TechNote_Plots/eXY_5on100.png");
   TCanvas *c_nXY = new TCanvas("c_nXY", "Neutron XY Dist at ZDC HCal", 100, 0, 2560, 1920);
-  ZDCHist->SetStats(0); ZDCHist->SetTitle(""); ZDCHist->GetXaxis()->SetTitle("x (cm)"); ZDCHist->GetYaxis()->SetTitle("y (cm)"); ZDCHist->Draw("COLZ");
-  ZDCHist->GetZaxis()->SetLabelSize(0.03); ZDCHist->GetZaxis()->SetLabelOffset(0); ZDCHist->Draw("COLZ"); c_nXY->Print("ECCE_NIM_Plots/nXY_5on100.png"); c_nXY->Print("ECCE_NIM_Plots/nXY_5on100.pdf");
+  
+  ZDCHist->GetXaxis()->SetTitle("x (cm)"); ZDCHist->GetYaxis()->SetTitle("y (cm)"); ZDCHist->Draw("COLZ");
+  c_nXY->Print("ECCE_NIM_Plots/nXY_5on100.png"); c_nXY->Print("ECCE_NIM_Plots/nXY_5on100.pdf");
+  // ZDCHist->GetZaxis()->SetLabelSize(0.03); ZDCHist->GetZaxis()->SetLabelOffset(0); ZDCHist->SetStats(0); ZDCHist->SetTitle(""); // No longer needed due to ECCE style file
   // TCanvas *c_pipTh = new TCanvas("c_pipTh", "Pion Truth p vs Theta", 100, 0, 2560, 1920);
   // pipThetaTruthHist->SetStats(0); pipThetaTruthHist->GetXaxis()->SetTitle("#theta (Deg)"); pipThetaTruthHist->GetYaxis()->SetTitle("P (GeV/c)"); pipThetaTruthHist->Draw("COLZ"); c_pipTh->Print("TechNote_Plots/pipTh_5on100.png");
   // TCanvas *c_epTh = new TCanvas("c_epTh", "Electron Truth p vs Theta", 100, 0, 2560, 1920);
@@ -149,12 +153,15 @@ void ECCE_NIM_Plots(string InFilename = ""){
   // TCanvas *c_taltvstt = new TCanvas("c_taltvstt", "t alt vs t truth", 100, 0, 2560, 1920);
   // t_altvstHist->SetStats(0); t_altvstHist->SetTitle(""); t_altvstHist->Draw("COLZ"); c_taltvstt->Print("ECCE_NIM_Plots/taltvstt_5on100.png"); c_taltvstt->Print("ECCE_NIM_Plots/taltvstt_5on100.pdf");
   TCanvas *c_tvstt = new TCanvas("c_tvstt", "t vs t truth", 100, 0, 2560, 1920); 
-  tvstHist->SetStats(0); tvstHist->SetTitle(""); tvstHist->Draw("COLZ"); c_tvstt->Print("ECCE_NIM_Plots/tvstt_5on100.png"); c_tvstt->Print("ECCE_NIM_Plots/tvstt_5on100.pdf");
+  tvstHist->Draw("COLZ"); c_tvstt->Print("ECCE_NIM_Plots/tvstt_5on100.png"); c_tvstt->Print("ECCE_NIM_Plots/tvstt_5on100.pdf");
+  // tvstHist->SetStats(0); tvstHist->SetTitle(""); // No longer need due to ECCE style file
   TCanvas *c_taltvstt = new TCanvas("c_taltvstt", "t alt vs t truth", 100, 0, 2560, 1920);
-  t_altvstHist->SetStats(0); t_altvstHist->GetXaxis()->SetRangeUser(0,0.4); t_altvstHist->SetTitle(""); t_altvstHist ->Draw("COLZ"); c_taltvstt->Print("ECCE_NIM_Plots/taltvstt_5on100.png"); c_taltvstt->Print("ECCE_NIM_Plots/taltvstt_5on100.pdf");
-  
+  t_altvstHist->GetXaxis()->SetRangeUser(0,0.4); t_altvstHist ->Draw("COLZ"); c_taltvstt->Print("ECCE_NIM_Plots/taltvstt_5on100.png"); c_taltvstt->Print("ECCE_NIM_Plots/taltvstt_5on100.pdf");
+   // t_altvstHist->SetStats(0); t_altvstHist->SetTitle(""); // No longer needed due to ECCE style file
   TCanvas *c_Q2tEff = new TCanvas("c_Q2tEff", "Q2 vs t Detection Efficiency", 100, 0, 2560, 1920);
-  Q2tEffHist_v2->SetStats(0); Q2tEffHist_v2->SetTitle(""); Q2tEffHist_v2->GetXaxis()->SetTitle("Q^{2} (GeV/c^{2})"); Q2tEffHist_v2->GetYaxis()->SetTitle("-t (GeV^{2})"); Q2tEffHist_v2->Draw("COLZ");
+  // Q2tEffHist_v2->SetStats(0); Q2tEffHist_v2->SetTitle(""); // No longer needed due to ECCE style file
+  Q2tEffHist_v2->GetXaxis()->SetTitle("Q^{2} (GeV/c^{2})"); Q2tEffHist_v2->GetYaxis()->SetTitle("-t (GeV^{2})");
+  Q2tEffHist_v2->Draw("COLZ");
   c_Q2tEff->Print("ECCE_NIM_Plots/Q2tEff_5on100.png"); c_Q2tEff->Print("ECCE_NIM_Plots/Q2tEff_5on100.pdf");
   // TCanvas *c_pmissDiffp = new TCanvas("c_pmissDiffp", "Pmiss vs Neutron P Truth", 100, 0, 2560, 1920);
   // pmissDiff_p_Hist->SetStats(0); pmissDiff_p_Hist->Draw("HISTERR"); c_pmissDiffp->Print("TechNote_Plots/pmissDiffp_5on100.png");
@@ -172,28 +179,32 @@ void ECCE_NIM_Plots(string InFilename = ""){
   c_Q2tbinned_rates_v1->Divide(3,3);
   for(Int_t A = 0; A < 8; A++){
     c_Q2tbinned_rates_v1->cd(A+1);
-    Q2Labels[A] = new TLegend(0.65, 0.65, 0.85, 0.85);
+    Q2Labels[A] = new TLegend(0.65, 0.7, 0.85, 0.9);
     Q2Labels[A]->SetHeader(Q2LabelsInfo[A], "C");
     Q2Labels[A]->SetBorderSize(0); Q2Labels[A]->SetFillStyle(0); // Remove the borders and make the legend box transparent
     Q2Labels[A]->SetTextSize(0.06);
-    tHists[A]->GetXaxis()->SetLabelSize(0.05); tHists[A]->GetXaxis()->SetTitleOffset(1.20);
-    tHists[A]->GetYaxis()->SetNdivisions(5,5,0); tHists[A]->GetYaxis()->SetMaxDigits(2); tHists[A]->GetYaxis()->SetLabelSize(0.05); tHists[A]->GetYaxis()->SetTitleOffset(1.20); // Tweak ticks and labelling on the Y axis
-    tHists[A]->SetTitle(""); tHists[A]->SetLineWidth(2);
+    //tHists[A]->GetXaxis()->SetLabelSize(0.05); tHists[A]->GetXaxis()->SetTitleOffset(1.20); // No longer needed due to ECCE style file
+    //tHists[A]->GetYaxis()->SetNdivisions(5,5,0); tHists[A]->GetYaxis()->SetMaxDigits(2); tHists[A]->GetYaxis()->SetLabelSize(0.05); tHists[A]->GetYaxis()->SetTitleOffset(1.20); // Tweak ticks and labelling on the Y axis // No longer needed due to ECCE style file
     //tHists[A]->GetXaxis()->SetTitle(""); tHists[A]->GetYaxis()->SetTitle("");// Optional - Disable titles, have to then be written on manually to the .png
-    tHists[A]->SetStats(0); tHists[A]->Draw("HISTERR"); Q2Labels[A]->Draw("SAME");
+    //tHists[A]->SetTitle(""); tHists[A]->SetLineWidth(2); tHists[A]->SetStats(0); // No longer needed due to ECCE style file
+    tHists[A]->Draw("HISTERR"); Q2Labels[A]->Draw("SAME");
   }
 
   c_Q2tbinned_rates_v1->cd(9);  
-  InfoDump.DrawLatex(.2,.8,"L = 10^{34} cm^{-2}s^{-1}");
-  InfoDump.DrawLatex(.2,.7,"assumed in rate");
-  InfoDump.DrawLatex(.2,.6,"calculation");
+  InfoDump.DrawLatex(.2,.8,"#it{#bf{ECCE}} Simulation");
+  InfoDump.DrawLatex(.2,.7,"e+p 5+100 GeV");
+  InfoDump.DrawLatex(.2,.6,"L = 10^{34} cm^{-2}s^{-1}");
+  InfoDump.DrawLatex(.2,.5,"assumed in rate");
+  InfoDump.DrawLatex(.2,.4,"calculation");
   c_Q2tbinned_rates_v1->Print("ECCE_NIM_Plots/Q2t_rates_v1_5on100.png"); c_Q2tbinned_rates_v1->Print("ECCE_NIM_Plots/Q2t_rates_v1_5on100.pdf");
    
   TCanvas *c_nResp = new TCanvas("c_nResp", "Neutron p Resolution", 100, 0, 2560, 1920);
-  nRes_p_Hist->SetStats(0); nRes_p_Hist->SetTitle(""); nRes_p_Hist->GetXaxis()->SetRangeUser(-3, 3); nRes_p_Hist->GetXaxis()->SetTitle("#frac{#Delta p_{n}}{p_{ntruth}} (%)"); nRes_p_Hist->GetYaxis()->SetTitle("Rate (Hz)");
-  nRes_p_Hist->GetXaxis()->SetTitleOffset(1.05); nRes_p_Hist->GetXaxis()->SetLabelSize(0.05); // Tweaks to X axis
-  nRes_p_Hist->GetYaxis()->SetTitleOffset(1.0); nRes_p_Hist->GetYaxis()->SetTitleSize(0.05); nRes_p_Hist->GetYaxis()->SetLabelSize(0.05); // Tweaks to y-axis
-  nRes_p_Hist->SetLineWidth(2);
+  nRes_p_Hist->GetXaxis()->SetRangeUser(-3, 3); nRes_p_Hist->GetXaxis()->SetTitle("#Delta p_{n}/p_{ntruth} (%)"); nRes_p_Hist->GetYaxis()->SetTitle("Rate (Hz)");
+  // Commented lines no longer needed due to switch to ECCE style file
+  //nRes_p_Hist->SetStats(0); nRes_p_Hist->SetTitle(""); 
+  //nRes_p_Hist->GetXaxis()->SetTitleOffset(1.05); nRes_p_Hist->GetXaxis()->SetLabelSize(0.05); // Tweaks to X axis
+  //nRes_p_Hist->GetYaxis()->SetTitleOffset(1.0); nRes_p_Hist->GetYaxis()->SetTitleSize(0.05); nRes_p_Hist->GetYaxis()->SetLabelSize(0.05); // Tweaks to y-axis
+  //nRes_p_Hist->SetLineWidth(2);
   nRes_p_Hist->Draw("HISTERR");
   c_nResp->Print("ECCE_NIM_Plots/nRes_p_5on100.png"); c_nResp->Print("ECCE_NIM_Plots/nRes_p_5on100.pdf");
 
@@ -332,12 +343,14 @@ void ECCE_NIM_Plots(string InFilename = ""){
 
   // Comparison of SIDIS BG with DEMP neutrons
   TCanvas *c_SIDISComp = new TCanvas("c_SIDISComp", "DEMP vs SIDIS Comparison", 100, 0, 2560, 1920);
-  pn_Dist[3]->SetStats(0); pn_Dist[3]->SetTitle(""); pn_Dist[3]->GetXaxis()->SetTitle("DEMP p_{n}, SIDIS p_{miss} (GeV/c)"); pn_Dist[3]->GetYaxis()->SetTitle("Arbitrary Scale"); // Set titles
-  pn_Dist[3]->SetMinimum(0.); SIDIS_pMiss_Dist->SetLineColor(2); SIDIS_pMiss_Dist->SetLineWidth(2);
+  pn_Dist[3]->GetXaxis()->SetTitle("DEMP p_{n}, SIDIS p_{miss} (GeV/c)"); pn_Dist[3]->GetYaxis()->SetTitle("Arbitrary Scale"); // Set titles
+  pn_Dist[3]->SetMinimum(0.); SIDIS_pMiss_Dist->SetLineColor(2);
+  //pn_Dist[3]->SetStats(0); pn_Dist[3]->SetTitle(""); SIDIS_pMiss_Dist->SetLineWidth(2); // No longer needed due to ECCE style file
   pn_Dist[3]->Draw("HIST"); SIDIS_pMiss_Dist->Draw("SAMEHIST"); // Set y axis to go from 0, set colour of SIDIS to red, draw both
-  TLegend *SIDISCompLegend = new TLegend(0.20, 0.60, 0.50, 0.75); // Define legend
+  TLegend *SIDISCompLegend = new TLegend(0.175, 0.60, 0.475, 0.75); // Define legend
   SIDISCompLegend->AddEntry(pn_Dist[3], "DEMP Neutron Momentum", "l"); SIDISCompLegend->AddEntry(SIDIS_pMiss_Dist, "SIDIS Missing Momentum", "l"); // Add entries to legend
-  SIDISCompLegend->SetBorderSize(0); SIDISCompLegend->SetFillStyle(0); SIDISCompLegend->SetTextSize(0.04);
+  SIDISCompLegend->SetBorderSize(0); SIDISCompLegend->SetFillStyle(0);
+  //SIDISCompLegend->SetTextSize(0.04);
   SIDISCompLegend->Draw("SAME");// Draw legend
   c_SIDISComp->Print("ECCE_NIM_Plots/SIDIS_Comp.png"); c_SIDISComp->Print("ECCE_NIM_Plots/SIDIS_Comp.pdf"); // Print to file
 
