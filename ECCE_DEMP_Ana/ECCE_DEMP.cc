@@ -673,7 +673,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     nRecPMag = nRec4Vect.P();
     nRecTheta = nRec4Vect.Theta();
     nRecPhi = nRec4Vect.Phi();
-    nRecZDCPos.SetXYZ(nRecZDCPos.Z()*tan(nRecPhi)*cos(nRecTheta), nRecZDCPos.Z()*tan(nRecPhi)*sin(nRecTheta), nRecZDCPos.Z()); // Assume Z position from ZDC is true.
+    nRecZDCPos.SetXYZ(nRecZDCPos.Z()*tan(nRecTheta)*cos(nRecPhi), nRecZDCPos.Z()*tan(nRecTheta)*sin(nRecPhi), nRecZDCPos.Z()); // Assume Z position from ZDC is true.
 
     t4Vect = eBeam4Vect - (e4Vect+pi4Vect);
     t_alt4Vect= pBeam4Vect - nRec4Vect;
@@ -953,9 +953,11 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_pmissDiff_px->Fill(pmiss4Vect.Px()-n4VectTruth.Px(), wgt);
     h1_pmissDiff_py->Fill(pmiss4Vect.Py()-n4VectTruth.Py(), wgt);
     h1_pmissDiff_pz->Fill(pmiss4Vect.Pz()-n4VectTruth.Pz(), wgt);
-
+    
+    // SJDK 30/05/22 The 375 used here is the approximate z position of the central barrel calorimeter in cm. This projects the tracks to that position (since the calorimeter hits didn't work)
+    // This isn't exactly coded fantastically, I think this was just here to make a quick plot at one point
     h2_pi_XY->Fill((375*(TMath::Cos(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), (375*(TMath::Sin(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), wgt);
-    h2_e_XY->Fill((200*(TMath::Cos(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), (375*(TMath::Sin(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), wgt);
+    h2_e_XY->Fill((375*(TMath::Cos(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), (375*(TMath::Sin(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), wgt);
     if ( IP_design == "IP6"){
       h2_ZDC_XY_IP6->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
     }
