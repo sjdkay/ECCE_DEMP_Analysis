@@ -1,7 +1,7 @@
 // Tell emacs that this is a C++ source
 //  -*- C++ -*-.
-#ifndef ECCE_DEMP_ANA_H
-#define ECCE_DEMP_ANA_H
+#ifndef ECCE_DEMP5on41_ANA_H
+#define ECCE_DEMP5on41_ANA_H
 
 #include <fun4all/SubsysReco.h>
 
@@ -16,6 +16,9 @@
 #include "TLorentzVector.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
+#include "TProfile2D.h"
+#include "TCanvas.h"
 
 #include <pdbcalbase/PdbParameterMap.h>
 #include <phparameter/PHParameters.h>
@@ -26,13 +29,13 @@ class TFile;
 class TNtuple;
 class JetEvalStack;
 
-class ECCE_DEMP : public SubsysReco
+class ECCE_DEMP5on41 : public SubsysReco
 {
  public:
 
-  ECCE_DEMP(const std::string &name = "ECCE_DEMP", const std::string &fname = "MyNtuple.root");
+  ECCE_DEMP5on41(const std::string &name = "ECCE_DEMP5on41", const std::string &fname = "MyNtuple.root");
 
-  virtual ~ECCE_DEMP();
+  virtual ~ECCE_DEMP5on41();
 
   /** Called during initialization.
       Typically this is where you can book histograms, and e.g.
@@ -218,20 +221,27 @@ class ECCE_DEMP : public SubsysReco
   Double_t PhiDiff_Cut;
   // The Pmiss cut values are chosen a little arbitrarily, hard to judge w/o SIDIS to compare with
   // Cut will be anything ABOVE this value for each bin
-  Double_t PmissCutVal[8] = {96.0, 93.5, 91.0, 87.0, 83.0, 80.0, 77.5, 75.0}; // Array to store Pmiss cut values in, 5on 100
+  Double_t PmissCutVal[19] = {38.0, 37.5, 38.75, 38.75, 38.5, 38.25, 38.0, 38.0, 37.75, 37.5, 37.0, 36.5, 36.5, 36.0, 35.25, 34.5, 34.0, 33.5, 32.5}; // Array to store Pmiss cut values in - mfek 06/21/2022 changed for 5 on 41
+  Double_t Q2BinVal[20] = {2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 17.5, 20.0, 22.5, 25.0, 27.5, 30.0}; // mfek 06/21/2022 - new binning
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
   // Histograms for coincidence analysis routine
   TH1F* h1_Q2_DetEff_Uncut;
   TH1F* h1_Q2_DetEff_Cut;
+  TH1F* h1_Q2_DetEff_Missed; // mfek 06/02/2022
   TH1F* h1_Q2_DetEff;
+  TH1F* h1_Q2_DetEff_MissedThrown; // mfek 06/02/2022
   TH2F* h2_Q2_t_DetEff_Uncut;
   TH2F* h2_Q2_t_DetEff_Cut;
   TH2F* h2_Q2_t_DetEff;
+  TH2F* h2_Q2_t_DetEff_Missed; // mfek 06/02/2022
+  TH2F* h2_Q2_t_DetEff_MissedThrown; // mfek 06/02/2022
   TH2F* h2_Q2_t_DetEff_v2_Uncut;
   TH2F* h2_Q2_t_DetEff_v2_Cut;
   TH2F* h2_Q2_t_DetEff_v2;
+  TH2F* h2_Q2_t_DetEff_Missed_v2; // mfek 06/02/2022
+  TH2F* h2_Q2_t_DetEff_MissedThrown_v2; // mfek 06/02/2022
 
   // 1D distributions for each particle
   TH1F* h1_pi_px;
@@ -309,6 +319,7 @@ class ECCE_DEMP : public SubsysReco
 
   TH2F* h2_pi_XY;
   TH2F* h2_e_XY;
+  TH2F* h2_e_XY2;
   TH2F* h2_n_XY;
   
   TH1F* h1_Q2_Dist;
@@ -345,6 +356,65 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTruth_pz;
   TH1F* h1_nTruth_E;
   TH1F* h1_nTruth_Theta;
+
+  // Particle Truth Info Pre-Cut - mfek 05/27/2022
+  TH1F* h1_piTruth_preCut_p;
+  TH1F* h1_piTruth_preCut_px;
+  TH1F* h1_piTruth_preCut_py;
+  TH1F* h1_piTruth_preCut_pz;
+  TH1F* h1_piTruth_preCut_E;
+  TH1F* h1_eTruth_preCut_p;
+  TH1F* h1_eTruth_preCut_px;
+  TH1F* h1_eTruth_preCut_py;
+  TH1F* h1_eTruth_preCut_pz;
+  TH1F* h1_eTruth_preCut_E;
+  TH1F* h1_nTruth_preCut_p;
+  TH1F* h1_nTruth_preCut_px;
+  TH1F* h1_nTruth_preCut_py;
+  TH1F* h1_nTruth_preCut_pz;
+  TH1F* h1_nTruth_preCut_E;
+  TH1F* h1_nTruth_preCut_Theta;
+  TH1F* h1_nTruth_preCut_Theta_inRange;
+  TH2F* h2_nTruth_preCut_XY;
+  TH2F* h2_nTruth_preCut_XY_inZDC;
+  TH2F* h2_nTruth_preCut_XY_outZDC;
+  TH2F* h2_nTruth_XY_hits;
+
+  // Particle Truth info for Missed Events - mfek 06/02/2022
+  TH1F* h1_piTruth_Missed_p;
+  TH1F* h1_piTruth_Missed_px;
+  TH1F* h1_piTruth_Missed_py;
+  TH1F* h1_piTruth_Missed_pz;
+  TH1F* h1_piTruth_Missed_E;
+  TH1F* h1_piTruth_Missed_Theta;
+  TH1F* h1_piTruth_Missed_Phi;
+
+  TH1F* h1_eTruth_Missed_p;
+  TH1F* h1_eTruth_Missed_px;
+  TH1F* h1_eTruth_Missed_py;
+  TH1F* h1_eTruth_Missed_pz;
+  TH1F* h1_eTruth_Missed_E;
+  TH1F* h1_eTruth_Missed_Theta;
+  TH1F* h1_eTruth_Missed_Phi;
+
+  TH1F* h1_nTruth_Missed_p;
+  TH1F* h1_nTruth_Missed_px;
+  TH1F* h1_nTruth_Missed_py;
+  TH1F* h1_nTruth_Missed_pz;
+  TH1F* h1_nTruth_Missed_E;
+  TH1F* h1_nTruth_Missed_Theta;
+  TH1F* h1_nTruth_Missed_Theta_inRange;
+  TH1F* h1_nTruth_Missed_Phi;
+
+  TH2F* h2_nTruth_Missed_XY;
+
+  TH1F* h1_Q2Truth_Dist_Missed;
+  TH1F* h1_tTruth_Dist_Missed;
+
+  Double_t max_X;
+  Double_t min_X;
+  Double_t max_Y;
+  Double_t min_Y;
 
   // Particle Resolution histograms
   TH1F* h1_piRes_p;
@@ -390,14 +460,14 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_nTruth_pypz;
   
   // 1D Kinematic analysis plots
-  TH1F* h1_t_Q2[7];
-  TH1F* h1_t_alt_Q2[7];
+  TH1F* h1_t_Q2[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_t_alt_Q2[19]; // mfek 06/21/2022 - changed binning for 5 on 41
 
   // 2D Kinematic analysis plots
   TH2F* h2_t_ep;
   TH2F* h2_t_Q2;
   TH2F* h2_delta_t_t;
-  TH2F* h2_delta_t_t_Q2[7];
+  TH2F* h2_delta_t_t_Q2[19]; // mfek 06/21/2022 - changed binning for 5 on 41
 
   // 1D Physics results plots
   TH1F* h1_Mmiss_result;
@@ -406,25 +476,23 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_Mmiss_Comp_result;
   TH1F* h1_taltres_result;
   TH1F* h1_taltres_result_ttruth[10]; // Binned in t_truth
-  TH1F* h1_t_result[8];
-  TH1F* h1_t_truth_thrown_result[8];
-  TH1F* h1_nTheta_result[8];
-  TH1F* h1_pmiss_result[8];
-  TH1F* h1_pn_result[8];
-  TH1F* h1_t_cut_result[8];
-  TH1F* h1_Q2_cut_result[8];
-  TH1F* h1_W_cut_result[8];
+  TH1F* h1_t_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_t_truth_thrown_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_nTheta_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_pmiss_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41 
+  TH1F* h1_pn_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41 
+  TH1F* h1_t_cut_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41 
+  TH1F* h1_Q2_cut_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_W_cut_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41
 
   // 2D Physics Results Plots
   TH2F* h2_Q2_W_result;
   TH2F* h2_t_ttruth_result;
   TH2F* h2_t_alt_ttruth_result;
-  TH2F* h2_t_ttruth_result_Q2[8];
-  TH2F* h2_t_alt_ttruth_result_Q2[8];
-  TH2F* h2_Q2_Q2truth_result[8];
-  TH2F* h2_W_Wtruth_result[8];
+  TH2F* h2_t_ttruth_result_Q2[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH2F* h2_t_alt_ttruth_result_Q2[19]; // mfek 06/21/2022 - changed binning for 5 on 41
   TH2F* h2_t_t_alt_result;
-  TH2F* h2_Q2_t_result[8];
+  TH2F* h2_Q2_t_result[19]; // mfek 06/21/2022 - changed binning for 5 on 41
 
   // Cut analysis plots
   TH1F* h1_nTheta_tCut; // nTheta dist with just the -t cut
@@ -441,9 +509,19 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_t_cut3_High; // -t cut, theta n cut, theta/phi diff cuts
   TH1F* h1_t_cut4_High; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
 
-  TH1F* h1_t_Resolution[8];
-  TH1F* h1_talt_Resolution_ZDC[8];
-  TH1F* h1_talt_Resolution_pMiss[8];
+  TH1F* h1_t_Resolution[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_talt_Resolution_ZDC[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+  TH1F* h1_talt_Resolution_pMiss[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+
+  TH3F* nTruth_xyE3D; // mfek 05/31/2022
+  TH3F* ZDC_xyE3D; // mfek 05/31/2022
+  TH3F* nTruth_Missed_xyE3D; // mfek 06/03/2022
+
+  TProfile2D* h3nTruth_xyE_pxy; // mfek 05/31/2022
+  TProfile2D* h3ZDC_xyE_pxy; // mfek 05/31/2022
+  TProfile2D* h3nTruth_Missed_xyE_pxy; // mfek 06/03/2022
+
+  TCanvas* c;
 
   PHParameters Enclosure_params{"PHGEnclosure"};
   PHParameters ZDC_params{"PHG4RP"};
@@ -461,6 +539,16 @@ class ECCE_DEMP : public SubsysReco
 
   TString IP_design;
 
+  int thrownEvents; // mfek 05/27/2022 - new counter variable added
+  int cut1Events; // mfek 05/27/2022 - new counter variable added 
+  int cut2Events; // mfek 05/27/2022 - new counter variable added
+  int cut3Events; // mfek 05/27/2022 - new counter variable added
+  int cut4Events; // mfek 05/27/2022 - new counter variable added
+  int cut5Events; // mfek 05/27/2022 - new counter variable added
+
+  int count_afterePi; // mfek 05/27/2022 - new counter variable added
+  int count_aftern; // mfek 05/27/2022 - new counter variable added
+
 };
 
-#endif // ECCE_DEMP_ANA_H
+#endif // ECCE_DEMP5on41_ANA_H

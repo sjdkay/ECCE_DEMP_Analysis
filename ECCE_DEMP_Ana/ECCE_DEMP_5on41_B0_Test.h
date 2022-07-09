@@ -1,7 +1,7 @@
 // Tell emacs that this is a C++ source
 //  -*- C++ -*-.
-#ifndef ECCE_DEMP_ANA_H
-#define ECCE_DEMP_ANA_H
+#ifndef ECCE_DEMP_5on41_B0_Test_ANA_H
+#define ECCE_DEMP_5on41_B0_Test_ANA_H
 
 #include <fun4all/SubsysReco.h>
 
@@ -26,13 +26,13 @@ class TFile;
 class TNtuple;
 class JetEvalStack;
 
-class ECCE_DEMP : public SubsysReco
+class ECCE_DEMP_5on41_B0_Test : public SubsysReco
 {
  public:
 
-  ECCE_DEMP(const std::string &name = "ECCE_DEMP", const std::string &fname = "MyNtuple.root");
+  ECCE_DEMP_5on41_B0_Test(const std::string &name = "ECCE_DEMP_5on41_B0_Test", const std::string &fname = "MyNtuple.root");
 
-  virtual ~ECCE_DEMP();
+  virtual ~ECCE_DEMP_5on41_B0_Test();
 
   /** Called during initialization.
       Typically this is where you can book histograms, and e.g.
@@ -69,6 +69,7 @@ class ECCE_DEMP : public SubsysReco
 
   bool Check_ePi(PHCompositeNode *);
   bool Check_n(PHCompositeNode *);
+  int process_g4hits_B0(PHCompositeNode *);
 
   void use_initial_vertex(const bool b = true) {initial_vertex = b;}
 
@@ -98,6 +99,18 @@ class ECCE_DEMP : public SubsysReco
   float ZDC_Position_Smear(float E);
 
   //*********************************
+  // B0 Tracker Energy and Position smearing
+
+  float B0Tracker_Energy_Smear(float E);
+  float B0Tracker_Position_Smear(float E);
+
+  //*********************************
+  // B0 Cal Energy and Position smearing
+
+  float B0Cal_Energy_Smear(float E);
+  float B0Cal_Position_Smear(float E);
+
+  //*********************************
   // Coordinate transformation from global to local
 
   float Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot);
@@ -116,8 +129,9 @@ class ECCE_DEMP : public SubsysReco
   double true_tpi;
 
   double have_true_dis_info = false;
-  
+ 
   bool  HIT_IN_ZDC;
+  bool  HIT_IN_B0;
   bool  HIT_IN_EMCAL;
   bool  HIT_IN_HCAL;
   bool  CLUS_IN_EMCAL;
@@ -222,229 +236,6 @@ class ECCE_DEMP : public SubsysReco
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
-  // Histograms for coincidence analysis routine
-  TH1F* h1_Q2_DetEff_Uncut;
-  TH1F* h1_Q2_DetEff_Cut;
-  TH1F* h1_Q2_DetEff;
-  TH2F* h2_Q2_t_DetEff_Uncut;
-  TH2F* h2_Q2_t_DetEff_Cut;
-  TH2F* h2_Q2_t_DetEff;
-  TH2F* h2_Q2_t_DetEff_v2_Uncut;
-  TH2F* h2_Q2_t_DetEff_v2_Cut;
-  TH2F* h2_Q2_t_DetEff_v2;
-
-  // 1D distributions for each particle
-  TH1F* h1_pi_px;
-  TH1F* h1_pi_py;
-  TH1F* h1_pi_pz;
-  TH1F* h1_pi_p;
-  TH1F* h1_pi_E;
-  TH1F* h1_pi_Theta;
-  TH1F* h1_pi_Phi;
-  TH1F* h1_e_px;
-  TH1F* h1_e_py;
-  TH1F* h1_e_pz;
-  TH1F* h1_e_p;
-  TH1F* h1_e_E;
-  TH1F* h1_e_Theta;
-  TH1F* h1_e_Phi;
-  TH1F* h1_n_px;
-  TH1F* h1_n_py;
-  TH1F* h1_n_pz;
-  TH1F* h1_n_p;
-  TH1F* h1_n_E;
-  TH1F* h1_n_Theta;
-  TH1F* h1_n_Phi;
-  TH1F* h1_n_ThetaDiff;
-  TH1F* h1_n_PhiDiff;
-  TH2F* h2_n_ThetaPhiDiff;
-
-  TH1F* h1_nRec_px;
-  TH1F* h1_nRec_py;
-  TH1F* h1_nRec_pz;
-  TH1F* h1_nRec_p;
-  TH1F* h1_nRec_E;
-  TH1F* h1_nRec_Theta;
-  TH1F* h1_nRec_Phi;
-
-  TH1F* h1_pi_px_Unweighted;
-  TH1F* h1_pi_py_Unweighted;
-  TH1F* h1_pi_pz_Unweighted;
-  TH1F* h1_pi_p_Unweighted;
-  TH1F* h1_pi_E_Unweighted;
-  TH1F* h1_pi_Theta_Unweighted;
-  TH1F* h1_pi_Phi_Unweighted;
-  TH1F* h1_e_px_Unweighted;
-  TH1F* h1_e_py_Unweighted;
-  TH1F* h1_e_pz_Unweighted;
-  TH1F* h1_e_p_Unweighted;
-  TH1F* h1_e_E_Unweighted;
-  TH1F* h1_e_Theta_Unweighted;
-  TH1F* h1_e_Phi_Unweighted;
-  TH1F* h1_n_px_Unweighted;
-  TH1F* h1_n_py_Unweighted;
-  TH1F* h1_n_pz_Unweighted;
-  TH1F* h1_n_p_Unweighted;
-  TH1F* h1_n_E_Unweighted;
-  TH1F* h1_n_Theta_Unweighted;
-  TH1F* h1_n_Phi_Unweighted;
-  TH1F* h1_n_ThetaDiff_Unweighted;
-  TH1F* h1_n_PhiDiff_Unweighted;
-  TH2F* h2_n_ThetaPhiDiff_Unweighted;
-
-  TH1F* h1_pmiss_px;
-  TH1F* h1_pmiss_py;
-  TH1F* h1_pmiss_pz;
-  TH1F* h1_pmiss_p;
-  TH1F* h1_pmiss_E;
-  TH1F* h1_pmiss_Theta;
-  TH1F* h1_pmiss_Phi;
-  TH1F* h1_gamma_px;
-  TH1F* h1_gamma_py;
-  TH1F* h1_gamma_pz;
-  TH1F* h1_gamma_p;
-  TH1F* h1_gamma_E;
-  TH1F* h1_gamma_Theta;
-  TH1F* h1_gamma_Phi;
-
-  TH2F* h2_pi_XY;
-  TH2F* h2_e_XY;
-  TH2F* h2_n_XY;
-  
-  TH1F* h1_Q2_Dist;
-  TH1F* h1_W_Dist;
-  TH1F* h1_t_Dist;
-  TH1F* h1_t_alt_Dist;
-  TH1F* h1_t_comp;
-  TH1F* h1_xb_Dist;
-  TH1F* h1_xi_Dist;
-
-  TH1F* h1_Q2Truth_Dist;
-  TH1F* h1_WTruth_Dist;
-  TH1F* h1_tTruth_Dist;
-  TH1F* h1_t_altTruth_Dist;
-  TH1F* h1_xbTruth_Dist;
-  TH1F* h1_xiTruth_Dist;
-
-  // Particle Truth info
-  TH1F* h1_piTruth_p;
-  TH1F* h1_piTruth_px;
-  TH1F* h1_piTruth_py;
-  TH1F* h1_piTruth_pz;
-  TH1F* h1_piTruth_E;
-  TH1F* h1_piTruth_Theta;
-  TH1F* h1_eTruth_p;
-  TH1F* h1_eTruth_px;
-  TH1F* h1_eTruth_py;
-  TH1F* h1_eTruth_pz;
-  TH1F* h1_eTruth_E; 
-  TH1F* h1_eTruth_Theta;
-  TH1F* h1_nTruth_p;
-  TH1F* h1_nTruth_px;
-  TH1F* h1_nTruth_py;
-  TH1F* h1_nTruth_pz;
-  TH1F* h1_nTruth_E;
-  TH1F* h1_nTruth_Theta;
-
-  // Particle Resolution histograms
-  TH1F* h1_piRes_p;
-  TH1F* h1_piRes_px;
-  TH1F* h1_piRes_py;
-  TH1F* h1_piRes_pz;  
-  TH1F* h1_eRes_p;
-  TH1F* h1_eRes_px;
-  TH1F* h1_eRes_py;
-  TH1F* h1_eRes_pz;
-  TH1F* h1_nRes_p;
-  TH1F* h1_nRes_px;
-  TH1F* h1_nRes_py;
-  TH1F* h1_nRes_pz;
-  TH1F* h1_pmissDiff_p;
-  TH1F* h1_pmissDiff_px;
-  TH1F* h1_pmissDiff_py;
-  TH1F* h1_pmissDiff_pz;
-
-  // 2D distributions 
-  TH2F* h2_ZDC_XY_IP6;
-  TH2F* h2_ZDC_XY_IP8;
-  TH2F* h2_ZDC_XY_l;
-  // Particle Theta/Phi and Theta/p distributions
-  TH2F* h2_eTrack_ThetaPhi;
-  TH2F* h2_eTrack_pTheta;
-  TH2F* h2_eTrack_pTheta_Truth;
-  TH2F* h2_piTrack_ThetaPhi;
-  TH2F* h2_piTrack_pTheta;
-  TH2F* h2_piTrack_pTheta_Truth;
-  TH2F* h2_nTrack_ThetaPhi;
-  TH2F* h2_nTrack_pTheta;
-  TH2F* h2_nTrack_pTheta_Truth;
-  // 2D resolution test plots
-  TH2F* h2_eTruth_pxpy;
-  TH2F* h2_piTruth_pxpy;
-  TH2F* h2_nTruth_pxpy;
-  TH2F* h2_eTruth_pxpz;
-  TH2F* h2_piTruth_pxpz;
-  TH2F* h2_nTruth_pxpz;
-  TH2F* h2_eTruth_pypz;
-  TH2F* h2_piTruth_pypz;
-  TH2F* h2_nTruth_pypz;
-  
-  // 1D Kinematic analysis plots
-  TH1F* h1_t_Q2[7];
-  TH1F* h1_t_alt_Q2[7];
-
-  // 2D Kinematic analysis plots
-  TH2F* h2_t_ep;
-  TH2F* h2_t_Q2;
-  TH2F* h2_delta_t_t;
-  TH2F* h2_delta_t_t_Q2[7];
-
-  // 1D Physics results plots
-  TH1F* h1_Mmiss_result;
-  TH1F* h1_MmissSq_result;
-  TH1F* h1_Mmiss_truth_result;
-  TH1F* h1_Mmiss_Comp_result;
-  TH1F* h1_taltres_result;
-  TH1F* h1_taltres_result_ttruth[10]; // Binned in t_truth
-  TH1F* h1_t_result[8];
-  TH1F* h1_t_truth_thrown_result[8];
-  TH1F* h1_nTheta_result[8];
-  TH1F* h1_pmiss_result[8];
-  TH1F* h1_pn_result[8];
-  TH1F* h1_t_cut_result[8];
-  TH1F* h1_Q2_cut_result[8];
-  TH1F* h1_W_cut_result[8];
-
-  // 2D Physics Results Plots
-  TH2F* h2_Q2_W_result;
-  TH2F* h2_t_ttruth_result;
-  TH2F* h2_t_alt_ttruth_result;
-  TH2F* h2_t_ttruth_result_Q2[8];
-  TH2F* h2_t_alt_ttruth_result_Q2[8];
-  TH2F* h2_Q2_Q2truth_result[8];
-  TH2F* h2_W_Wtruth_result[8];
-  TH2F* h2_t_t_alt_result;
-  TH2F* h2_Q2_t_result[8];
-
-  // Cut analysis plots
-  TH1F* h1_nTheta_tCut; // nTheta dist with just the -t cut
-  TH1F* h1_t_cut1_Low; // Just the -t cut
-  TH1F* h1_t_cut2_Low; // -t cut and theta n cut
-  TH1F* h1_t_cut3_Low; // -t cut, theta n cut, theta/phi diff cuts
-  TH1F* h1_t_cut4_Low; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
-  TH1F* h1_t_cut1_Mid; // Just the -t cut
-  TH1F* h1_t_cut2_Mid; // -t cut and theta n cut
-  TH1F* h1_t_cut3_Mid; // -t cut, theta n cut, theta/phi diff cuts
-  TH1F* h1_t_cut4_Mid; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
-  TH1F* h1_t_cut1_High; // Just the -t cut
-  TH1F* h1_t_cut2_High; // -t cut and theta n cut
-  TH1F* h1_t_cut3_High; // -t cut, theta n cut, theta/phi diff cuts
-  TH1F* h1_t_cut4_High; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
-
-  TH1F* h1_t_Resolution[8];
-  TH1F* h1_talt_Resolution_ZDC[8];
-  TH1F* h1_talt_Resolution_pMiss[8];
-
   PHParameters Enclosure_params{"PHGEnclosure"};
   PHParameters ZDC_params{"PHG4RP"};
   PHParameters RP_1_params{"PHG4RP"};
@@ -463,4 +254,4 @@ class ECCE_DEMP : public SubsysReco
 
 };
 
-#endif // ECCE_DEMP_ANA_H
+#endif // ECCE_DEMP_5on41_B0_Test_ANA_H

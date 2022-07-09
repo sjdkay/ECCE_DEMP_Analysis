@@ -1,5 +1,6 @@
 // 22/09/21 - Stephen JD Kay, University of Regina
 // 03/03/22 - Added in SIDIS comparison plot at the end
+// 09/07/22 - Added in Q2 vs Q2truth and W vs Wtruth plots to the pdf
 
 // A quick script to extract values from the bins in a histogram and save them to a .csv file
 // Also plots a bunch of histograms too, outputs a pdf and some other plots (comment/uncomment as needed)
@@ -61,7 +62,9 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   TH2F* Q2tHists[8];
   TH2F* tvst_Q2_Hists[8];
   TH2F* taltvst_Q2_Hists[8];
-  TH1F* taltres_Hists[10]; // 22/02/22 - SJDK - t binned t resolution plots  
+  TH1F* taltres_Hists[10]; // 22/02/22 - SJDK - t binned t resolution plots
+  TH2F* Q2vsQ2_Hists[8];
+  TH2F* WvsW_Hists[8];
   
   TH2F* pipThetaTruthHist = (TH2F*)((TH2F*)InFile->Get("Pion_Truth_Info/piTrack_pTheta_Truth"));
   TH2F* epThetaTruthHist = (TH2F*)((TH2F*)InFile->Get("Scattered_Electron_Truth_Info/eTrack_pTheta_Truth"));
@@ -131,8 +134,12 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     Q2Hists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/Q2_cut_Result_Q2_%i",A)));
     WHists[A-1] = (TH1F*)((TH1F*)InFile->Get(Form("Physics_Results/W_cut_Result_Q2_%i",A)));
     Q2tHists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/Q2_t_cut_Result_Q2_%i",A)));
-    tvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_ttruth_Result_Q2_%i",A))); 
-    taltvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_alt_ttruth_Result_Q2_%i",A))); 
+    tvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_ttruth_Result_Q2_%i",A)));
+    taltvst_Q2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/t_alt_ttruth_Result_Q2_%i",A)));
+    if (((TDirectory*)InFile->Get("Physics_Results"))->GetListOfKeys()->Contains("Q2_Q2truth_Result_Q2_1")){
+      Q2vsQ2_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/Q2_Q2truth_Result_Q2_%i",A)));
+      WvsW_Hists[A-1] = (TH2F*)((TH2F*)InFile->Get(Form("Physics_Results/W_Wtruth_Result_Q2_%i",A)));
+    }
   }
 
   Double_t BinVals[10];
@@ -182,11 +189,17 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
   for(Int_t A = 0; A <8; A++){
     Outfile << errors[A] << "\n";
   }
-  
+
   TCanvas *c_Output[17];
+  
   for(Int_t A = 0; A < 8; A++){
     c_Output[A] = new TCanvas(Form("c_Output_%i", (A+1)), Form("Results_p%i", (A+1)), 100, 0, 1000, 900);
-    c_Output[A]->Divide(3,2);
+    if (((TDirectory*)InFile->Get("Physics_Results"))->GetListOfKeys()->Contains("Q2_Q2truth_Result_Q2_1")){
+      c_Output[A]->Divide(4,2);
+    }
+    else{
+      c_Output[A]->Divide(3,2);
+    }
     c_Output[A]->cd(1);
     tHists[A]->Draw("HISTERR");
     c_Output[A]->cd(2);
@@ -198,6 +211,12 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
     c_Output[A]->cd(5);
     taltvst_Q2_Hists[A]->Draw("COLZ");
     c_Output[A]->cd(6);
+    if (((TDirectory*)InFile->Get("Physics_Results"))->GetListOfKeys()->Contains("Q2_Q2truth_Result_Q2_1")){
+      Q2vsQ2_Hists[A]->Draw("COLZ");
+      c_Output[A]->cd(7);
+      WvsW_Hists[A]->Draw("COLZ");
+      c_Output[A]->cd(8);
+    }
     InfoDump.DrawLatex(.2,.8,"L = 10^{34} cm^{-2}s^{-1}");
     InfoDump.DrawLatex(.2,.7,"assumed in rate");
     InfoDump.DrawLatex(.2,.6,"calculation");
@@ -209,7 +228,7 @@ void BinExtractor(string InFilename = "", string OutFilename = ""){
       c_Output[A]->Print(Outpdf);
     }
   }
-
+    
   c_Output[8] = new TCanvas("c_Output_9", "Results_p9", 100, 0, 1000, 900);
   c_Output[8]->Divide(3,2);
   c_Output[8]->cd(1);

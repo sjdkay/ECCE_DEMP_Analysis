@@ -1,7 +1,7 @@
 // Tell emacs that this is a C++ source
 //  -*- C++ -*-.
-#ifndef ECCE_DEMP_ANA_H
-#define ECCE_DEMP_ANA_H
+#ifndef ECCE_DEMP10on100_ANA_H
+#define ECCE_DEMP10on100_ANA_H
 
 #include <fun4all/SubsysReco.h>
 
@@ -16,6 +16,9 @@
 #include "TLorentzVector.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TH3.h"
+#include "TProfile2D.h"
+#include "TCanvas.h"
 
 #include <pdbcalbase/PdbParameterMap.h>
 #include <phparameter/PHParameters.h>
@@ -26,13 +29,13 @@ class TFile;
 class TNtuple;
 class JetEvalStack;
 
-class ECCE_DEMP : public SubsysReco
+class ECCE_DEMP10on100 : public SubsysReco
 {
  public:
 
-  ECCE_DEMP(const std::string &name = "ECCE_DEMP", const std::string &fname = "MyNtuple.root");
+  ECCE_DEMP10on100(const std::string &name = "ECCE_DEMP10on100", const std::string &fname = "MyNtuple.root");
 
-  virtual ~ECCE_DEMP();
+  virtual ~ECCE_DEMP10on100();
 
   /** Called during initialization.
       Typically this is where you can book histograms, and e.g.
@@ -218,7 +221,9 @@ class ECCE_DEMP : public SubsysReco
   Double_t PhiDiff_Cut;
   // The Pmiss cut values are chosen a little arbitrarily, hard to judge w/o SIDIS to compare with
   // Cut will be anything ABOVE this value for each bin
-  Double_t PmissCutVal[8] = {96.0, 93.5, 91.0, 87.0, 83.0, 80.0, 77.5, 75.0}; // Array to store Pmiss cut values in, 5on 100
+  Double_t PmissCutVal[23] = {96.5, 96.5, 94.5, 92.5, 90.5, 88.5, 86.5, 85.5, 83.5, 81.5, 80.0, 77.5, 76.5, 76.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0}; // Array to store Pmiss cut values in
+  Double_t Q2BinVal[15] = {2.0, 5.0, 7.5, 10.0, 12.5, 15.0, 17.5, 20.0, 22.5, 25.0, 27.5, 30.0, 32.5, 35.0, 40.0}; // mfek 06/22/2022 - new binning
+  // mfek 06/22/2022 - changed binning
   Int_t ZDC_hit;
   Int_t EEMC_hit;
 
@@ -346,6 +351,67 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_nTruth_E;
   TH1F* h1_nTruth_Theta;
 
+  // Particle Truth Info Pre-Cut - mfek 06/23/2022
+  TH1F* h1_piTruth_preCut_p;
+  TH1F* h1_piTruth_preCut_px;
+  TH1F* h1_piTruth_preCut_py;
+  TH1F* h1_piTruth_preCut_pz;
+  TH1F* h1_piTruth_preCut_E;
+  TH1F* h1_piTruth_preCut_Theta;
+  TH1F* h1_piTruth_preCut_Phi;
+
+  TH1F* h1_eTruth_preCut_p;
+  TH1F* h1_eTruth_preCut_px;
+  TH1F* h1_eTruth_preCut_py;
+  TH1F* h1_eTruth_preCut_pz;
+  TH1F* h1_eTruth_preCut_E;
+  TH1F* h1_eTruth_preCut_Theta;
+  TH1F* h1_eTruth_preCut_Phi;
+
+  TH1F* h1_nTruth_preCut_p;
+  TH1F* h1_nTruth_preCut_px;
+  TH1F* h1_nTruth_preCut_py;
+  TH1F* h1_nTruth_preCut_pz;
+  TH1F* h1_nTruth_preCut_E;
+  TH1F* h1_nTruth_preCut_Theta;
+  TH1F* h1_nTruth_preCut_Theta_inRange;
+  TH1F* h1_nTruth_preCut_Phi;
+  TH2F* h2_nTruth_preCut_XY;
+  TH2F* h2_nTruth_preCut_XY_inZDC;
+  TH2F* h2_nTruth_preCut_XY_outZDC;
+  TH2F* h2_nTruth_XY_hits;
+
+  // Particle Truth info for Missed Events - mfek 06/23/2022
+  TH1F* h1_piTruth_Missed_p;
+  TH1F* h1_piTruth_Missed_px;
+  TH1F* h1_piTruth_Missed_py;
+  TH1F* h1_piTruth_Missed_pz;
+  TH1F* h1_piTruth_Missed_E;
+  TH1F* h1_piTruth_Missed_Theta;
+  TH1F* h1_piTruth_Missed_Phi;
+
+  TH1F* h1_eTruth_Missed_p;
+  TH1F* h1_eTruth_Missed_px;
+  TH1F* h1_eTruth_Missed_py;
+  TH1F* h1_eTruth_Missed_pz;
+  TH1F* h1_eTruth_Missed_E;
+  TH1F* h1_eTruth_Missed_Theta;
+  TH1F* h1_eTruth_Missed_Phi;
+
+  TH1F* h1_nTruth_Missed_p;
+  TH1F* h1_nTruth_Missed_px;
+  TH1F* h1_nTruth_Missed_py;
+  TH1F* h1_nTruth_Missed_pz;
+  TH1F* h1_nTruth_Missed_E;
+  TH1F* h1_nTruth_Missed_Theta;
+  TH1F* h1_nTruth_Missed_Theta_inRange;
+  TH1F* h1_nTruth_Missed_Phi;
+
+  TH2F* h2_nTruth_Missed_XY;
+
+  TH1F* h1_Q2Truth_Dist_Missed;
+  TH1F* h1_tTruth_Dist_Missed;
+
   // Particle Resolution histograms
   TH1F* h1_piRes_p;
   TH1F* h1_piRes_px;
@@ -390,14 +456,14 @@ class ECCE_DEMP : public SubsysReco
   TH2F* h2_nTruth_pypz;
   
   // 1D Kinematic analysis plots
-  TH1F* h1_t_Q2[7];
-  TH1F* h1_t_alt_Q2[7];
+  TH1F* h1_t_Q2[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_t_alt_Q2[14]; // mfek 06/22/2022 - changed binning
 
   // 2D Kinematic analysis plots
   TH2F* h2_t_ep;
   TH2F* h2_t_Q2;
   TH2F* h2_delta_t_t;
-  TH2F* h2_delta_t_t_Q2[7];
+  TH2F* h2_delta_t_t_Q2[14]; // mfek 06/22/2022 - changed binning
 
   // 1D Physics results plots
   TH1F* h1_Mmiss_result;
@@ -406,25 +472,23 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_Mmiss_Comp_result;
   TH1F* h1_taltres_result;
   TH1F* h1_taltres_result_ttruth[10]; // Binned in t_truth
-  TH1F* h1_t_result[8];
-  TH1F* h1_t_truth_thrown_result[8];
-  TH1F* h1_nTheta_result[8];
-  TH1F* h1_pmiss_result[8];
-  TH1F* h1_pn_result[8];
-  TH1F* h1_t_cut_result[8];
-  TH1F* h1_Q2_cut_result[8];
-  TH1F* h1_W_cut_result[8];
+  TH1F* h1_t_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_t_truth_thrown_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_nTheta_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_pmiss_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_pn_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_t_cut_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_Q2_cut_result[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_W_cut_result[14]; // mfek 06/22/2022 - changed binning
 
   // 2D Physics Results Plots
   TH2F* h2_Q2_W_result;
   TH2F* h2_t_ttruth_result;
   TH2F* h2_t_alt_ttruth_result;
-  TH2F* h2_t_ttruth_result_Q2[8];
-  TH2F* h2_t_alt_ttruth_result_Q2[8];
-  TH2F* h2_Q2_Q2truth_result[8];
-  TH2F* h2_W_Wtruth_result[8];
+  TH2F* h2_t_ttruth_result_Q2[14]; // mfek 06/22/2022 - changed binning
+  TH2F* h2_t_alt_ttruth_result_Q2[14]; // mfek 06/22/2022 - changed binning
   TH2F* h2_t_t_alt_result;
-  TH2F* h2_Q2_t_result[8];
+  TH2F* h2_Q2_t_result[14]; // mfek 06/22/2022 - changed binning
 
   // Cut analysis plots
   TH1F* h1_nTheta_tCut; // nTheta dist with just the -t cut
@@ -441,9 +505,29 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_t_cut3_High; // -t cut, theta n cut, theta/phi diff cuts
   TH1F* h1_t_cut4_High; // -t cut, theta n cut, theta/phi diff cuts, pmiss cuts
 
-  TH1F* h1_t_Resolution[8];
-  TH1F* h1_talt_Resolution_ZDC[8];
-  TH1F* h1_talt_Resolution_pMiss[8];
+  TH1F* h1_t_Resolution[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_talt_Resolution_ZDC[14]; // mfek 06/22/2022 - changed binning
+  TH1F* h1_talt_Resolution_pMiss[14]; // mfek 06/22/2022 - changed binning
+
+  int thrownEvents; // mfek 06/22/2022 - new counter variable added
+  int cut1Events; // mfek 06/22/2022 - new counter variable added 
+  int cut2Events; // mfek 06/22/2022 - new counter variable added
+  int cut3Events; // mfek 06/22/2022 - new counter variable added
+  int cut4Events; // mfek 06/22/2022 - new counter variable added
+  int cut5Events; // mfek 06/22/2022 - new counter variable added
+
+  int count_afterePi; // mfek 06/22/2022 - new counter variable added
+  int count_aftern; // mfek 06/22/2022 - new counter variable added
+
+  TH3F* nTruth_xyE3D; // mfek 06/23/2022
+  TH3F* ZDC_xyE3D; // mfek 06/23/2022
+  TH3F* nTruth_Missed_xyE3D; // mfek 06/23/2022
+
+  TProfile2D* h3nTruth_xyE_pxy; // mfek 06/23/2022
+  TProfile2D* h3ZDC_xyE_pxy; // mfek 06/23/2022
+  TProfile2D* h3nTruth_Missed_xyE_pxy; // mfek 06/23/2022
+
+  TCanvas* c; // mfek 06/23/2022
 
   PHParameters Enclosure_params{"PHGEnclosure"};
   PHParameters ZDC_params{"PHG4RP"};
@@ -463,4 +547,4 @@ class ECCE_DEMP : public SubsysReco
 
 };
 
-#endif // ECCE_DEMP_ANA_H
+#endif // ECCE_DEMP10on100_ANA_H

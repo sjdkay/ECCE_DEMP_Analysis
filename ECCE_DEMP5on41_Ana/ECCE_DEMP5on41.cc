@@ -1,4 +1,4 @@
-#include "ECCE_DEMP.h"
+#include "ECCE_DEMP5on41.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <fun4all/Fun4AllServer.h>
@@ -48,9 +48,12 @@
 #include <TFile.h>
 #include <TNtuple.h>
 #include <TH2F.h>
+#include <TH3.h>
+#include <TProfile2D.h>
 #include <TString.h>
 #include <TTree.h>
 #include <TVector3.h>
+#include <TCanvas.h>
 
 #include <algorithm>
 #include <cassert>
@@ -70,11 +73,11 @@
 
 using namespace std;
 
-ECCE_DEMP::ECCE_DEMP(const std::string &name, const std::string& filename):
+ECCE_DEMP5on41::ECCE_DEMP5on41(const std::string &name, const std::string& filename):
  SubsysReco(name)
  , outfilename(filename)
 {
-  std::cout << "ECCE_DEMP_example::Diff_Tagg_example(const std::string &name) Calling ctor" << std::endl;
+  std::cout << "ECCE_DEMP5on41_example::Diff_Tagg_example(const std::string &name) Calling ctor" << std::endl;
 
   unsigned int seed = PHRandomSeed();  // fixed seed is handled in this funtcion
   m_RandomGenerator = gsl_rng_alloc(gsl_rng_mt19937);
@@ -83,37 +86,57 @@ ECCE_DEMP::ECCE_DEMP(const std::string &name, const std::string& filename):
 }
 
 //____________________________________________________________________________..
-ECCE_DEMP::~ECCE_DEMP()
+ECCE_DEMP5on41::~ECCE_DEMP5on41()
 {
 
   gsl_rng_free(m_RandomGenerator);
 
-  std::cout << "ECCE_DEMP::~ECCE_DEMP() Calling dtor" << std::endl;
+  std::cout << "ECCE_DEMP5on41::~ECCE_DEMP5on41() Calling dtor" << std::endl;
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::Init(PHCompositeNode *topNode)
+int ECCE_DEMP5on41::Init(PHCompositeNode *topNode)
 {
 
   static_event_counter = 0;
   hm = new Fun4AllHistoManager(Name());
   outfile = new TFile(outfilename.c_str(), "RECREATE");
 
-  std::cout << "ECCE_DEMP::Init(PHCompositeNode *topNode) Initializing" << std::endl;
+  std::cout << "ECCE_DEMP5on41::Init(PHCompositeNode *topNode) Initializing" << std::endl;
 
   event_itt = 0;
+  thrownEvents = 0; // mfek 05/27/2022 - new counter variable initialized
+  cut1Events = 0; // mfek 05/27/2022 - new counter variable initialized 
+  cut2Events = 0; // mfek 05/27/2022 - new counter variable initialized
+  cut3Events = 0; // mfek 05/27/2022 - new counter variable initialized
+  cut4Events = 0; // mfek 05/27/2022 - new counter variable initialized
+  cut5Events = 0; // mfek 05/27/2022 - new counter variable initialized
+  count_aftern = 0; // mfek 05/27/2022 - new counter variable initialized
+  count_afterePi = 0; // mfek 05/27/2022 - new counter variable initialized
+
+  max_X = -10000;
+  min_X = 10000;
+
+  max_Y = -10000;
+  min_Y = 10000;
   
   gDirectory->mkdir("Detection_Efficiency");
   gDirectory->cd("Detection_Efficiency");
   h1_Q2_DetEff_Uncut = new TH1F("Q2_DetEff_Uncut", "Q^{2}_{Truth} for thrown events; Q^{2}", 100, 0, 40); h1_Q2_DetEff_Uncut->Sumw2();
   h1_Q2_DetEff_Cut = new TH1F("Q2_DetEff_Cut", "Q^{2}_{Truth} for detected events; Q^{2}", 100, 0, 40); h1_Q2_DetEff_Cut->Sumw2();
   h1_Q2_DetEff = new TH1F("Q2_DetEff", "Q^{2}_{Truth} detected/thrown ratio; Q^{2}", 100, 0, 40); h1_Q2_DetEff->Sumw2();
+  h1_Q2_DetEff_Missed = new TH1F("Q2_DetEff_Missed", "Q^{2}_{Truth} for missed events; Q^{2}", 100, 0, 40); h1_Q2_DetEff_Missed->Sumw2(); // mfek 06/02/2022
+  h1_Q2_DetEff_MissedThrown = new TH1F("Q2_DetEff_MissedThrown", "Q^{2}_{Truth} missed/thrown ratio; Q^{2}", 100, 0, 40); h1_Q2_DetEff_MissedThrown->Sumw2(); // mfek 06/02/2022
   h2_Q2_t_DetEff_Uncut = new TH2F("Q2_t_DetEff_Uncut", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff_Uncut->Sumw2();
   h2_Q2_t_DetEff_Cut = new TH2F("Q2_t_DetEff_Cut", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff_Cut->Sumw2();
   h2_Q2_t_DetEff = new TH2F("Q2_t_DetEff", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff->Sumw2();
+  h2_Q2_t_DetEff_Missed = new TH2F("Q2_t_DetEff_Missed", "Q^{2}_{Truth} vs -t_{Truth} for missed events; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff_Missed->Sumw2(); // mfek 06/02/2022
+  h2_Q2_t_DetEff_MissedThrown = new TH2F("Q2_t_DetEff_MissedThrown", "Q^{2}_{Truth} vs -t_{Truth} missed/thrown ratio; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 10, 0, 40, 10, 0, 0.5); h2_Q2_t_DetEff_MissedThrown->Sumw2(); // mfek 06/02/2022
   h2_Q2_t_DetEff_v2_Uncut = new TH2F("Q2_t_DetEff_v2_Uncut", "Q^{2}_{Truth} vs -t_{Truth} for thrown events; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_v2_Uncut->Sumw2();
   h2_Q2_t_DetEff_v2_Cut = new TH2F("Q2_t_DetEff_v2_Cut", "Q^{2}_{Truth} vs -t_{Truth} for detected events; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_v2_Cut->Sumw2();
   h2_Q2_t_DetEff_v2 = new TH2F("Q2_t_DetEff_v2", "Q^{2}_{Truth} vs -t_{Truth} detected/thrown ratio; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_v2->Sumw2();
+  h2_Q2_t_DetEff_Missed_v2 = new TH2F("Q2_t_DetEff_Missed_v2", "Q^{2}_{Truth} vs -t_{Truth} for missed events; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_Missed_v2->Sumw2(); // mfek 06/02/2022
+  h2_Q2_t_DetEff_MissedThrown_v2 = new TH2F("Q2_t_DetEff_MissedThrown_v2", "Q^{2}_{Truth} vs -t_{Truth} missed/thrown ratio; Q^{2}; -t (GeV^{2}); Q^{2} (GeV/c^{2})", 20, 0, 40, 20, 0, 0.5); h2_Q2_t_DetEff_MissedThrown_v2->Sumw2(); // mfek 06/02/2022
   gDirectory->cd("../");  
 
   gDirectory->mkdir("Particle_Momenta_Resolution");
@@ -143,7 +166,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_pi_pz = new TH1F("pi_pz", "#pi p_{z} Distribution;p_{z} (GeV)", 200, -50, 50); 
   h1_pi_p = new TH1F("pi_p", "#pi p Distribution;p (GeV)", 200, 0, 50);
   h1_pi_E = new TH1F("pi_E", "#pi E Distribution;E (GeV)", 200, 0, 50);
-  h1_pi_Theta = new TH1F("pi_Theta", "#pi #theta Distribution; #theta (deg)", 200, 0, 50);
+  h1_pi_Theta = new TH1F("pi_Theta", "#pi #theta Distribution; #theta (deg)", 200, 0, 60); // mfek 05/26/2022 - changed range for 5 on 41, noticed odd difference in distribution when comparing 5 on100 and 5 on41, wanted to see if it had a wider distribution
   h1_pi_Phi = new TH1F("pi_Phi", "#pi #phi Distribution; #phi (deg)", 360, -180, 180);
   h2_piTrack_ThetaPhi = new TH2F("piTrack_ThetaPhi", "#pi Track #theta vs #phi; #theta (deg); #phi (deg)", 120, 0, 60, 720, -180, 180);
   h2_piTrack_pTheta = new TH2F("piTrack_pTheta", "#pi Track #theta vs P; #theta (deg); P (GeV/c)", 120, 0, 60, 500, 0, 50);
@@ -188,6 +211,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_eTrack_ThetaPhi = new TH2F("eTrack_ThetaPhi", "e' Track #theta vs #phi; #theta (deg); #phi (deg)", 140, 110, 180, 720, -180, 180);
   h2_eTrack_pTheta = new TH2F("eTrack_pTheta", "e' Track #theta vs P; #theta (deg); P (GeV/c)", 140, 110, 180, 100, 0, 10);
   h2_e_XY = new TH2F("e_XY", "e' X vs Y at z=200cm (EMCal) Dist; x (cm); y (cm)", 240, -600, 600, 240, -600, 600);
+  h2_e_XY2 = new TH2F("e_XY2", "e' X vs Y at z=200cm (EMCal) Dist; x (cm); y (cm)", 240, -600, 600, 240, -600, 600);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Scattered_Electron_Unweighted_Info");
@@ -219,14 +243,14 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->cd("ZDC_Neutron_Info");
   h1_n_px = new TH1F("n_px", "n p_{x} Distribution;p_{x} (GeV)", 480, -6, 6);
   h1_n_py = new TH1F("n_py", "n p_{y} Distribution;p_{y} (GeV)", 200, -2.5, 2.5);
-  h1_n_pz = new TH1F("n_pz", "n p_{z} Distribution;p_{z} (GeV)", 240, 0, 120); 
-  h1_n_p = new TH1F("n_p", "n p Distribution;p (GeV)", 240, 0, 120);
-  h1_n_E = new TH1F("n_E", "n E Distribution;E (GeV)", 240, 0, 120);
+  h1_n_pz = new TH1F("n_pz", "n p_{z} Distribution;p_{z} (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_n_p = new TH1F("n_p", "n p Distribution;p (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_n_E = new TH1F("n_E", "n E Distribution;E (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   h1_n_Theta = new TH1F("n_Theta", "n #theta Distribution; #theta (deg)", 500, 0, 5);
   h1_n_Phi = new TH1F("n_Phi", "n #phi Distribution; #phi (deg)", 360, -180, 180);
 
   h2_nTrack_ThetaPhi = new TH2F("nTrack_ThetaPhi", "n Track #theta vs #phi; #theta (deg); #phi (deg)", 500, 0, 5, 360, -180, 180);
-  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta (deg); P (GeV/c)", 500, 0, 5, 1000, 0, 100);
+  h2_nTrack_pTheta = new TH2F("nTrack_pTheta", "n Track #theta vs P; #theta (deg); P (GeV/c)", 500, 0, 5, 1000, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   h2_n_XY = new TH2F("n_XY", "n X vs Y at ZDC Dist; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
   h1_n_ThetaDiff = new TH1F("n_ThetaDiff", "#theta_{pMiss} - #theta_{ZDC}; #theta_{pMiss}-#theta_{ZDC}(Deg)", 100, -5, 5);
   h1_n_PhiDiff = new TH1F("n_PhiDiff", " #phi_{pMiss} - #phi_{ZDC}; #phi_{pMiss}-#phi_{ZDC}(Deg)", 200, -25, 25);
@@ -237,9 +261,9 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->cd("ZDC_Neutron_Unweighted_Info");
   h1_n_px_Unweighted = new TH1F("n_px_Unweighted", "n p_{x} Distribution (Unweighted);p_{x} (GeV)", 480, -6, 6);
   h1_n_py_Unweighted = new TH1F("n_py_Unweighted", "n p_{y} Distribution (Unweighted);p_{y} (GeV)", 200, -2.5, 2.5);
-  h1_n_pz_Unweighted = new TH1F("n_pz_Unweighted", "n p_{z} Distribution (Unweighted);p_{z} (GeV)", 240, 0, 120); 
-  h1_n_p_Unweighted = new TH1F("n_p_Unweighted", "n p Distribution (Unweighted);p (GeV)", 240, 0, 120);
-  h1_n_E_Unweighted = new TH1F("n_E_Unweighted", "n E Distribution (Unweighted);E (GeV)", 240, 0, 120);
+  h1_n_pz_Unweighted = new TH1F("n_pz_Unweighted", "n p_{z} Distribution (Unweighted);p_{z} (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41 
+  h1_n_p_Unweighted = new TH1F("n_p_Unweighted", "n p Distribution (Unweighted);p (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_n_E_Unweighted = new TH1F("n_E_Unweighted", "n E Distribution (Unweighted);E (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   h1_n_Theta_Unweighted = new TH1F("n_Theta_Unweighted", "n #theta Distribution (Unweighted); #theta (deg)", 500, 0, 5);
   h1_n_Phi_Unweighted = new TH1F("n_Phi_Unweighted", "n #phi Distribution (Unweighted); #phi (deg)", 360, -180, 180);
   h1_n_ThetaDiff_Unweighted = new TH1F("n_ThetaDiff_Unweighted", "#theta_{pMiss} - #theta_{ZDC} (Unweighted); #theta_{pMiss}-#theta_{ZDC}(Deg)", 100, -5, 5);
@@ -251,9 +275,9 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->cd("Reconstructed_Neutron_Info");
   h1_nRec_px = new TH1F("nRec_px", "n_{Rec}p_{x} Distribution;p_{x} (GeV)", 480, -6, 6);
   h1_nRec_py = new TH1F("nRec_py", "n_{Rec}p_{y} Distribution;p_{y} (GeV)", 200, -2.5, 2.5);
-  h1_nRec_pz = new TH1F("nRec_pz", "n_{Rec}p_{z} Distribution;p_{z} (GeV)", 240, 0, 120); 
-  h1_nRec_p = new TH1F("nRec_p", "n_{Rec}p Distribution;p (GeV)", 240, 0, 120);
-  h1_nRec_E = new TH1F("nRec_E", "n_{Rec}E Distribution;E (GeV)", 240, 0, 120);
+  h1_nRec_pz = new TH1F("nRec_pz", "n_{Rec}p_{z} Distribution;p_{z} (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_nRec_p = new TH1F("nRec_p", "n_{Rec}p Distribution;p (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_nRec_E = new TH1F("nRec_E", "n_{Rec}E Distribution;E (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   h1_nRec_Theta = new TH1F("nRec_Theta", "n_{Rec}#theta Distribution; #theta (deg)", 500, 0, 5);
   h1_nRec_Phi = new TH1F("nRec_Phi", "n_{Rec}#phi Distribution; #phi (deg)", 360, -180, 180);
   gDirectory->cd("../");
@@ -262,23 +286,23 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->cd("Neutron_Truth_Info");
   h1_nTruth_px = new TH1F("nTruth_px", "nTruth p_{x} Distribution;p_{x} (GeV)", 480, -6, 6);
   h1_nTruth_py = new TH1F("nTruth_py", "nTruth p_{y} Distribution;p_{y} (GeV)", 200, -2.5, 2.5);
-  h1_nTruth_pz = new TH1F("nTruth_pz", "nTruth p_{z} Distribution;p_{z} (GeV)", 240, 0, 120); 
-  h1_nTruth_p = new TH1F("nTruth_p", "nTruth p Distribution;p (GeV)", 240, 0, 120);
-  h1_nTruth_E = new TH1F("nTruth_E", "nTruth E Distribution;E (GeV)", 240, 0, 120);
+  h1_nTruth_pz = new TH1F("nTruth_pz", "nTruth p_{z} Distribution;p_{z} (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41 
+  h1_nTruth_p = new TH1F("nTruth_p", "nTruth p Distribution;p (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_nTruth_E = new TH1F("nTruth_E", "nTruth E Distribution;E (GeV)", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   h1_nTruth_Theta = new TH1F("nTruth_Theta", "nTruth #theta Distribution; #theta (deg)", 500, 0, 5);
   h2_nTruth_pxpy = new TH2F("nTruth_pxpy", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{y}}{Truth p_{y}}", 100, -50, 50, 100, -50, 50);
   h2_nTruth_pxpz = new TH2F("nTruth_pxpz", "n #frac{#Delta p_{x}}{Truth p_{x}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{x}}{Truth p_{x}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
   h2_nTruth_pypz = new TH2F("nTruth_pypz", "n #frac{#Delta p_{y}}{Truth p_{y}} vs #frac{#Delta p_{z}}{Truth p_{z}}; #frac{#Delta p_{y}}{Truth p_{y}}; #frac{#Delta p_{z}}{Truth p_{z}}", 100, -50, 50, 100, -50, 50);
-  h2_nTrack_pTheta_Truth = new TH2F("nTrack_pTheta_Truth", "n Track #theta vs P (Truth); #theta (deg); P (GeV/c)", 500, 0, 5, 1000, 0, 100);
+  h2_nTrack_pTheta_Truth = new TH2F("nTrack_pTheta_Truth", "n Track #theta vs P (Truth); #theta (deg); P (GeV/c)", 500, 0, 5, 1000, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   gDirectory->cd("../");
 
   gDirectory->mkdir("PMiss_Info");
   gDirectory->cd("PMiss_Info");
   h1_pmiss_px = new TH1F("pmiss_px", "p_{miss} p_{x} Distribution", 800, -10, 10);
   h1_pmiss_py = new TH1F("pmiss_py", "p_{miss} p_{y} Distribution", 200, -2.5, 2.5);
-  h1_pmiss_pz = new TH1F("pmiss_pz", "p_{miss} p_{z} Distribution", 240, 0, 120); 
-  h1_pmiss_p = new TH1F("pmiss_p", "p_{miss} p Distribution", 240, 0, 120);
-  h1_pmiss_E = new TH1F("pmiss_E", "p_{miss} E Distribution", 240, 0, 120);
+  h1_pmiss_pz = new TH1F("pmiss_pz", "p_{miss} p_{z} Distribution", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_pmiss_p = new TH1F("pmiss_p", "p_{miss} p Distribution", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
+  h1_pmiss_E = new TH1F("pmiss_E", "p_{miss} E Distribution", 240, 0, 50); // mfek 05/26/2022 - changed range for 5 on 41
   h1_pmiss_Theta = new TH1F("pmiss_Theta", "p_{miss} #theta Distribution; #theta (deg)", 1000, 0, 10);
   h1_pmiss_Phi = new TH1F("pmiss_Phi", "p_{miss} #phi Distribution; #phi (deg)", 720, -180, 180);
   gDirectory->cd("../");
@@ -297,7 +321,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->mkdir("Kinematics_Info");
   gDirectory->cd("Kinematics_Info");
   h1_Q2_Dist = new TH1F("Q2_Dist", "Q^{2} Distribution", 200, 0, 50);
-  h1_W_Dist = new TH1F("W_Dist", "W Distribution", 500, 0, 50);
+  h1_W_Dist = new TH1F("W_Dist", "W Distribution", 500, 0, 40); // mfek 05/26/2022 - changed range for 5 on 41
   h1_t_Dist = new TH1F("t_Dist", "t Distribution", 100, 0, 10);
   h1_t_alt_Dist = new TH1F("t_alt_Dist", "t (Alternative calculation) Distribution", 100, 0, 1);
   h1_t_comp = new TH1F("t_comp_Dist", "#frac{#Delta t}{t} Distribution; #frac{t_{alt}-t}{t} (%)", 200, -100, 100);
@@ -308,7 +332,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->mkdir("Kinematics_Truth_Info");
   gDirectory->cd("Kinematics_Truth_Info");
   h1_Q2Truth_Dist = new TH1F("Q2Truth_Dist", "Q^{2} Truth Distribution", 200, 0, 50);
-  h1_WTruth_Dist = new TH1F("WTruth_Dist", "W Truth Distribution", 500, 0, 50);
+  h1_WTruth_Dist = new TH1F("WTruth_Dist", "W Truth Distribution", 500, 0, 40); // mfek 05/26/2022 - changed range for 5 on 41
   h1_tTruth_Dist = new TH1F("tTruth_Dist", "t Truth Distribution", 100, 0, 1);
   h1_t_altTruth_Dist = new TH1F("t_altTruth_Dist", "-t_alt Truth (Alternative Calculation) Distribution", 100, 0, 1);
   h1_xbTruth_Dist = new TH1F("xbTruth_Dist", "x_{b} Truth Distribution", 100, 0, 1);
@@ -321,58 +345,35 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h2_t_Q2 = new TH2F("t_Q2", "t vs Q^{2}; t; Q^{2}", 100, 0, 10, 200, 0, 50);
   h2_delta_t_t = new TH2F("delta_t_t", "#Delta t vs t; #Delta t (%); t", 200, -100, 100, 100, 0, 1);
   
-  for(Int_t A = 0; A < 7; A++){
-    h1_t_Q2[A] = new TH1F(Form("t_Q2_%i", (A+1)), Form("t dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
-    h1_t_alt_Q2[A] = new TH1F(Form("t_alt_Q2_%i", (A+1)), Form("t (Alternative calculation) dist, %i < Q^{2} < %i; t", (5 + (A*5)), 10+(A*5)), 100, 0, 10);
-    h2_delta_t_t_Q2[A] = new TH2F(Form("delta_t_t_Q2_%i", (A+1)), Form("#Delta t vs t, %i < Q^{2} < %i; #Delta t (Percent); t", (5 + (A*5)), 10+(A*5)), 200, -100, 100, 100, 0, 1);
-  }
+  for(Int_t A = 0; A < 19; A++){
+ 
+    h1_t_Q2[A] = new TH1F(Form("t_Q2_%i", (A+1)), Form("t dist, %2.1f < Q^{2} < %2.1f; t", Q2BinVal[A], Q2BinVal[A+1]), 100, 0, 10);
+    h1_t_alt_Q2[A] = new TH1F(Form("t_alt_Q2_%i", (A+1)), Form("t (Alternative calculation) dist, %2.1f < Q^{2} < %2.1f; t", Q2BinVal[A], Q2BinVal[A+1]), 100, 0, 10);
+    h2_delta_t_t_Q2[A] = new TH2F(Form("delta_t_t_Q2_%i", (A+1)), Form("#Delta t vs t, %2.1f < Q^{2} < %2.1f; #Delta t (Percent); t", Q2BinVal[A], Q2BinVal[A+1]), 200, -100, 100, 100, 0, 1); // mfek 06/02/2022 - new binning
+  } // mfek 06/21/2022 - changed Q2 binning
   gDirectory->cd("../");
 
   gDirectory->mkdir("Physics_Results_Cuts");
   gDirectory->cd("Physics_Results_Cuts");
-  // Results histograms are binned in Q2, first two bins are special
-  for(Int_t A = 0; A < 8; A++){
-    if ( A <= 1){
-      h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
-      h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 500, 0, 5);
-      h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 240, 0, 120) ;
-      h1_pn_result[A] = new TH1F(Form("pn_Result_Q2_%i", (A+1)), Form("p_{n} Dist, %2.1f < Q^{2} < %2.1f", (5+(A*2.5)), (7.5+(A*2.5))), 240, 0, 120) ;
-    }
-    else{
-      h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
-      h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 500, 0, 5);
-      h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 240, 0, 120) ;
-      h1_pn_result[A] = new TH1F(Form("pn_Result_Q2_%i", (A+1)), Form("p_{n} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 240, 0, 120) ;
-    }
-  }
-
+  for(Int_t A = 0; A < 19; A++){
+    h1_t_result[A] = new TH1F(Form("t_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", Q2BinVal[A], Q2BinVal[A+1]), 10, 0, 0.4);
+    h1_nTheta_result[A] = new TH1F(Form("nTheta_Result_Q2_%i", (A+1)), Form("#theta_{n} Dist, %2.1f < Q^{2} < %2.1f", Q2BinVal[A], Q2BinVal[A+1]), 500, 0, 5);
+    h1_pmiss_result[A] = new TH1F(Form("pmiss_Result_Q2_%i", (A+1)), Form("p_{miss} Dist, %2.1f < Q^{2} < %2.1f", Q2BinVal[A], Q2BinVal[A+1]), 240, 0, 50) ;
+    h1_pn_result[A] = new TH1F(Form("pn_Result_Q2_%i", (A+1)), Form("p_{n} Dist, %2.1f < Q^{2} < %2.1f", Q2BinVal[A], Q2BinVal[A+1]), 240, 0, 50) ; //mfek 06/02/2022 - new binning
+  }// mfek 06/21/2022 - changed binning for 5 on 41
   gDirectory->cd("../");
+
   gDirectory->mkdir("Physics_Results");
   gDirectory->cd("Physics_Results");
-  for(Int_t A = 0; A < 8; A++){
-    if ( A <= 1){
-      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
-      h1_t_truth_thrown_result[A] = new TH1F(Form("t_truth_thrown_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", (5+(A*2.5)), (7.5+(A*2.5))), 10, 0, 0.4);
-      h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, (5+(A*2.5)), (7.5+(A*2.5)));
-      h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 60, 0, 30);
-      h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+(A*2.5)), (7.5+(A*2.5))), 25, (5+(A*2.5)), (7.5+(A*2.5)), 10, 0, 0.4);
-      h2_t_ttruth_result_Q2[A] = new TH2F(Form("t_ttruth_Result_Q2_%i",(A+1)), Form("-t vs -t_{truth}, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); -t_{truth}(GeV^{2})",(5+(A*2.5)), (7.5+(A*2.5))), 50, 0, 10, 50, 0, 0.5); 
-      h2_t_alt_ttruth_result_Q2[A] = new TH2F(Form("t_alt_ttruth_Result_Q2_%i",(A+1)), Form("-t_{alt} vs -t_{truth}, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})",(5+(A*2.5)), (7.5+(A*2.5))), 50, 0, 0.5, 50, 0, 0.5); 
-      h2_Q2_Q2truth_result[A] = new TH2F(Form("Q2_Q2truth_Result_Q2_%i",(A+1)), "Q^{2} vs Q^{2}_{truth} with p_{miss}, #theta_{n} cuts; Q^{2} (GeV/c^{2}); Q^{2}_{truth} (GeV/c^{2})", 25, (5+(A*2.5)), (7.5+(A*2.5)), 25, (5+(A*2.5)), (7.5+(A*2.5)));
-      h2_W_Wtruth_result[A] = new TH2F(Form("W_Wtruth_Result_Q2_%i", (A+1)), Form("W vs W_{truth} Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; W (GeV); W_{truth} (GeV)", (5+(A*2.5)), (7.5+(A*2.5))), 120, 0, 30, 48, 0, 12);
-    }
-    else{
-      h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
-      h1_t_truth_thrown_result[A] = new TH1F(Form("t_truth_thrown_Result_Q2_%i", (A+1)), Form("-t_{truth} Dist, %i < Q^{2} < %i; -t", (5+((A-1)*5)), (10+((A-1)*5))), 10, 0, 0.4);
-      h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 50, (5+((A-1)*5)), (10+((A-1)*5)));
-      h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 60, 0, 30);
-      h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", (5+((A-1)*5)), (10+((A-1)*5))), 50, (5+((A-1)*5)), (10+((A-1)*5)), 10, 0, 0.4);
-      h2_t_ttruth_result_Q2[A] = new TH2F(Form("t_ttruth_Result_Q2_%i",(A+1)), Form("-t vs -t_{truth}, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); -t_{truth}(GeV^{2})",(5+((A-1)*5)), (10+((A-1)*5))), 50, 0, 10, 50, 0, 0.5); 
-      h2_t_alt_ttruth_result_Q2[A] = new TH2F(Form("t_alt_ttruth_Result_Q2_%i",(A+1)), Form("-t_{alt} vs -t_{truth}, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})",(5+((A-1)*5)), (10+((A-1)*5))), 50, 0, 0.5, 50, 0, 0.5);
-      h2_Q2_Q2truth_result[A] = new TH2F(Form("Q2_Q2truth_Result_Q2_%i",(A+1)), "Q^{2} vs Q^{2}_{truth} with p_{miss}, #theta_{n} cuts; Q^{2} (GeV/c^{2}); Q^{2}_{truth} (GeV/c^{2})", 50, (5+((A-1)*5)), (10+((A-1)*5)), 50, (5+((A-1)*5)), (10+((A-1)*5)));
-      h2_W_Wtruth_result[A] = new TH2F(Form("W_Wtruth_Result_Q2_%i", (A+1)), Form("W vs W_{truth} Dist, %i < Q^{2} < %i, with p_{miss}, #theta_{n} cuts; W (GeV); W_{truth} (GeV)", (5+((A-1)*5)), (10+((A-1)*5))), 120, 0, 30, 48, 0, 12);
-    }
-  }
+  for(Int_t A = 0; A < 19; A++){
+    h1_t_cut_result[A] = new TH1F(Form("t_cut_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); Rate(Hz)", Q2BinVal[A], Q2BinVal[A+1]), 10, 0, 0.4);
+    h1_t_truth_thrown_result[A] = new TH1F(Form("t_truth_thrown_Result_Q2_%i", (A+1)), Form("-t Dist, %2.1f < Q^{2} < %2.1f; -t", Q2BinVal[A], Q2BinVal[A+1]), 10, 0, 0.4);
+    h1_Q2_cut_result[A] = new TH1F(Form("Q2_cut_Result_Q2_%i", (A+1)), Form("Q^{2} Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); Rate(Hz)", Q2BinVal[A], Q2BinVal[A+1]), 25, Q2BinVal[A], Q2BinVal[A+1]);
+    h1_W_cut_result[A] = new TH1F(Form("W_cut_Result_Q2_%i", (A+1)), Form("W Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; W(GeV); Rate(Hz)", Q2BinVal[A], Q2BinVal[A+1]), 60, 0, 30);
+    h2_Q2_t_result[A] = new TH2F(Form("Q2_t_cut_Result_Q2_%i", (A+1)), Form("Q^{2} vs -t Dist, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; Q^{2}(GeV^{2}); -t (GeV^{2})", Q2BinVal[A], Q2BinVal[A+1]), 25, Q2BinVal[A], Q2BinVal[A+1], 10, 0, 0.4);
+    h2_t_ttruth_result_Q2[A] = new TH2F(Form("t_ttruth_Result_Q2_%i",(A+1)), Form("-t vs -t_{truth}, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t (GeV^{2}); -t_{truth}(GeV^{2})",Q2BinVal[A], Q2BinVal[A+1]), 50, 0, 10, 50, 0, 0.5); 
+    h2_t_alt_ttruth_result_Q2[A] = new TH2F(Form("t_alt_ttruth_Result_Q2_%i",(A+1)), Form("-t_{alt} vs -t_{truth}, %2.1f < Q^{2} < %2.1f, with p_{miss}, #theta_{n} cuts; -t_{alt} (GeV^{2}); -t_{truth}(GeV^{2})", Q2BinVal[A], Q2BinVal[A+1]), 50, 0, 0.5, 50, 0, 0.5); // mfek 06/02/2022 - new binning
+  } // mfek 06/21/2022 - changed binning for 5 on 41
 
   gDirectory->cd("../");
   gDirectory->mkdir("Physics_Results_Misc");
@@ -394,44 +395,106 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   gDirectory->mkdir("Cut_Analysis");
   gDirectory->cd("Cut_Analysis");
   h1_nTheta_tCut = new TH1F("nTheta_tCut", "n #theta Distribution (-t < 0.4); #theta (deg)", 500, 0, 5);
-  h1_t_cut1_Low = new TH1F("t_result_cut1_Low", "t dist 7.5 < Q^{2} < 10, t cut only; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut2_Low = new TH1F("t_result_cut2_Low", "t dist 7.5 < Q^{2} < 10, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut3_Low = new TH1F("t_result_cut3_Low", "t dist 7.5 < Q^{2} < 10, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut4_Low = new TH1F("t_result_cut4_Low", "t dist 7.5 < Q^{2} < 10,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut1_Mid = new TH1F("t_result_cut1_Mid", "t dist 15 < Q^{2} < 20, t cut only; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut2_Mid = new TH1F("t_result_cut2_Mid", "t dist 15 < Q^{2} < 20, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut3_Mid = new TH1F("t_result_cut3_Mid", "t dist 15 < Q^{2} < 20, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut4_Mid = new TH1F("t_result_cut4_Mid", "t dist 15 < Q^{2} < 20,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut1_High = new TH1F("t_result_cut1_High", "t dist 25 < Q^{2} < 30, t cut only; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut2_High = new TH1F("t_result_cut2_High", "t dist 25 < Q^{2} < 30, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut3_High = new TH1F("t_result_cut3_High", "t dist 25 < Q^{2} < 30, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
-  h1_t_cut4_High = new TH1F("t_result_cut4_High", "t dist 25 < Q^{2} < 30,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
+  h1_t_cut1_Low = new TH1F("t_result_cut1_Low", "t dist 5.0 < Q^{2} < 7.5, t cut only; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut2_Low = new TH1F("t_result_cut2_Low", "t dist 5.0 < Q^{2} < 7.5, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
+ h1_t_cut3_Low = new TH1F("t_result_cut3_Low", "t dist 5.0 < Q^{2} < 7.5, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut4_Low = new TH1F("t_result_cut4_Low", "t dist 5.0 < Q^{2} < 7.5,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
+  h1_t_cut1_Mid = new TH1F("t_result_cut1_Mid", "t dist 10.0 < Q^{2} < 12.5, t cut only; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut2_Mid = new TH1F("t_result_cut2_Mid", "t dist 10.0 < Q^{2} < 12.5, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
+ h1_t_cut3_Mid = new TH1F("t_result_cut3_Mid", "t dist 10.0 < Q^{2} < 12.5, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut4_Mid = new TH1F("t_result_cut4_Mid", "t dist 10.0 < Q^{2} < 12.5,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4);
+  h1_t_cut1_High = new TH1F("t_result_cut1_High", "t dist 15.0 < Q^{2} < 20.0, t cut only; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut2_High = new TH1F("t_result_cut2_High", "t dist 15.0 < Q^{2} < 20.0, t cut, #theta_{n} cut; -t(GeV^{2})", 10, 0, 0.4);
+ h1_t_cut3_High = new TH1F("t_result_cut3_High", "t dist 15.0 < Q^{2} < 20.0, t cut, #theta_{n} cut, #theta_{diff} , phi_{diff} cuts; -t(GeV^{2})", 10, 0, 0.4);
+h1_t_cut4_High = new TH1F("t_result_cut4_High", "t dist 15.0 < Q^{2} < 20.0,  t cut, #theta_{n} cut, #theta_{diff} , phi_{diff}, p_{miss} cuts; -t(GeV^{2})", 10, 0, 0.4); // mfek 05/26/2022 - changed binning for 5 on 41
 
   gDirectory->cd("../");
   gDirectory->mkdir("t_Resolution");
   gDirectory->cd("t_Resolution");
-  for(Int_t A = 0; A < 8; A++){
-    if ( A <= 1){
-      h1_t_Resolution[A]=new TH1F(Form("t_Resolution_Q2_%i", (A+1)), Form("t - t_{truth} Dist, %2.1f < Q^{2} < %2.1f;  t - t_{truth} (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 150, -5.5, 0.5);
-      h1_talt_Resolution_ZDC[A]=new TH1F(Form("talt_Resolution_ZDC_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.1f < Q^{2} < %2.1f, ZDC Info Only;  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, -0.5, 0.5);
-      h1_talt_Resolution_pMiss[A]=new TH1F(Form("talt_Resolution_pMiss_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.1f < Q^{2} < %2.1f, Corrected p_{Miss};  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 25, -0.5, 0.5);
-    }
-    else{
-      h1_t_Resolution[A]=new TH1F(Form("t_Resolution_Q2_%i", (A+1)), Form("t - t_{truth} Dist, %i < Q^{2} < %i;  t - t_{truth} (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 150, -5.5, 0.5);
-      h1_talt_Resolution_ZDC[A]=new TH1F(Form("talt_Resolution_ZDC_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %i < Q^{2} < %i, ZDC Info Only;  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 25, -0.5, 0.5);
-      h1_talt_Resolution_pMiss[A]=new TH1F(Form("talt_Resolution_pMiss_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %i < Q^{2} < %i, Corrected p_{Miss};  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 25, -0.5, 0.5);
-    }
-  }
+  for(Int_t A = 0; A < 19; A++){
+    
+    h1_t_Resolution[A]=new TH1F(Form("t_Resolution_Q2_%i", (A+1)), Form("t - t_{truth} Dist, %2.1f < Q^{2} < %2.1f;  t - t_{truth} (GeV^{2}); Rate(Hz)", Q2BinVal[A], Q2BinVal[A+1]), 150, -5.5, 0.5);
+    h1_talt_Resolution_ZDC[A]=new TH1F(Form("talt_Resolution_ZDC_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.1f < Q^{2} < %2.1f, ZDC Info Only;  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", Q2BinVal[A], Q2BinVal[A+1]), 25, -0.5, 0.5);
+    h1_talt_Resolution_pMiss[A]=new TH1F(Form("talt_Resolution_pMiss_Q2_%i", (A+1)), Form("t_{alt} - t_{truth} Dist, %2.1f < Q^{2} < %2.1f, Corrected p_{Miss};  t_{alt} - t_{truth} (GeV^{2}); Rate(Hz)", Q2BinVal[A], Q2BinVal[A+1]), 25, -0.5, 0.5); // mfek 06/02/2022 - new binning
+  } // mfek 06/21/2022 - changed binning for 5 on 41
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("pi_e_n_preCut_Truth_Dist"); // mfek 05/27/2022 - new directory for precut truth values
+  gDirectory->cd("pi_e_n_preCut_Truth_Dist");
+
+  h1_piTruth_preCut_px = new TH1F("piTruth_preCut_px", "#pi Truth p_{x} Distribution;p_{x} (GeV)", 200, -20, 20);
+  h1_piTruth_preCut_py = new TH1F("piTruth_preCut_py", "#pi Truth p_{y} Distribution;p_{y} (GeV)", 200, -20, 20);
+  h1_piTruth_preCut_pz = new TH1F("piTruth_preCut_pz", "#pi Truth p_{z} Distribution;p_{z} (GeV)", 200, -50, 50); 
+  h1_piTruth_preCut_p = new TH1F("piTruth_preCut_p", "#pi Truth p Distribution;p (GeV)", 200, 0, 50);
+  h1_piTruth_preCut_E = new TH1F("piTruth_preCut_E", "#pi Truth E Distribution;E (GeV)", 200, 0, 50);
+
+  h1_eTruth_preCut_px = new TH1F("eTruth_preCut_px", "e' Truth p_{x} Distribution;p_{x} (GeV)", 240, -6, 6);
+  h1_eTruth_preCut_py = new TH1F("eTruth_preCut_py", "e' Truth p_{y} Distribution;p_{y} (GeV)", 240, -6, 6);
+  h1_eTruth_preCut_pz = new TH1F("eTruth_preCut_pz", "e' Truth p_{z} Distribution;p_{z} (GeV)", 120, -6, 0); 
+  h1_eTruth_preCut_p = new TH1F("eTruth_preCut_p", "e' Truth p Distribution;p (GeV)", 160, 0, 8);
+  h1_eTruth_preCut_E = new TH1F("eTruth_preCut_E", "e' Truth E Distribution;E (GeV)", 160, 0, 8);
+
+  h1_nTruth_preCut_px = new TH1F("nTruth_preCut_px", "nTruth p_{x} Distribution;p_{x} (GeV)", 480, -6, 6);
+  h1_nTruth_preCut_py = new TH1F("nTruth_preCut_py", "nTruth p_{y} Distribution;p_{y} (GeV)", 200, -2.5, 2.5);
+  h1_nTruth_preCut_pz = new TH1F("nTruth_preCut_pz", "nTruth p_{z} Distribution;p_{z} (GeV)", 240, 0, 50);
+  h1_nTruth_preCut_p = new TH1F("nTruth_preCut_p", "nTruth p Distribution;p (GeV)", 240, 0, 50);
+  h1_nTruth_preCut_E = new TH1F("nTruth_preCut_E", "nTruth E Distribution;E (GeV)", 240, 0, 50);
+  h1_nTruth_preCut_Theta = new TH1F("nTruth_preCut_Theta", "nTruth #theta Distribution;#theta (deg)", 180, -10, 10);
+  h1_nTruth_preCut_Theta_inRange = new TH1F("nTruth_preCut_Theta_inRange", "nTruth #theta Distribution in Range;#theta (deg)", 50, 1, 2);
+  h2_nTruth_preCut_XY = new TH2F("nTruth_preCut_XY", "nTruth XY Distribution; x (cm); y (cm)", 200, -200, 0, 200, -150, 150); // mfek 05/30/2022 - new XY plot
+  h2_nTruth_preCut_XY_inZDC = new TH2F("nTruth_preCut_XY_inZDC", "nTruth XY Distribution in ZDC range; x (cm); y (cm)", 200, -200, 0, 200, -150, 150); // mfek 05/31/2022 - new XY plot
+  h2_nTruth_preCut_XY_outZDC = new TH2F("nTruth_preCut_XY_outZDC", "nTruth XY Distribution outside ZDC range; x (cm); y (cm)", 200, -200, 0, 200, -150, 150); // mfek 05/31/2022 - new XY plot
+  h2_nTruth_XY_hits = new TH2F("nTruth_preCut_XY_hits", "nTruth XY Distribution for ZDC hits; x (cm); y (cm)", 200, -200, 0, 200, -150, 150); // mfek 05/31/2022 - new XY plot
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("pi_e_n_Missed_Truth_Dist"); // mfek 06/02/2022 - new directory for truth values of missed events
+  gDirectory->cd("pi_e_n_Missed_Truth_Dist");
+
+  h1_piTruth_Missed_px = new TH1F("piTruth_Missed_px", "Missed #pi Truth p_{x} Distribution;p_{x} (GeV)", 200, -20, 20);
+  h1_piTruth_Missed_py = new TH1F("piTruth_Missed_py", "Missed #pi Truth p_{y} Distribution;p_{y} (GeV)", 200, -20, 20);
+  h1_piTruth_Missed_pz = new TH1F("piTruth_Missed_pz", "Missed #pi Truth p_{z} Distribution;p_{z} (GeV)", 200, -50, 50); 
+  h1_piTruth_Missed_p = new TH1F("piTruth_Missed_p", "Missed #pi Truth p Distribution;p (GeV)", 200, 0, 50);
+  h1_piTruth_Missed_E = new TH1F("piTruth_Missed_E", "Missed #pi Truth E Distribution;E (GeV)", 200, 0, 50);
+  h1_piTruth_Missed_Theta = new TH1F("piTruth_Missed_Theta", "Missed #pi Truth #theta Distribution;#theta (deg)", 160, 0, 50);
+  h1_piTruth_Missed_Phi = new TH1F("piTruth_Missed_Phi", "Missed #pi Truth #phi Distribution;#phi (deg)", 360, -180, 180);
+
+  h1_eTruth_Missed_px = new TH1F("eTruth_Missed_px", "Missed e' Truth p_{x} Distribution;p_{x} (GeV)", 240, -6, 6);
+  h1_eTruth_Missed_py = new TH1F("eTruth_Missed_py", "Missed e' Truth p_{y} Distribution;p_{y} (GeV)", 240, -6, 6);
+  h1_eTruth_Missed_pz = new TH1F("eTruth_Missed_pz", "Missed e' Truth p_{z} Distribution;p_{z} (GeV)", 120, -6, 0); 
+  h1_eTruth_Missed_p = new TH1F("eTruth_Missed_p", "Missed e' Truth p Distribution;p (GeV)", 160, 0, 8);
+  h1_eTruth_Missed_E = new TH1F("eTruth_Missed_E", "Missed e' Truth E Distribution;E (GeV)", 160, 0, 8);
+  h1_eTruth_Missed_Theta = new TH1F("eTruth_Missed_Theta", "Missed e' Truth #theta Distribution;#theta (deg)", 160, 110, 160);
+  h1_eTruth_Missed_Phi = new TH1F("eTruth_Missed_Phi", "Missed e' Truth #phi Distribution;#phi (deg)", 360, -180, 180);
+
+  h1_nTruth_Missed_px = new TH1F("nTruth_Missed_px", "Missed nTruth p_{x} Distribution;p_{x} (GeV)", 480, -6, 6);
+  h1_nTruth_Missed_py = new TH1F("nTruth_Missed_py", "Missed nTruth p_{y} Distribution;p_{y} (GeV)", 200, -2.5, 2.5);
+  h1_nTruth_Missed_pz = new TH1F("nTruth_Missed_pz", "Missed nTruth p_{z} Distribution;p_{z} (GeV)", 240, 0, 50);
+  h1_nTruth_Missed_p = new TH1F("nTruth_Missed_p", "Missed nTruth p Distribution;p (GeV)", 240, 0, 50);
+  h1_nTruth_Missed_E = new TH1F("nTruth_Missed_E", "Missed nTruth E Distribution;E (GeV)", 240, 0, 50);
+  h1_nTruth_Missed_Theta = new TH1F("nTruth_Missed_Theta", "Missed nTruth #theta Distribution;#theta (deg)", 160, -10, 10);
+  h1_nTruth_Missed_Theta_inRange = new TH1F("nTruth_Missed_Theta_inRange", "Missed nTruth #theta Distribution in Range;#theta (deg)", 50, 1, 2);
+  h1_nTruth_Missed_Phi = new TH1F("nTruth_Missed_Phi", "Missed nTruth #phi Distribution;#phi (deg)", 360, -180, 180);
+
+  h2_nTruth_Missed_XY = new TH2F("nTruth_Missed_XY", "Missed nTruth XY Distribution; x (cm); y (cm)", 200, -200, 0, 200, -150, 150);
+
+  h1_Q2Truth_Dist_Missed = new TH1F("Q2Truth_Dist_Missed", "Missed Q^{2} Truth Distribution", 200, 0, 50);
+  h1_tTruth_Dist_Missed = new TH1F("tTruth_Dist_Missed", "Missed t Truth Distribution", 100, 0, 1); 
 
   gDirectory->cd("../");
   h2_ZDC_XY_IP6 = new TH2F("ZDC_XY_IP6", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
   h2_ZDC_XY_IP8 = new TH2F("ZDC_XY_IP8", "n X vs Y at ZDC; x (cm); y (cm)", 200, 50, 150, 200, -50, 50);
   h2_ZDC_XY_l = new TH2F("ZDC_XY_l", "n X vs Y at ZDC (Local Co-ords); x (cm); y (cm)", 800, -200, 200, 200, -50, 50);
+  nTruth_xyE3D = new TH3F("nTruth_xyE3D", "n X vs Y vs E Truth Distribution; x (cm); y (cm); E (GeV)", 100, -200, 0, 100, -150, 150, 100, 0, 50); // mfek 05/31/2022
+  ZDC_xyE3D = new TH3F("ZDC_xyE3D", "n X vs Y vs E ZDC Distribution; x (cm); y (cm); E (GeV)", 100, -200, 0, 100, -150, 150, 100, 0, 50); // mfek 05/31/2022
+  nTruth_Missed_xyE3D = new TH3F("nTruth_Missed_xyE3D", "n X vs Y vs E Truth Distribution for missed events; x (cm); y (cm); E (GeV)", 100, -200, 0, 100, -150, 150, 100, 0, 50); // mfek 06/03/2022
+  h3nTruth_xyE_pxy = new TProfile2D("h3nTruth_xyE_pxy", "n X vs Y vs E Truth Distribution; y (cm); x (cm)", 100, -150, 150, 100, -200, 0, 0.0, 50); // mfek 05/31/2022
+  h3ZDC_xyE_pxy = new TProfile2D("h3ZDC_xyE_pxy", "n X vs Y vs E ZDC Distribution; y (cm); x (cm)", 100, -150, 150, 100, -200, 0, 0.0, 50); // mfek 05/31/2022
+  h3nTruth_Missed_xyE_pxy = new TProfile2D("h3nTruth_Missed_xyE_pxy", "n X vs Y vs E Truth Distribution for missed events; y (cm); x (cm)", 100, -150, 150, 100, -200, 0, 0.0, 50); // mfek 06/03/2022
 
   // Define beam 4 vectors - Assume IP6 by default, for other IPs, adjust in the Process Event loop (at the top)
   e_beam_energy = 5;
   e_beam_pmag = sqrt(pow(e_beam_energy,2)-pow(mElec,2));
-  ion_beam_energy = 100;
+  ion_beam_energy = 41; // mfek, 05/26/2022, change to 41
   ion_beam_pmag = sqrt((pow(ion_beam_energy,2)-pow(mProt,2)));
   crossing_angle = 0.025; 
   eBeam4Vect.SetPxPyPzE(0,0,-1*e_beam_pmag,e_beam_energy);
@@ -447,7 +510,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
       nTried = 17000; // This is the approximate total number of events generated in a single file of this sample (5on100 epi)
     }
     else{
-      nTried = 170000; // This is the approximate total number of events generated in a single file of this sample (5on41 epi)
+      nTried = 179000; // This is the approximate total number of events generated in a single file of this sample (5on41 epi)
     }
   }
   else if (e_beam_energy == 10){
@@ -458,7 +521,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::InitRun(PHCompositeNode *topNode)
+int ECCE_DEMP5on41::InitRun(PHCompositeNode *topNode)
 {
   if( static_event_counter == 0){
     encloseure_nodeparams = findNode::getClass<PdbParameterMapContainer>(topNode, "G4GEOPARAM_hFarFwdBeamLineEnclosure_0");
@@ -507,11 +570,12 @@ int ECCE_DEMP::InitRun(PHCompositeNode *topNode)
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::process_event(PHCompositeNode *topNode)
+int ECCE_DEMP5on41::process_event(PHCompositeNode *topNode)
 {
   ZDC_hit = 0;
   EEMC_hit = 0;
-  event_itt++; 
+  event_itt++;
+  thrownEvents++; // mfek 05/27/2022
   
   if (IP_design == "IP8" ){ // If IP8, need to adjust crossing angle and adjust incoming beams
     crossing_angle = 0.035; // IP8 has a 35 mRad crossing angle
@@ -568,24 +632,98 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
   xb_truth =  Q2_truth/(2*(pBeam4Vect.Dot(virtphoton4VectTruth)));
   xi_truth = xb_truth/(2-xb_truth);
 
+  // mfek 05/27/2022 - filling new histograms
+  h1_piTruth_preCut_px->Fill(pi4VectTruth.Px(), wgt);
+  h1_piTruth_preCut_py->Fill(pi4VectTruth.Py(), wgt);
+  h1_piTruth_preCut_pz->Fill(pi4VectTruth.Pz(), wgt);
+  h1_piTruth_preCut_p->Fill(pi4VectTruth.P(), wgt);
+  h1_piTruth_preCut_E->Fill(pi4VectTruth.E(), wgt);
+
+  h1_eTruth_preCut_px->Fill(e4VectTruth.Px(), wgt);
+  h1_eTruth_preCut_py->Fill(e4VectTruth.Py(), wgt);
+  h1_eTruth_preCut_pz->Fill(e4VectTruth.Pz(), wgt);
+  h1_eTruth_preCut_p->Fill(e4VectTruth.P(), wgt);
+  h1_eTruth_preCut_E->Fill(e4VectTruth.E(), wgt);
+
+  h1_nTruth_preCut_px->Fill(n4VectTruth.Px(), wgt);
+  h1_nTruth_preCut_py->Fill(n4VectTruth.Py(), wgt);
+  h1_nTruth_preCut_pz->Fill(n4VectTruth.Pz(), wgt);
+  h1_nTruth_preCut_p->Fill(n4VectTruth.P(), wgt);
+  h1_nTruth_preCut_E->Fill(n4VectTruth.E(), wgt);
+  h1_nTruth_preCut_Theta->Fill(n4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+  if (n4VectTruth.Theta()*TMath::RadToDeg() >= 1.2 && n4VectTruth.Theta()*TMath::RadToDeg() <= 1.66) {
+    h1_nTruth_preCut_Theta_inRange->Fill(n4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+  } // mfek 06/03/2022 - new histogram
+  h2_nTruth_preCut_XY->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), wgt); // mfek 05/28/2022 - filling neutron truth XY distribution
+
+  if (3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()) > -150 && 3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()) < -50 && 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()) > -50 && 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()) < 50) {
+    h2_nTruth_preCut_XY_inZDC->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), wgt);
+  }
+  else {
+    h2_nTruth_preCut_XY_outZDC->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), wgt);
+  }
+
+  nTruth_xyE3D->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), n4VectTruth.E(), wgt); // mfek 05/31/2022
+
   h1_Q2_DetEff_Uncut->Fill(Q2_truth, wgt);
   h2_Q2_t_DetEff_Uncut->Fill(Q2_truth, t_truth, wgt);
   h2_Q2_t_DetEff_v2_Uncut->Fill(Q2_truth, t_truth, wgt);
 
-  for(Int_t B = 0; B < 8; B++){
-    if ( B <= 1){
-      Q2_low = 5+(B*2.5);
-      Q2_high = 7.5+(B*2.5);
-    }
-    else{
-      Q2_low = 5+((B-1)*5.0);
-      Q2_high = 10+((B-1)*5.0);
-    }
+  for(Int_t B = 0; B < 19; B++){
+    Q2_low = Q2BinVal[B];
+    Q2_high = Q2BinVal[B+1];
     if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
-    h1_t_truth_thrown_result[B]->Fill(t_truth, wgt);
+      h1_t_truth_thrown_result[B]->Fill(t_truth, wgt);
     }
-  }
+  } // mfek 06/21/2022 - new binning
 
+  if (Check_n(topNode) == true) {
+    count_aftern++;
+  } // mfek 05/27/2022 - new counter added
+
+  if (Check_ePi(topNode) == true) {
+    count_afterePi++;
+  } // mfek 05/27/2022 - new counter added
+
+  if (Check_n(topNode) != true || Check_ePi(topNode) != true) {
+    h1_Q2_DetEff_Missed->Fill(Q2_truth, wgt);
+    h2_Q2_t_DetEff_Missed->Fill(Q2_truth, t_truth, wgt);
+    h2_Q2_t_DetEff_Missed_v2->Fill(Q2_truth, t_truth, wgt);
+
+    h1_piTruth_Missed_p->Fill(pi4VectTruth.P(), wgt);
+    h1_piTruth_Missed_px->Fill(pi4VectTruth.Px(), wgt);
+    h1_piTruth_Missed_py->Fill(pi4VectTruth.Py(), wgt);
+    h1_piTruth_Missed_pz->Fill(pi4VectTruth.Pz(), wgt);
+    h1_piTruth_Missed_E->Fill(pi4VectTruth.E(), wgt);
+    h1_piTruth_Missed_Theta->Fill(pi4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    h1_piTruth_Missed_Phi->Fill(pi4VectTruth.Phi()*TMath::RadToDeg(), wgt);
+
+    h1_eTruth_Missed_p->Fill(e4VectTruth.P(), wgt);
+    h1_eTruth_Missed_px->Fill(e4VectTruth.Px(), wgt);
+    h1_eTruth_Missed_py->Fill(e4VectTruth.Py(), wgt);
+    h1_eTruth_Missed_pz->Fill(e4VectTruth.Pz(), wgt);
+    h1_eTruth_Missed_E->Fill(e4VectTruth.E(), wgt);
+    h1_eTruth_Missed_Theta->Fill(e4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    h1_eTruth_Missed_Phi->Fill(e4VectTruth.Phi()*TMath::RadToDeg(), wgt);
+
+    h1_nTruth_Missed_p->Fill(n4VectTruth.P(), wgt);
+    h1_nTruth_Missed_px->Fill(n4VectTruth.Px(), wgt);
+    h1_nTruth_Missed_py->Fill(n4VectTruth.Py(), wgt);
+    h1_nTruth_Missed_pz->Fill(n4VectTruth.Pz(), wgt);
+    h1_nTruth_Missed_E->Fill(n4VectTruth.E(), wgt);
+    h1_nTruth_Missed_Theta->Fill(n4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    if (n4VectTruth.Theta()*TMath::RadToDeg() >= 1.2 && n4VectTruth.Theta()*TMath::RadToDeg() <= 1.66) {
+      h1_nTruth_Missed_Theta_inRange->Fill(n4VectTruth.Theta()*TMath::RadToDeg(), wgt);
+    } // mfek 06/03/2022 - new histogram
+    h1_nTruth_Missed_Phi->Fill(n4VectTruth.Phi()*TMath::RadToDeg(), wgt);
+
+    h2_nTruth_Missed_XY->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), wgt);
+
+    nTruth_Missed_xyE3D->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), n4VectTruth.E(), wgt); // mfek 06/03/2022
+
+    h1_Q2Truth_Dist_Missed->Fill(Q2_truth, wgt);
+    h1_tTruth_Dist_Missed->Fill(t_truth, wgt);
+  } // mfek 06/02/2022
 
   if (Check_n(topNode) == true && Check_ePi(topNode) == true){ // For event, check if it look like we have an e/pi/n in the event
     // Get track map for e'/pi info
@@ -594,6 +732,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     //PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_ZDC");
     // Need to use ZDC surrogate now
     PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_ZDCsurrogate");
+    cut1Events++; // mfek 05/27/2022 - new counter added (counts after applying ZDC energy deposit cut)
 
     if (!trackmap)
       {
@@ -601,7 +740,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	if (!trackmap)
 	  {
 	    cout
-	      << "ECCE_DEMP::process_event - Error can not find DST trackmap node SvtxTrackMap" << endl;
+	      << "ECCE_DEMP5on41::process_event - Error can not find DST trackmap node SvtxTrackMap" << endl;
 	    exit(-1);
 	  }
       }
@@ -649,6 +788,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 
 	  det_x_pos = Enclosure_params.get_double_param("place_x")  + ZDC_params.get_double_param("place_x");
 	  det_z_pos = Enclosure_params.get_double_param("place_z")  + ZDC_params.get_double_param("place_z");
+	  //std::cout << det_x_pos << std::endl;
 
 	  ZDC_params.set_double_param("place_x", det_x_pos); 
 	  ZDC_params.set_double_param("place_z", det_z_pos); 
@@ -797,30 +937,26 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h2_t_ep->Fill(t, e4Vect.P(), wgt);
     h2_t_Q2->Fill(t,Q2, wgt);
     h2_delta_t_t->Fill(((t - t_truth)/t_truth)*100, t, wgt);
-    
-    for(Int_t B = 0; B < 7; B++){
-      Q2_low = 5+(B*5);
-      Q2_high = 10+(B*5);
-      if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
-	h1_t_Q2[B]->Fill(t, wgt);
-	h1_t_alt_Q2[B]->Fill(t_alt, wgt);
-	h2_delta_t_t_Q2[B]->Fill(((t - t_truth)/t_truth)*100, t, wgt);
-      }
-    }
 
-    for(Int_t B = 0; B < 8; B++){
-      if ( B <= 1){
-	Q2_low = 5+(B*2.5);
-	Q2_high = 7.5+(B*2.5);
+    for(Int_t B = 0; B < 19; B++){
+      Q2_low = Q2BinVal[B];
+      Q2_high = Q2BinVal[B+1];
+      if ( Q2_truth > Q2_low && Q2_truth < Q2_high){
+	  h1_t_Q2[B]->Fill(t, wgt);
+	  h1_t_alt_Q2[B]->Fill(t_alt, wgt);
+	  h2_delta_t_t_Q2[B]->Fill(((t - t_truth)/t_truth)*100, t, wgt);
       }
-      else{
-	Q2_low = 5+((B-1)*5.0);
-	Q2_high = 10+((B-1)*5.0);
-      }
+    } // mfek 06/21/2022 - changed binning for 5 on 41
+
+    for(Int_t B = 0; B < 19; B++){
+      
+      Q2_low = Q2BinVal[B];
+      Q2_high = Q2BinVal[B+1]; // mfek 06/21/2022 - new binning
 
       // Fill some histograms under different cut conditions for comparison
       // These are used for some plots Garth wanted
-      if (Q2_low == 7.5){
+ 
+      if (Q2_low == 5.0){
 	if ( Q2 > Q2_low && Q2 < Q2_high){
 	  if (t_alt < 0.4){ 
 	    h1_t_cut1_Low->Fill(t_alt, wgt);
@@ -836,7 +972,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	  }
 	}
       }
-      else if (Q2_low == 15.0){
+      else if (Q2_low == 10.0){
 	if ( Q2 > Q2_low && Q2 < Q2_high){
 	  if (t_alt < 0.4){ 
 	    h1_t_cut1_Mid->Fill(t_alt, wgt);
@@ -852,7 +988,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	  }
 	}
       }
-      else if (Q2_low == 25.0){
+      else if ((Q2_low == 12.5) || (Q2_low == 15.0)){
 	if ( Q2 > Q2_low && Q2 < Q2_high){
 	  if (t_alt < 0.4){ 
 	    h1_t_cut1_High->Fill(t_alt, wgt);
@@ -897,11 +1033,19 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	  h1_nTheta_result[B]->Fill(nRec4Vect.Theta()*TMath::RadToDeg(), wgt);
 	  h1_pmiss_result[B]->Fill(pmiss4Vect.P(), wgt);
 	  h1_pn_result[B]->Fill(nRec4Vect.P(), wgt);
+          cut2Events++; // mfek 05/27/2022 - t cut
 	  // Apply other cuts
 	  //if ( (pmiss4Vect.P() < PmissCutVal[B]) && ((nSmeared4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nSmeared4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){
 	  // SJDK - 31/03/22
 	  // nRec4Vect is EXACTLY the missing momentum vector for now, so comparing it to the pmiss cut value is fine
 	  //if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){ // Old version without theta/phi diff cuts
+	  // mfek 05/27/2022 - adding an extra if loop system to count events passing through the cuts
+	  if ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) {
+	    cut3Events++;
+	    if (abs(nTheta_Diff*TMath::RadToDeg()) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut) {
+	      cut4Events++;
+	    } // ThetaDiff/PhiDiff CUt
+	  } // Thetan Cut
 	  if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){
 	    h1_t_cut_result[B]->Fill(t_alt, wgt);
 	    h1_Q2_cut_result[B]->Fill(Q2, wgt);
@@ -917,12 +1061,26 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	    h2_Q2_t_result[B]->Fill(Q2, t_alt, wgt);
 	    h2_t_ttruth_result_Q2[B]->Fill(t, t_truth, wgt);
 	    h2_t_alt_ttruth_result_Q2[B]->Fill(t_alt, t_truth, wgt);
-	    h2_Q2_Q2truth_result[B]->Fill(Q2, Q2_truth, wgt);
-	    h2_W_Wtruth_result[B]->Fill(W, W_truth, wgt);
+	    cut5Events++; // mfek 05/27/2022 - PMiss cut
 	  }
 	}
       }
     }
+
+    /*// mfek 05/27/2022 - adding an extra if loop system to count events passing through the cuts
+      
+    if (Check_n(topNode) == true && Check_ePi(topNode) == true) {
+      cut1Events++;
+      if (t_alt < 0.4 && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))) {
+        cut2Events++;
+	if ((abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut) {
+	cut3Events++;
+	  //if (nRec4Vect.P() < PmissCutVal[B]) {
+	  //cut4Events++;
+	  //} // Pmiss cut
+	} // Angle Difference Cuts
+      } // Thetan Difference Cuts
+    } // Energy Cuts*/
 
     h1_piTruth_p->Fill(pi4VectTruth.P(), wgt);
     h1_piTruth_px->Fill(pi4VectTruth.Px(), wgt);
@@ -959,11 +1117,10 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_pmissDiff_px->Fill(pmiss4Vect.Px()-n4VectTruth.Px(), wgt);
     h1_pmissDiff_py->Fill(pmiss4Vect.Py()-n4VectTruth.Py(), wgt);
     h1_pmissDiff_pz->Fill(pmiss4Vect.Pz()-n4VectTruth.Pz(), wgt);
-    
-    // SJDK 30/05/22 The 375 used here is the approximate z position of the central barrel calorimeter in cm. This projects the tracks to that position (since the calorimeter hits didn't work)
-    // This isn't exactly coded fantastically, I think this was just here to make a quick plot at one point
+
     h2_pi_XY->Fill((375*(TMath::Cos(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), (375*(TMath::Sin(pi4Vect.Phi()))*(TMath::Tan(pi4Vect.Theta()))), wgt);
     h2_e_XY->Fill((375*(TMath::Cos(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), (375*(TMath::Sin(e4Vect.Phi()))*(TMath::Tan(e4Vect.Theta()))), wgt);
+
     if ( IP_design == "IP6"){
       h2_ZDC_XY_IP6->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
     }
@@ -974,6 +1131,10 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
       h2_ZDC_XY_IP6->Fill(nZDCPos.x(), nZDCPos.y(), wgt);
     }
     h2_ZDC_XY_l->Fill(local_x, local_y, wgt);
+
+    ZDC_xyE3D->Fill(nZDCPos.x(), nZDCPos.y(), n4Vect.E(), wgt); // mfek 05/31/2022
+
+    h2_nTruth_XY_hits->Fill(3700*TMath::Cos(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), 3700*TMath::Sin(n4VectTruth.Phi())*TMath::Tan(n4VectTruth.Theta()), wgt); // mfek
  
     h2_piTrack_ThetaPhi->Fill((pi4Vect.Theta()*TMath::RadToDeg()), (pi4Vect.Phi()*TMath::RadToDeg()), wgt);
     h2_piTrack_pTheta->Fill((pi4Vect.Theta()*TMath::RadToDeg()), pi4Vect.P(), wgt);
@@ -1004,31 +1165,54 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::ResetEvent(PHCompositeNode *topNode)
+int ECCE_DEMP5on41::ResetEvent(PHCompositeNode *topNode)
 {
-//  std::cout << "ECCE_DEMP::ResetEvent(PHCompositeNode *topNode) Resetting internal structures, prepare for next event" << std::endl;
+//  std::cout << "ECCE_DEMP5on41::ResetEvent(PHCompositeNode *topNode) Resetting internal structures, prepare for next event" << std::endl;
 //
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::EndRun(const int runnumber)
+int ECCE_DEMP5on41::EndRun(const int runnumber)
 {
-  std::cout << "ECCE_DEMP::EndRun(const int runnumber) Ending Run for Run " << runnumber << std::endl;
+  std::cout << "ECCE_DEMP5on41::EndRun(const int runnumber) Ending Run for Run " << runnumber << std::endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::End(PHCompositeNode *topNode)
+int ECCE_DEMP5on41::End(PHCompositeNode *topNode)
 {
-  std::cout << "ECCE_DEMP::End(PHCompositeNode *topNode) This is the End..." << std::endl;
+  std::cout << "ECCE_DEMP5on41::End(PHCompositeNode *topNode) This is the End..." << std::endl;
+  std::cout << "thrown events: " << thrownEvents << std::endl; // mfek 05/27/2022
+  std::cout << "events after cut 1: " << cut1Events << std::endl; // mfek 05/27/2022
+  std::cout << "events after cut 2: " << cut2Events << std::endl; // mfek 05/27/2022
+  std::cout << "events after cut 3: " << cut3Events << std::endl; // mfek 05/27/2022  
+  std::cout << "events after cut 4: " << cut4Events << std::endl; // mfek 05/27/2022
+  std::cout << "events after cut 5: " << cut5Events << std::endl; // mfek 05/27/2022
+  std::cout << "events Check_n(): " << count_aftern << std::endl; // mfek 05/27/2022
+  std::cout << "events Check_ePi(): " << count_afterePi << std::endl; // mfek 05/27/2022
+  std::cout << "nTried: " << nTried << std::endl; // mfek 05/27/2022
+  //std::cout << "det_z_pos: " << Enclosure_params.get_double_param("place_z")  + ZDC_params.get_double_param("place_z") << std::endl;
+
   ScalingFact = double(event_itt)/nTried; // This scaling factor is needed to normalise the weighted results
   h1_Q2_DetEff->Divide(h1_Q2_DetEff_Cut, h1_Q2_DetEff_Uncut);
   h2_Q2_t_DetEff->Divide(h2_Q2_t_DetEff_Cut, h2_Q2_t_DetEff_Uncut);
   h2_Q2_t_DetEff_v2->Divide(h2_Q2_t_DetEff_v2_Cut, h2_Q2_t_DetEff_v2_Uncut);
+  h1_Q2_DetEff_MissedThrown->Divide(h1_Q2_DetEff_Missed, h1_Q2_DetEff_Uncut); // mfek 06/02/2022
+  h2_Q2_t_DetEff_MissedThrown->Divide(h2_Q2_t_DetEff_Missed, h2_Q2_t_DetEff_Uncut); // mfek 06/02/2022
+  h2_Q2_t_DetEff_MissedThrown_v2->Divide(h2_Q2_t_DetEff_Missed_v2, h2_Q2_t_DetEff_v2_Uncut); // mfek 06/02/2022
+
+  /*h1_Q2_DetEff_Missed->Scale((1/ScalingFact)); // mfek 06/02/2022
+  h2_Q2_t_DetEff_Missed->Scale((1/ScalingFact)); // mfek 06/02/2022
+  h2_Q2_t_DetEff_Missed_v2->Scale((1/ScalingFact)); // mfek 06/02/2022 
+  h1_Q2_DetEff_MissedThrown->Scale((1/ScalingFact)); // mfek 06/02/2022
+  h2_Q2_t_DetEff_MissedThrown->Scale((1/ScalingFact)); // mfek 06/02/2022
+  h2_Q2_t_DetEff_MissedThrown_v2->Scale((1/ScalingFact)); // mfek 06/02/2022*/
+
   h2_Q2_W_result->Scale((1/ScalingFact));
   h2_pi_XY->Scale((1/ScalingFact));  
   h2_e_XY->Scale((1/ScalingFact));
+
   if ( IP_design == "IP6"){
     delete h2_ZDC_XY_IP8;
     h2_ZDC_XY_IP6->Scale((1/ScalingFact));
@@ -1074,7 +1258,7 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
   h1_pmissDiff_py->Scale((1/ScalingFact));
   h1_pmissDiff_pz->Scale((1/ScalingFact));
 
-  for(Int_t C = 0; C < 8; C++){
+  for(Int_t C = 0; C < 19; C++){
     h1_pmiss_result[C]->Scale((1/ScalingFact));
     h1_pn_result[C]->Scale((1/ScalingFact));	
     h1_t_result[C]->Scale((1/ScalingFact));
@@ -1088,8 +1272,6 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
     h1_t_Resolution[C]->Scale((1/ScalingFact));
     h1_talt_Resolution_ZDC[C]->Scale((1/ScalingFact));
     h1_talt_Resolution_pMiss[C]->Scale((1/ScalingFact));
-    h2_Q2_Q2truth_result[C]->Scale((1/ScalingFact));
-    h2_W_Wtruth_result[C]->Scale((1/ScalingFact));
   }
 
   h1_nTheta_tCut->Scale((1/ScalingFact));
@@ -1106,6 +1288,62 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
   h1_t_cut3_High->Scale((1/ScalingFact));
   h1_t_cut4_High->Scale((1/ScalingFact));
 
+  /*h1_piTruth_preCut_px->Scale((1/ScalingFact));
+  h1_piTruth_preCut_py->Scale((1/ScalingFact));
+  h1_piTruth_preCut_pz->Scale((1/ScalingFact));
+  h1_piTruth_preCut_p->Scale((1/ScalingFact));
+  h1_piTruth_preCut_E->Scale((1/ScalingFact));
+  h1_eTruth_preCut_px->Scale((1/ScalingFact));
+  h1_eTruth_preCut_py->Scale((1/ScalingFact));
+  h1_eTruth_preCut_pz->Scale((1/ScalingFact));
+  h1_eTruth_preCut_p->Scale((1/ScalingFact));
+  h1_eTruth_preCut_E->Scale((1/ScalingFact));
+  h1_nTruth_preCut_px->Scale((1/ScalingFact));
+  h1_nTruth_preCut_py->Scale((1/ScalingFact));
+  h1_nTruth_preCut_pz->Scale((1/ScalingFact));
+  h1_nTruth_preCut_p->Scale((1/ScalingFact));
+  h1_nTruth_preCut_E->Scale((1/ScalingFact));
+  h1_nTruth_preCut_Theta->Scale((1/ScalingFact));
+  h2_nTruth_preCut_XY->Scale((1/ScalingFact));
+  h2_nTruth_preCut_XY_inZDC->Scale((1/ScalingFact));
+  h2_nTruth_preCut_XY_outZDC->Scale((1/ScalingFact));
+  h2_nTruth_XY_hits->Scale((1/ScalingFact));
+  nTruth_xyE3D->Scale((1/ScalingFact));*/  
+  ZDC_xyE3D->Scale((1/ScalingFact));
+
+  // mfek 06/02/2022
+  /*h1_piTruth_Missed_p->Scale((1/ScalingFact));
+  h1_piTruth_Missed_px->Scale((1/ScalingFact));
+  h1_piTruth_Missed_py->Scale((1/ScalingFact));
+  h1_piTruth_Missed_pz->Scale((1/ScalingFact));
+  h1_piTruth_Missed_E->Scale((1/ScalingFact));
+  h1_piTruth_Missed_Theta->Scale((1/ScalingFact));
+  h1_piTruth_Missed_Phi->Scale((1/ScalingFact));
+  h1_eTruth_Missed_p->Scale((1/ScalingFact));
+  h1_eTruth_Missed_px->Scale((1/ScalingFact));
+  h1_eTruth_Missed_py->Scale((1/ScalingFact));
+  h1_eTruth_Missed_pz->Scale((1/ScalingFact));
+  h1_eTruth_Missed_E->Scale((1/ScalingFact));
+  h1_eTruth_Missed_Theta->Scale((1/ScalingFact));
+  h1_eTruth_Missed_Phi->Scale((1/ScalingFact));
+  h1_nTruth_Missed_p->Scale((1/ScalingFact));
+  h1_nTruth_Missed_px->Scale((1/ScalingFact));
+  h1_nTruth_Missed_py->Scale((1/ScalingFact));
+  h1_nTruth_Missed_pz->Scale((1/ScalingFact));
+  h1_nTruth_Missed_E->Scale((1/ScalingFact));
+  h1_nTruth_Missed_Theta->Scale((1/ScalingFact));
+  h1_nTruth_Missed_Phi->Scale((1/ScalingFact));
+  h2_nTruth_Missed_XY->Scale((1/ScalingFact));*/
+
+  c = new TCanvas();
+  c->Divide(2,2);
+  c->cd(1);
+  nTruth_xyE3D->Project3DProfile("yx")->Draw("COLZ");
+  c->cd(2);
+  ZDC_xyE3D->Project3DProfile("yx")->Draw("COLZ");
+  c->cd(3);
+  nTruth_Missed_xyE3D->Project3DProfile("yx")->Draw("COLZ");
+
   outfile->cd();
   outfile->Write();
   outfile->Close();
@@ -1116,16 +1354,16 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
 }
 
 //____________________________________________________________________________..
-int ECCE_DEMP::Reset(PHCompositeNode *topNode)
+int ECCE_DEMP5on41::Reset(PHCompositeNode *topNode)
 {
- std::cout << "ECCE_DEMP::Reset(PHCompositeNode *topNode) being Reset" << std::endl;
+ std::cout << "ECCE_DEMP5on41::Reset(PHCompositeNode *topNode) being Reset" << std::endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
 //____________________________________________________________________________..
-void ECCE_DEMP::Print(const std::string &what) const
+void ECCE_DEMP5on41::Print(const std::string &what) const
 {
-  std::cout << "ECCE_DEMP::Print(const std::string &what) const Printing info for " << what << std::endl;
+  std::cout << "ECCE_DEMP5on41::Print(const std::string &what) const Printing info for " << what << std::endl;
 }
 
 
@@ -1134,7 +1372,7 @@ void ECCE_DEMP::Print(const std::string &what) const
 //
 // Energy smearing
 
-float ECCE_DEMP::ZDC_Energy_Smear_EMCAL(float E) {
+float ECCE_DEMP5on41::ZDC_Energy_Smear_EMCAL(float E) {
 
   float resolution, E_reco;
 
@@ -1146,7 +1384,7 @@ float ECCE_DEMP::ZDC_Energy_Smear_EMCAL(float E) {
 
 // Energy smearing
 
-float ECCE_DEMP::ZDC_Energy_Smear_HCAL(float E) {
+float ECCE_DEMP5on41::ZDC_Energy_Smear_HCAL(float E) {
 
   float resolution, E_reco;
 
@@ -1160,7 +1398,7 @@ float ECCE_DEMP::ZDC_Energy_Smear_HCAL(float E) {
 
 // Energy smearing
 
-float ECCE_DEMP::ZDC_Energy_Smear_PbWO4(float E) {
+float ECCE_DEMP5on41::ZDC_Energy_Smear_PbWO4(float E) {
 
   float resolution, E_reco;
 
@@ -1173,7 +1411,7 @@ float ECCE_DEMP::ZDC_Energy_Smear_PbWO4(float E) {
 
 // Position smearing
 
-float ECCE_DEMP::ZDC_Position_Smear(float P) {
+float ECCE_DEMP5on41::ZDC_Position_Smear(float P) {
 
   float resolution, P_reco;
 
@@ -1186,7 +1424,7 @@ float ECCE_DEMP::ZDC_Position_Smear(float P) {
 
 //***************************************************
 
-bool ECCE_DEMP::Check_ePi(PHCompositeNode* topNode)
+bool ECCE_DEMP5on41::Check_ePi(PHCompositeNode* topNode)
 {
   SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
   if (!trackmap)
@@ -1195,7 +1433,7 @@ bool ECCE_DEMP::Check_ePi(PHCompositeNode* topNode)
       if (!trackmap)
     	{
     	  cout
-    	    << "ECCE_DEMP::process_event - Error can not find DST trackmap node SvtxTrackMap" << endl;
+    	    << "ECCE_DEMP5on41::process_event - Error can not find DST trackmap node SvtxTrackMap" << endl;
     	  exit(-1);
     	}
     }
@@ -1228,7 +1466,7 @@ bool ECCE_DEMP::Check_ePi(PHCompositeNode* topNode)
 
 //***************************************************
 
-bool ECCE_DEMP::Check_n(PHCompositeNode* topNode)
+bool ECCE_DEMP5on41::Check_n(PHCompositeNode* topNode)
 {
   // loop over the G4Hits
 
@@ -1245,8 +1483,8 @@ bool ECCE_DEMP::Check_n(PHCompositeNode* topNode)
     for (PHG4HitContainer::ConstIterator hit_iter = hit_range.first; hit_iter != hit_range.second; hit_iter++)
       {
 	ZDCHits++;
-	//if (hit_iter->second->get_edep() > 40){ // Hit in ZDC with roughly correct energy for neutron, should check the smeared energy instead?
-	if (ZDC_Energy_Smear_HCAL(hit_iter->second->get_edep()) > 40){ // Hit in ZDC with roughly correct energy for neutron, use smeared energy
+	//if (hit_iter->second->get_edep() > 10){ // Hit in ZDC with roughly correct energy for neutron, should check the smeared energy instead?
+	if (ZDC_Energy_Smear_HCAL(hit_iter->second->get_edep()) > 10){ // Hit in ZDC with roughly correct energy for neutron, use smeared energy // mfek 05/26/2022 - changed to 10 GeV threshold for more appropriate cut for 5 on 41 events
 	  nZDChit = kTRUE;
 	}
       }
@@ -1266,7 +1504,7 @@ bool ECCE_DEMP::Check_n(PHCompositeNode* topNode)
 // Conversion to local co-ordinate system from global values - from Bill's Diff_Tagg_Ana scripts
 //*******************************************
 
-float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot) {
+float ECCE_DEMP5on41::Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot) {
 
 
    TVector3 global_cor(global_x, global_y, global_z);
@@ -1281,14 +1519,14 @@ float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, flo
 
 //*******************************************
 
-float ECCE_DEMP::Get_Local_Y(float global_x, float global_y, float global_z, float det_tilt, float cross_angle) {
+float ECCE_DEMP5on41::Get_Local_Y(float global_x, float global_y, float global_z, float det_tilt, float cross_angle) {
 
 	return global_y;
 
 }
 
 //*******************************************
-float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, PdbParameterMapContainer *det_nodeparams) {
+float ECCE_DEMP5on41::Get_Local_X(float global_x, float global_y, float global_z, PdbParameterMapContainer *det_nodeparams) {
 
    PHParameters Det_params{"PHDet"};
 
@@ -1317,7 +1555,7 @@ float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, Pdb
 
 //*******************************************
 
-float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, PHParameters Det_params) {
+float ECCE_DEMP5on41::Get_Local_X(float global_x, float global_y, float global_z, PHParameters Det_params) {
 
    float det_xCent = Det_params.get_double_param("place_x");
    float det_zCent = Det_params.get_double_param("place_z");
@@ -1334,4 +1572,3 @@ float ECCE_DEMP::Get_Local_X(float global_x, float global_y, float global_z, PHP
    return local_x1;
 
 }
-
