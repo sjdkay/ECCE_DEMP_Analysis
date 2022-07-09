@@ -444,6 +444,8 @@ class ECCE_DEMP : public SubsysReco
   TH1F* h1_t_Resolution[8];
   TH1F* h1_talt_Resolution_ZDC[8];
   TH1F* h1_talt_Resolution_pMiss[8];
+  TH1F* h1_Q2_Resolution[8];
+  TH1F* h1_W_Resolution[8];
 
   PHParameters Enclosure_params{"PHGEnclosure"};
   PHParameters ZDC_params{"PHG4RP"};

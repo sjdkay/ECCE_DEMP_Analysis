@@ -424,6 +424,30 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   }
 
   gDirectory->cd("../");
+  gDirectory->mkdir("Q2_Resolution");
+  gDirectory->cd("Q2_Resolution");
+  for(Int_t A = 0; A < 8; A++){
+    if ( A <= 1){
+      h1_Q2_Resolution[A]=new TH1F(Form("Q2_Resolution_Q2_%i", (A+1)), Form("Q^{2} - Q^{2}_{truth} Dist, %2.1f < Q^{2} < %2.1f; (Q^{2} - Q^{2}_{truth})/Q^{2}_{truth}; Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 120, -30, 30);
+    }
+    else{
+      h1_Q2_Resolution[A]=new TH1F(Form("Q2_Resolution_Q2_%i", (A+1)), Form("Q^{2} - Q^{2}_{truth} Dist, %i < Q^{2} < %i; (Q^{2} - Q^{2}_{truth})/Q^{2}_{truth}; Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 120, -30, 30);
+    }
+  }
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("W_Resolution");
+  gDirectory->cd("W_Resolution");
+  for(Int_t A = 0; A < 8; A++){
+    if ( A <= 1){
+      h1_W_Resolution[A]=new TH1F(Form("W_Resolution_Q2_%i", (A+1)), Form("W - W_{truth} Dist, %2.1f < Q^{2} < %2.1f; (W - W_{truth})/W_{truth}; Rate(Hz)", (5+(A*2.5)), (7.5+(A*2.5))), 400, -100, 100);
+    }
+    else{
+      h1_W_Resolution[A]=new TH1F(Form("W_Resolution_Q2_%i", (A+1)), Form("W - W_{truth} Dist, %i < Q^{2} < %i; (W - W_{truth})/W_{truth}; Rate(Hz)", (5+((A-1)*5)), (10+((A-1)*5))), 400, -100, 100);
+    }
+  }
+  
+  gDirectory->cd("../");
   h2_ZDC_XY_IP6 = new TH2F("ZDC_XY_IP6", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
   h2_ZDC_XY_IP8 = new TH2F("ZDC_XY_IP8", "n X vs Y at ZDC; x (cm); y (cm)", 200, 50, 150, 200, -50, 50);
   h2_ZDC_XY_l = new TH2F("ZDC_XY_l", "n X vs Y at ZDC (Local Co-ords); x (cm); y (cm)", 800, -200, 200, 200, -50, 50);
@@ -919,6 +943,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	    h2_t_alt_ttruth_result_Q2[B]->Fill(t_alt, t_truth, wgt);
 	    h2_Q2_Q2truth_result[B]->Fill(Q2, Q2_truth, wgt);
 	    h2_W_Wtruth_result[B]->Fill(W, W_truth, wgt);
+	    h1_Q2_Resolution[B]->Fill(((Q2-Q2_truth)/Q2_truth)*100, wgt);
+	    h1_W_Resolution[B]->Fill(((W-W_truth)/W_truth)*100, wgt);
 	  }
 	}
       }
@@ -1090,6 +1116,8 @@ int ECCE_DEMP::End(PHCompositeNode *topNode)
     h1_talt_Resolution_pMiss[C]->Scale((1/ScalingFact));
     h2_Q2_Q2truth_result[C]->Scale((1/ScalingFact));
     h2_W_Wtruth_result[C]->Scale((1/ScalingFact));
+    h1_Q2_Resolution[C]->Scale((1/ScalingFact));
+    h1_W_Resolution[C]->Scale((1/ScalingFact));
   }
 
   h1_nTheta_tCut->Scale((1/ScalingFact));
