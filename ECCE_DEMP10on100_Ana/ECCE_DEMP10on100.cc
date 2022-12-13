@@ -314,6 +314,7 @@ int ECCE_DEMP10on100::Init(PHCompositeNode *topNode)
   h1_t_comp = new TH1F("t_comp_Dist", "#frac{#Delta t}{t} Distribution; #frac{t_{alt}-t}{t} (%)", 200, -100, 100);
   h1_xb_Dist = new TH1F("xb_Dist", "x_{b} Distribution", 100, 0, 1);
   h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
+  h1_y_inv_Dist = new TH1F("y_inv_Dist", "y Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Kinematics_Truth_Info");
@@ -324,6 +325,7 @@ int ECCE_DEMP10on100::Init(PHCompositeNode *topNode)
   h1_t_altTruth_Dist = new TH1F("t_altTruth_Dist", "-t_alt Truth (Alternative Calculation) Distribution", 100, 0, 1);
   h1_xbTruth_Dist = new TH1F("xbTruth_Dist", "x_{b} Truth Distribution", 100, 0, 1);
   h1_xiTruth_Dist = new TH1F("xiTruth_Dist", "#xi Truth Distribution", 100, 0, 1);
+  h1_y_invTruth_Dist = new TH1F("y_invTruth_Dist", "y_{Truth} Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Kinematics_Analysis");
@@ -622,6 +624,7 @@ int ECCE_DEMP10on100::process_event(PHCompositeNode *topNode)
   t_alt_truth = -(t_alt4VectTruth.Mag2());
   xb_truth =  Q2_truth/(2*(pBeam4Vect.Dot(virtphoton4VectTruth)));
   xi_truth = xb_truth/(2-xb_truth);
+  y_inv_truth = (pBeam4Vect.Dot(virtphoton4VectTruth))/(pBeam4Vect.Dot(eBeam4Vect));// Calculation of the fractional energy loss
 
   // mfek 06/23/2022
   h1_piTruth_preCut_px->Fill(pi4VectTruth.Px(), wgt);
@@ -826,6 +829,7 @@ int ECCE_DEMP10on100::process_event(PHCompositeNode *topNode)
     t_alt_ZDC = -(t_alt4Vect_ZDC.Mag2());
     xb =  Q2/(2*(pBeam4Vect.Dot(virtphoton4Vect)));
     xi = xb/(2-xb);
+    y_inv = (pBeam4Vect.Dot(virtphoton4Vect))/(pBeam4Vect.Dot(eBeam4Vect));// Calculation of the fractional energy loss
     
     // Fill weighted histograms
     h1_Q2_DetEff_Cut->Fill(Q2_truth, wgt);
@@ -913,6 +917,7 @@ int ECCE_DEMP10on100::process_event(PHCompositeNode *topNode)
     h1_t_comp->Fill(((t_alt-t)/t)*100, wgt);
     h1_xb_Dist->Fill(xb, wgt);
     h1_xi_Dist->Fill(xi, wgt);
+    h1_y_inv_Dist->Fill(y_inv, wgt);
 
     h1_Q2Truth_Dist->Fill(Q2_truth, wgt);
     h1_WTruth_Dist->Fill(W_truth, wgt);
@@ -920,6 +925,7 @@ int ECCE_DEMP10on100::process_event(PHCompositeNode *topNode)
     h1_t_altTruth_Dist->Fill(t_alt_truth, wgt);
     h1_xbTruth_Dist->Fill(xb_truth, wgt);
     h1_xiTruth_Dist->Fill(xi_truth, wgt);
+    h1_y_invTruth_Dist->Fill(y_inv_truth, wgt);
 
     h1_taltres_result->Fill((t_alt-t_truth),wgt);
 
@@ -1041,7 +1047,8 @@ int ECCE_DEMP10on100::process_event(PHCompositeNode *topNode)
 	    } // ThetaDiff/PhiDiff CUt
 	  } // Thetan Cut 
 	  // mfek 06/22/20222 - added theta diff/phi diff and thetan cut counters
-	  if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){
+	  // 18/10/22 - Added y_inv cut, only take events with y_inv > 0.01
+	  if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && y_inv > 0.01){
 	    h1_t_cut_result[B]->Fill(t_alt, wgt);
 	    h1_Q2_cut_result[B]->Fill(Q2, wgt);
 	    h1_W_cut_result[B]->Fill(W, wgt);

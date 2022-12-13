@@ -205,12 +205,14 @@ class ECCE_DEMP10on100 : public SubsysReco
   Double_t t_alt_ZDC;
   Double_t xb;
   Double_t xi;
+  Double_t y_inv;
   Double_t Q2_truth;
   Double_t W_truth;
   Double_t t_truth;
   Double_t t_alt_truth;
   Double_t xb_truth;
   Double_t xi_truth;
+  Double_t y_inv_truth;
 
   Double_t t_low;
   Double_t t_high;
@@ -323,6 +325,7 @@ class ECCE_DEMP10on100 : public SubsysReco
   TH1F* h1_t_comp;
   TH1F* h1_xb_Dist;
   TH1F* h1_xi_Dist;
+  TH1F* h1_y_inv_Dist;
 
   TH1F* h1_Q2Truth_Dist;
   TH1F* h1_WTruth_Dist;
@@ -330,6 +333,7 @@ class ECCE_DEMP10on100 : public SubsysReco
   TH1F* h1_t_altTruth_Dist;
   TH1F* h1_xbTruth_Dist;
   TH1F* h1_xiTruth_Dist;
+  TH1F* h1_y_invTruth_Dist;
 
   // Particle Truth info
   TH1F* h1_piTruth_p;

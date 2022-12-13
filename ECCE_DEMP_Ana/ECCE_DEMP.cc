@@ -303,6 +303,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_t_comp = new TH1F("t_comp_Dist", "#frac{#Delta t}{t} Distribution; #frac{t_{alt}-t}{t} (%)", 200, -100, 100);
   h1_xb_Dist = new TH1F("xb_Dist", "x_{b} Distribution", 100, 0, 1);
   h1_xi_Dist = new TH1F("xi_Dist", "#xi Distribution", 100, 0, 1);
+  h1_y_inv_Dist = new TH1F("y_inv_Dist", "y Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Kinematics_Truth_Info");
@@ -313,6 +314,7 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   h1_t_altTruth_Dist = new TH1F("t_altTruth_Dist", "-t_alt Truth (Alternative Calculation) Distribution", 100, 0, 1);
   h1_xbTruth_Dist = new TH1F("xbTruth_Dist", "x_{b} Truth Distribution", 100, 0, 1);
   h1_xiTruth_Dist = new TH1F("xiTruth_Dist", "#xi Truth Distribution", 100, 0, 1);
+  h1_y_invTruth_Dist = new TH1F("y_invTruth_Dist", "y_{Truth} Distribution", 100, 0, 1);
   gDirectory->cd("../");
 
   gDirectory->mkdir("Kinematics_Analysis");
@@ -345,6 +347,32 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
       h1_pn_result[A] = new TH1F(Form("pn_Result_Q2_%i", (A+1)), Form("p_{n} Dist, %i < Q^{2} < %i", (5+((A-1)*5)), (10+((A-1)*5))), 240, 0, 120) ;
     }
   }
+
+  gDirectory->cd("../");
+  gDirectory->mkdir("B0_Testing");
+  gDirectory->cd("B0_Testing");
+  // The first set of plots are just B0 quantities recorded in *any* event
+  h1_B0_E_All = new TH1F("B0_E_All", "B0 Energy Deposition - All Events", 500, 0, 0.01);
+  h1_B0_x_All = new TH1F("B0_x_All", "B0 x Position - All Events", 400, -40, 40);
+  h1_B0_y_All = new TH1F("B0_y_All", "B0 y Position - All Events", 400, -40, 40);
+  h1_B0_z_All = new TH1F("B0_z_All", "B0 z Position - All Events", 400, -40, 40);
+  h1_B0_Th_All = new TH1F("B0_Th_All", "B0 #theta - All Events", 80, 0, 4);
+  h1_B0_Ph_All = new TH1F("B0_Ph_All", "B0 #phi - All Events", 360, -180, 180);
+  // The first set of plots are just B0 quantities recorded in events which look like they have an electron and a pion (and may have a neutron)
+  h1_B0_E_ePi = new TH1F("B0_E_ePi", "B0 Energy Deposition - e+pi Events", 500, 0, 0.01);
+  h1_B0_x_ePi = new TH1F("B0_x_ePi", "B0 x Position - e+pi Events", 400, -40, 40);
+  h1_B0_y_ePi = new TH1F("B0_y_ePi", "B0 y Position - e+pi Events", 400, -40, 40);
+  h1_B0_z_ePi = new TH1F("B0_z_ePi", "B0 z Position - e+pi Events", 400, -40, 40);
+  h1_B0_Th_ePi = new TH1F("B0_Th_ePi", "B0 #theta - e+pi Events", 80, 0, 4);
+  h1_B0_Ph_ePi = new TH1F("B0_Ph_ePi", "B0 #phi - e+pi Events", 360, -180, 180);
+  // The first set of plots are just B0 quantities recorded in events which look like they have an electron,a pion and a neutron
+  h1_B0_E_ePin = new TH1F("B0_E_ePin", "B0 Energy Deposition - e+pi+n Events", 500, 0, 0.01);
+  h1_B0_x_ePin = new TH1F("B0_x_ePin", "B0 x Position - e+pi+n Events", 400, -40, 40);
+  h1_B0_y_ePin = new TH1F("B0_y_ePin", "B0 y Position - e+pi+n Events", 400, -40, 40);
+  h1_B0_z_ePin = new TH1F("B0_z_ePin", "B0 z Position - e+pi+n Events", 400, -40, 40);
+  h1_B0_Th_ePin = new TH1F("B0_Th_ePin", "B0 #theta - e+pi+n Events", 80, 0, 4);
+  h1_B0_Ph_ePin = new TH1F("B0_Ph_ePin", "B0 #phi - e+pi+n Events", 360, -180, 180);
+  h2_B0_ZDC_Th_ePin = new TH2F("B0_ZDC_Th_ePin", "B0 #theta vs ZDC #theta - e+pi+n Events; B0 #theta (Deg); ZDC #theta (Deg)", 80, 0, 4, 80, 0, 4);
 
   gDirectory->cd("../");
   gDirectory->mkdir("Physics_Results");
@@ -448,8 +476,8 @@ int ECCE_DEMP::Init(PHCompositeNode *topNode)
   }
   
   gDirectory->cd("../");
-  h2_ZDC_XY_IP6 = new TH2F("ZDC_XY_IP6", "n X vs Y at ZDC; x (cm); y (cm)", 200, -150, -50, 200, -50, 50);
-  h2_ZDC_XY_IP8 = new TH2F("ZDC_XY_IP8", "n X vs Y at ZDC; x (cm); y (cm)", 200, 50, 150, 200, -50, 50);
+  h2_ZDC_XY_IP6 = new TH2F("ZDC_XY_IP6", "n X vs Y at ZDC; x (cm); y (cm)", 400, -250, 150, 200, -50, 50);
+  h2_ZDC_XY_IP8 = new TH2F("ZDC_XY_IP8", "n X vs Y at ZDC; x (cm); y (cm)", 400, -100, 300, 200, -50, 50);
   h2_ZDC_XY_l = new TH2F("ZDC_XY_l", "n X vs Y at ZDC (Local Co-ords); x (cm); y (cm)", 800, -200, 200, 200, -50, 50);
 
   // Define beam 4 vectors - Assume IP6 by default, for other IPs, adjust in the Process Event loop (at the top)
@@ -591,6 +619,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
   t_alt_truth = -(t_alt4VectTruth.Mag2());
   xb_truth =  Q2_truth/(2*(pBeam4Vect.Dot(virtphoton4VectTruth)));
   xi_truth = xb_truth/(2-xb_truth);
+  y_inv_truth = (pBeam4Vect.Dot(virtphoton4VectTruth))/(pBeam4Vect.Dot(eBeam4Vect));// Calculation of the fractional energy loss
 
   h1_Q2_DetEff_Uncut->Fill(Q2_truth, wgt);
   h2_Q2_t_DetEff_Uncut->Fill(Q2_truth, t_truth, wgt);
@@ -610,6 +639,36 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     }
   }
 
+  // New loop to try and get some B0 hits, B0 tracker and calorimeter
+  // B0 info ONLY exists as truth info, apply smearing functions
+  PHG4HitContainer* B0_hits = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_b0Truth");
+  if(B0_hits){
+    PHG4HitContainer::ConstRange B0_hit_range = B0_hits->getHits();
+    for (PHG4HitContainer::ConstIterator B0_hit_iter = B0_hit_range.first; B0_hit_iter != B0_hit_range.second; B0_hit_iter++){
+      B0_ETrue = B0_hit_iter->second->get_edep();
+      B0_PosTrue.SetXYZ(B0_hit_iter->second->get_x(0), B0_hit_iter->second->get_y(0), B0_hit_iter->second->get_z(0));
+
+      B0_ESmear = B0Cal_Energy_Smear(B0_hit_iter->second->get_edep());
+      B0_PosSmear.SetXYZ(B0Cal_Position_Smear(B0_hit_iter->second->get_x(0)), B0Cal_Position_Smear(B0_hit_iter->second->get_y(0)), B0Cal_Position_Smear(B0_hit_iter->second->get_z(0)));
+    }
+  }
+
+  // Fill some B0 plots before e/pi check
+  h1_B0_E_All->Fill(B0_ETrue, wgt);
+  h1_B0_x_All->Fill(B0_PosTrue.X(), wgt);
+  h1_B0_y_All->Fill(B0_PosTrue.Y(), wgt);
+  h1_B0_z_All->Fill(B0_PosTrue.Z(), wgt);
+  h1_B0_Th_All->Fill(B0_PosTrue.Theta()*TMath::RadToDeg(), wgt);
+  h1_B0_Ph_All->Fill(B0_PosTrue.Phi()*TMath::RadToDeg(), wgt);
+  // Fill some B0 plots after an e/pi check
+  if (Check_ePi(topNode) == true){
+    h1_B0_E_ePi->Fill(B0_ETrue, wgt);
+    h1_B0_x_ePi->Fill(B0_PosTrue.X(), wgt);
+    h1_B0_y_ePi->Fill(B0_PosTrue.Y(), wgt);
+    h1_B0_z_ePi->Fill(B0_PosTrue.Z(), wgt);
+    h1_B0_Th_ePi->Fill(B0_PosTrue.Theta()*TMath::RadToDeg(), wgt);
+    h1_B0_Ph_ePi->Fill(B0_PosTrue.Phi()*TMath::RadToDeg(), wgt);  
+  }
 
   if (Check_n(topNode) == true && Check_ePi(topNode) == true){ // For event, check if it look like we have an e/pi/n in the event
     // Get track map for e'/pi info
@@ -619,6 +678,14 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     // Need to use ZDC surrogate now
     PHG4HitContainer* hits = findNode::getClass<PHG4HitContainer>(topNode, "G4HIT_ZDCsurrogate");
 
+    // Fill some B0 plots after e/pi+n check
+    h1_B0_E_ePin->Fill(B0_ETrue, wgt);
+    h1_B0_x_ePin->Fill(B0_PosTrue.X(), wgt);
+    h1_B0_y_ePin->Fill(B0_PosTrue.Y(), wgt);
+    h1_B0_z_ePin->Fill(B0_PosTrue.Z(), wgt);
+    h1_B0_Th_ePin->Fill(B0_PosTrue.Theta()*TMath::RadToDeg(), wgt);
+    h1_B0_Ph_ePin->Fill(B0_PosTrue.Phi()*TMath::RadToDeg(), wgt);
+    
     if (!trackmap)
       {
 	trackmap = findNode::getClass<SvtxTrackMap>(topNode, "TrackMap");
@@ -682,6 +749,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	}
     }
 
+    h2_B0_ZDC_Th_ePin->Fill(B0_PosTrue.Theta()*TMath::RadToDeg(), nTheta*TMath::RadToDeg());
+    
     // Now have relevant information from this event, fill some histograms and calculate some stuff
     // Calculate kinematic quantities for electroproduction
     virtphoton4Vect = eBeam4Vect - e4Vect;
@@ -714,7 +783,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     t_alt_ZDC = -(t_alt4Vect_ZDC.Mag2());
     xb =  Q2/(2*(pBeam4Vect.Dot(virtphoton4Vect)));
     xi = xb/(2-xb);
-    
+    y_inv = (pBeam4Vect.Dot(virtphoton4Vect))/(pBeam4Vect.Dot(eBeam4Vect));// Calculation of the fractional energy loss
     // Fill weighted histograms
     h1_Q2_DetEff_Cut->Fill(Q2_truth, wgt);
     h2_Q2_t_DetEff_Cut->Fill(Q2_truth, t_truth, wgt);
@@ -801,6 +870,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_t_comp->Fill(((t_alt-t)/t)*100, wgt);
     h1_xb_Dist->Fill(xb, wgt);
     h1_xi_Dist->Fill(xi, wgt);
+    h1_y_inv_Dist->Fill(y_inv, wgt);
 
     h1_Q2Truth_Dist->Fill(Q2_truth, wgt);
     h1_WTruth_Dist->Fill(W_truth, wgt);
@@ -808,6 +878,7 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
     h1_t_altTruth_Dist->Fill(t_alt_truth, wgt);
     h1_xbTruth_Dist->Fill(xb_truth, wgt);
     h1_xiTruth_Dist->Fill(xi_truth, wgt);
+    h1_y_invTruth_Dist->Fill(y_inv_truth, wgt);
 
     h1_taltres_result->Fill((t_alt-t_truth),wgt);
     for(Int_t B = 0; B < 10; B++){
@@ -926,7 +997,8 @@ int ECCE_DEMP::process_event(PHCompositeNode *topNode)
 	  // SJDK - 31/03/22
 	  // nRec4Vect is EXACTLY the missing momentum vector for now, so comparing it to the pmiss cut value is fine
 	  //if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5)))){ // Old version without theta/phi diff cuts
-	  if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut){
+	  // 18/10/22 - Added y_inv cut, only take events with y_inv > 0.01
+	  if ( (nRec4Vect.P() < PmissCutVal[B]) && ((nRec4Vect.Theta()*TMath::RadToDeg() > (Thetan_Cent-0.5)) && (nRec4Vect.Theta()*TMath::RadToDeg() < (Thetan_Cent+0.5))) && (abs(nTheta_Diff*TMath::RadToDeg())) < ThetaDiff_Cut && (abs(nPhi_Diff*TMath::RadToDeg())) < PhiDiff_Cut && y_inv > 0.01){
 	    h1_t_cut_result[B]->Fill(t_alt, wgt);
 	    h1_Q2_cut_result[B]->Fill(Q2, wgt);
 	    h1_W_cut_result[B]->Fill(W, wgt);
@@ -1206,6 +1278,65 @@ float ECCE_DEMP::ZDC_Position_Smear(float P) {
   float resolution, P_reco;
 
   resolution = 0.15;         /// Position resolution 0.15 cm
+  P_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * P;
+
+  return P_reco;
+
+}
+
+///*****************************************************
+/// B0 tracker smearing functions
+
+// Energy smearing
+
+float ECCE_DEMP::B0Tracker_Energy_Smear(float E) {
+
+  float resolution, E_reco;
+
+  resolution = sqrt(.25*.25/E + 0.04*0.04);
+  E_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * E;
+
+  return E_reco;
+
+}
+
+// Posision smearing
+
+float ECCE_DEMP::B0Tracker_Position_Smear(float P) {
+
+  float resolution, P_reco;
+
+  resolution = 0.1;         /// Position resolution 0.1 cm
+  P_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * P;
+
+  return P_reco;
+
+}
+
+
+///*****************************************************
+/// B0 Cal smearing functions
+
+// Energy smearing
+
+float ECCE_DEMP::B0Cal_Energy_Smear(float E) {
+
+  float resolution, E_reco;
+
+  resolution = sqrt(.25*.25/E + 0.04*0.04);
+  E_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * E;
+
+  return E_reco;
+
+}
+
+// Posision smearing
+
+float ECCE_DEMP::B0Cal_Position_Smear(float P) {
+
+  float resolution, P_reco;
+
+  resolution = 0.1;         /// Position resolution 0.1 cm
   P_reco = (1+ gsl_ran_gaussian(m_RandomGenerator, resolution)) * P;
 
   return P_reco;

@@ -101,6 +101,18 @@ class ECCE_DEMP5on41 : public SubsysReco
   float ZDC_Position_Smear(float E);
 
   //*********************************
+  // B0 Tracker Energy and Position smearing
+
+  float B0Tracker_Energy_Smear(float E);
+  float B0Tracker_Position_Smear(float E);
+
+  //*********************************
+  // B0 Cal Energy and Position smearing
+
+  float B0Cal_Energy_Smear(float E);
+  float B0Cal_Position_Smear(float E);
+
+  //*********************************
   // Coordinate transformation from global to local
 
   float Get_Local_X(float global_x, float global_y, float global_z, float det_tilt, float det_rot);
@@ -178,6 +190,12 @@ class ECCE_DEMP5on41 : public SubsysReco
   TLorentzVector pmiss4Vect_2;
   TLorentzVector pmiss4VectTruth_2;
 
+  Double_t B0_ETrue;
+  Double_t B0_ESmear;
+
+  TVector3 B0_PosTrue;
+  TVector3 B0_PosSmear;
+
   Double_t nEDep;
   Double_t nTheta;
   Double_t nPhi;
@@ -205,12 +223,14 @@ class ECCE_DEMP5on41 : public SubsysReco
   Double_t t_alt_ZDC;
   Double_t xb;
   Double_t xi;
+  Double_t y_inv;
   Double_t Q2_truth;
   Double_t W_truth;
   Double_t t_truth;
   Double_t t_alt_truth;
   Double_t xb_truth;
   Double_t xi_truth;
+  Double_t y_inv_truth;
 
   Double_t t_low;
   Double_t t_high;
@@ -329,6 +349,7 @@ class ECCE_DEMP5on41 : public SubsysReco
   TH1F* h1_t_comp;
   TH1F* h1_xb_Dist;
   TH1F* h1_xi_Dist;
+  TH1F* h1_y_inv_Dist;
 
   TH1F* h1_Q2Truth_Dist;
   TH1F* h1_WTruth_Dist;
@@ -336,6 +357,7 @@ class ECCE_DEMP5on41 : public SubsysReco
   TH1F* h1_t_altTruth_Dist;
   TH1F* h1_xbTruth_Dist;
   TH1F* h1_xiTruth_Dist;
+  TH1F* h1_y_invTruth_Dist;
 
   // Particle Truth info
   TH1F* h1_piTruth_p;
@@ -468,6 +490,27 @@ class ECCE_DEMP5on41 : public SubsysReco
   TH2F* h2_t_Q2;
   TH2F* h2_delta_t_t;
   TH2F* h2_delta_t_t_Q2[19]; // mfek 06/21/2022 - changed binning for 5 on 41
+
+  // BO Analysis plots
+  TH1F* h1_B0_E_All;
+  TH1F* h1_B0_x_All;
+  TH1F* h1_B0_y_All;
+  TH1F* h1_B0_z_All;
+  TH1F* h1_B0_Th_All;
+  TH1F* h1_B0_Ph_All;
+  TH1F* h1_B0_E_ePi;
+  TH1F* h1_B0_x_ePi;
+  TH1F* h1_B0_y_ePi;
+  TH1F* h1_B0_z_ePi;
+  TH1F* h1_B0_Th_ePi;
+  TH1F* h1_B0_Ph_ePi;
+  TH1F* h1_B0_E_ePin;
+  TH1F* h1_B0_x_ePin;
+  TH1F* h1_B0_y_ePin;
+  TH1F* h1_B0_z_ePin;
+  TH1F* h1_B0_Th_ePin;
+  TH1F* h1_B0_Ph_ePin;
+  TH2F* h2_B0_ZDC_Th_ePin;
 
   // 1D Physics results plots
   TH1F* h1_Mmiss_result;
